@@ -17,7 +17,7 @@ FT_LIB = $(addprefix $(FTDIR)/,libft.a)
 FT_INC = -I $(FTDIR)
 FT_LNK = -L $(FTDIR) -l ft
 
-all: obj $(MLX_LIB) $(FT_LIB) $(NAME)
+all: obj $(FT_LIB) $(NAME)
 
 obj:
 		mkdir -p $(OBJDIR)

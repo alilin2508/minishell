@@ -23,6 +23,23 @@ typedef struct	s_list
 	size_t			content_size;
 	struct s_list	*next;
 }				t_list;
+
+
+typedef struct  s_env
+{
+  char    *env;
+  struct s_env   *next;
+}               t_env;
+
+typedef struct  s_envindex
+{
+  struct s_env *head;
+  struct s_env *tail;
+}               t_envindex;
+
+
+void  ft_del_lst(t_env **p);
+void  ft_addback(t_env **p, char *environement);
 int		ft_atoi(const char *str);
 int		ft_isalnum(int c);
 int		ft_isalpha(int c);

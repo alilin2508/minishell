@@ -1,5 +1,4 @@
-#include "../includes/minishell.h"
-#include "../libft/libft.h"
+#include "minishell.h"
 
 void 	ft_putstr(char *str)
 {
@@ -13,10 +12,13 @@ void 	ft_putstr(char *str)
 
 int 	main()
 {
+		char *line;
+		line = NULL;
 		while (1)
 		{
-				ft_putstr(">> ");
-				get_next_line(0, 0);
+				write(1, "&> ", 3);
+				get_next_line(0, &line);
+
 		}
 		return (0);
 }
