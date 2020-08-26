@@ -46,7 +46,8 @@ SRC = ft_bzero.c \
 			ft_splitdel.c \
 			ft_lstcount.c \
 			ft_strcat.c \
-			ft_strcmp.c
+			ft_strcmp.c \
+			ft_strcpy.c
 
 OBJ		= $(SRC:.c=.o)
 CC		= gcc

@@ -12,20 +12,50 @@
 
 #include "minishell.h"
 
-/**void environment(char **env)
+void environment(char **env)
 {
 	int i;
 
 	i = 0;
 	while (env[i])
 		printf("%s\n", env[i++]);
-	return (0);
+}
+
+size_t path_max(char **env)
+{
+	int i;
+	size_t max;
+
+	i = 0;
+	max = 0;
+	while (env[i])
+	{
+		if (ft_strlen(env[i]) >= max)
+			max = ft_strlen(env[i]);
+		i++;
+	}
+	return (max);
 }
 
 void position(char **env)
 {
+	char *buff;
+	char *path;
 
-}**/
+	buff = NULL;
+	if (!(path = malloc(sizeof(char) * path_max(env))))
+		return;
+	path = getcwd(buff, sizeof(path));
+	printf("%s\n", path);
+	free(buff);
+	free(path);
+}
+
+void my_cd(const char *path)
+{
+	if (chdir(path) == -1)
+		perror("chdir()");
+}
 
 char **ft_getenv(char **env)
 {
@@ -73,35 +103,14 @@ char *my_getenv(char **env, char *path)
 	return (usable);
 }
 
-/**int					ft_access(char *path, char *cmd)
-{
-	DIR* rep;
-	struct dirent* fichier_lu;
-
-	rep = NULL;
-	rep = opendir(path);
-	if (rep == NULL)
-		exit(1);
-	while ((fichier_lu = readdir(rep)) != NULL)
-		if (ft_strcmp(fichier_lu, cmd) == 0)
-		{
-			if (closedir(rep) == -1)
-				exit(-1);
-			return (0);
-		}
-		if (closedir(rep) == -1)
-			exit(-1);
-		return (-1);
-}**/
-
 int ft_access(char *bin)
 {
 	int fd;
 
-	fd = open(bin, O_RDONLY);
-	if (fd == -1)
+	if ((fd = open(bin, O_RDONLY)) > 0)
+		return (0);
+	else
 		return (-1);
-	return (0);
 }
 
 static void get_path(char **cmd, char **env)
@@ -165,12 +174,35 @@ static void	cmd_execution(char **cmd)
 	else
 	{
 		if (execve(cmd[0], cmd, NULL) == -1)
-			perror(cmd[0]);
+			perror("shell");
 		exit(EXIT_FAILURE);
 	}
 }
 
-int			main(int ac, char **av, char **env)
+static void exect_built_commande(char **cmd, char **env)
+{
+	if (!ft_strcmp(cmd[0], "cd"))
+		my_cd(cmd[1]);
+	else if (!ft_strcmp(cmd[0], "env"))
+		environment(env);
+}
+
+int 				built_command(char *cmd)
+{
+	char	*build_com[] = {"cd", "env", NULL};
+	int 	i;
+
+	i = 0;
+	while (build_com[i])
+	{
+		if (ft_strcmp(build_com[i], cmd) == 0)
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+int					main(int ac, char **av, char **env)
 {
 	char	*line;
 	char	**commande;
@@ -183,14 +215,18 @@ int			main(int ac, char **av, char **env)
 		write(1, "$alilin> ", 9);
 		get_next_line(0, &line);
 		commande = ft_split(line, ' ');
-		get_path(commande, env);
-		free(line);
-		if (ft_strncmp(commande[0], "exit()", 7) == 0)
+		if (ft_strcmp(commande[0], "exit()") == 0)
 			break ;
+		free(line);
 		if (commande == NULL)
 			write(1, "command not found", 17);
-		else
+		else if (built_command(commande[0]) == 0)
+		{
+			get_path(commande, env);
 			cmd_execution(commande);
+		}
+		else
+			exect_built_commande(commande, env);
 		ft_splitdel(&commande);
 	}
 	system("leaks minishell");
