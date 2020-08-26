@@ -37,7 +37,8 @@ typedef struct  s_envindex
   struct s_env *tail;
 }               t_envindex;
 
-
+int	ft_strcmp(char *s1, char *s2);
+char *ft_strcat(char *dest, char *src);
 void  ft_del_lst(t_env **p);
 void  ft_addback(t_env **p, char *environement);
 int		ft_atoi(const char *str);
