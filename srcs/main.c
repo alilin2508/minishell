@@ -115,7 +115,6 @@ int ft_access(char *bin)
 
 static void get_path(char **cmd, char **env)
 {
-	system("leaks minishell");
 	char	*path;
 	char	*bin;
 	char	**split_path;
@@ -230,6 +229,6 @@ int					main(int ac, char **av, char **env)
 			exect_built_commande(commande, env);
 		ft_splitdel(&commande);
 	}
-//	system("leaks minishell");
+	system("leaks minishell");
 	return (0);
 }
