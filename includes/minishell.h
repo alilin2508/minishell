@@ -11,6 +11,7 @@
 # include <signal.h>
 # include <dirent.h>
 # include "../libft/libft.h"
+# include "../ft_printf/libftprintf.h"
 
 static void   get_path(char **cmd, char **env);
 char          **ft_getenv(char **env);

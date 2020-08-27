@@ -30,7 +30,7 @@ static int		ft_size(long nb)
 	return (size);
 }
 
-char			*ft_itoa(int n)
+char			*ft_itoa(long n)
 {
 	char			*str;
 	int				i;

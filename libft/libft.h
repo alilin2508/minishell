@@ -74,7 +74,7 @@ void	ft_putstr_fd(const char *s, int fd);
 void	ft_putendl_fd(const char *s, int fd);
 void	ft_putnbr_fd(int n, int fd);
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
-char	*ft_itoa(int n);
+char	*ft_itoa(long n);
 char	*ft_strtrim(char const *s1, char const *set);
 void	ft_putendl(char const *s);
 int     ft_lerpi(int first, int second, double p);

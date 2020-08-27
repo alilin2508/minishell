@@ -18,6 +18,7 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <unistd.h>
+# include "../libft/libft.h"
 
 int		g_result;
 int		g_lentoto;
@@ -44,7 +45,6 @@ void			ft_putstr(char *str, t_opt *f, int len);
 void			ft_return(t_opt *f, int len);
 int				ft_atoi(const char *str);
 void			*ft_calloc(size_t count, size_t size);
-char			*ft_itoa(long n);
 void			ft_putnbr(int nb);
 char			*ft_strdup(const char *s1);
 int				ft_isdigit(int c);

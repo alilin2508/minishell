@@ -10,14 +10,14 @@ SRC = main.c \
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 
 CC		= gcc
-CFLAGS = -g -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror
 
 FTDIR = ./libft
 FT_LIB = $(addprefix $(FTDIR)/,libft.a)
 FT_INC = -I $(FTDIR)
 FT_LNK = -L $(FTDIR) -l ft
 
-PRDIR = ./printf
+PRDIR = ./ft_printf
 PR_LIB = $(addprefix $(FTDIR)/,libftprintf.a)
 PR_INC = -I $(PRDIR)
 PR_LNK = -L $(PRDIR) -l ft
