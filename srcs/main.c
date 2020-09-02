@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#define _CRTDBG_MAP_ALLOC
 #include "minishell.h"
 
 void environment(char **env)
@@ -18,7 +19,11 @@ void environment(char **env)
 
 	i = 0;
 	while (env[i])
-		printf("%s\n", env[i++]);
+	{
+		ft_putstr(env[i]);
+		write(1, "\n", 1);
+		i++;
+	}
 }
 
 size_t path_max(char **env)
@@ -46,8 +51,9 @@ void position(char **env)
 	if (!(path = malloc(sizeof(char) * path_max(env))))
 		return;
 	path = getcwd(buff, sizeof(path));
-	printf("%s\n", path);
 	free(buff);
+	ft_putstr(path);
+	write(1, "\n", 1);
 	free(path);
 }
 
@@ -128,9 +134,9 @@ static void get_path(char **cmd, char **env)
 	if (cmd[0][0] != '/' && ft_strncmp(cmd[0], "./", 2) != 0)
 	{
 		split_path = ft_split(path, ':');
+		i = 0;
 		free(path);
 		path = NULL;
-		i = 0;
 		while (split_path[i])
 		{
 			bin = (char *)ft_calloc(sizeof(char), ft_strlen(split_path[i]) + 1 * ft_strlen(cmd[0]) + 1);
@@ -153,6 +159,8 @@ static void get_path(char **cmd, char **env)
 	{
 		free(bin);
 		bin = NULL;
+		free(path);
+		path = NULL;
 	}
 }
 
@@ -185,11 +193,13 @@ static void exect_built_commande(char **cmd, char **env)
 		my_cd(cmd[1]);
 	else if (!ft_strcmp(cmd[0], "env"))
 		environment(env);
+	else if (!ft_strcmp(cmd[0], "pwd"))
+		position(env);
 }
 
 int 				built_command(char *cmd)
 {
-	char	*build_com[] = {"cd", "env", NULL};
+	char	*build_com[] = {"cd", "env", "pwd", NULL};
 	int 	i;
 
 	i = 0;
@@ -212,14 +222,14 @@ int					main(int ac, char **av, char **env)
 	line = NULL;
 	while (42)
 	{
-		write(1, "$alilin> ", 9);
+		write(1, "$aliline> ", 9);
 		get_next_line(0, &line);
 		commande = ft_split(line, ' ');
-		if (ft_strcmp(commande[0], "exit()") == 0)
-			break ;
-		free(line);
 		if (commande == NULL)
 			write(1, "command not found", 17);
+		free(line);
+		if (ft_strcmp(commande[0], "exit()") == 0)
+			break ;
 		else if (built_command(commande[0]) == 0)
 		{
 			get_path(commande, env);
@@ -228,7 +238,9 @@ int					main(int ac, char **av, char **env)
 		else
 			exect_built_commande(commande, env);
 		ft_splitdel(&commande);
+		//system("leaks minishell");
 	}
-	system("leaks minishell");
+	_CrtDumpMemoryLeaks();
+	//system("leaks minishell");
 	return (0);
 }

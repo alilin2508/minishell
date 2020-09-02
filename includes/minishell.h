@@ -10,8 +10,7 @@
 # include <errno.h>
 # include <signal.h>
 # include <dirent.h>
-# include "../libft/libft.h"
-# include "../ft_printf/libftprintf.h"
+# include "../libft/includes/libft.h"
 
 static void   get_path(char **cmd, char **env);
 char          **ft_getenv(char **env);

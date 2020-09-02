@@ -1,4 +1,10 @@
 NAME = libft.a
+OS = $(shell uname)
+
+SRCDIR = ./srcs
+INCDIR = ./includes
+OBJDIR = ./obj
+
 SRC = ft_bzero.c \
 			ft_isalpha.c \
 			ft_isdigit.c \
@@ -47,25 +53,33 @@ SRC = ft_bzero.c \
 			ft_lstcount.c \
 			ft_strcat.c \
 			ft_strcmp.c \
-			ft_strcpy.c
+			ft_strcpy.c \
+			ft_putstr.c
 
-OBJ		= $(SRC:.c=.o)
+OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
+
 CC		= gcc
-CFLAGS	= -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror
 
-all: $(NAME)
+all: obj $(NAME)
 
-%.o:%.c
-	$(CC) $(CFLAGS) -o $@ -c $<
+obj:
+		@mkdir -p $(OBJDIR)
+
+$(OBJDIR)/%.o:$(SRCDIR)/%.c
+		@$(CC) $(CFLAGS) -I $(INCDIR) -o $@ -c $<
+
+$(PR_LIB):
+	@make -C $(PRDIR)
 
 $(NAME): $(OBJ)
-	ar rc $(NAME) $(OBJ)
-	ranlib $(NAME)
+	@ar rc $(NAME) $(OBJ)
+	@ranlib $(NAME)
 
 clean:
-	rm -rf $(OBJ)
+		rm -rf $(OBJDIR)
 
 fclean: clean
-	rm -rf $(NAME)
+		rm -f $(NAME)
 
 re: fclean all
