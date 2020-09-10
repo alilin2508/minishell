@@ -212,10 +212,32 @@ int 				built_command(char *cmd)
 	return (0);
 }
 
+int                ft_commande(char *line, char **env)
+{
+    char    **commande;
+
+    commande = ft_split(line, ' ');
+    free(line);
+	if (commande == NULL)
+		write(1, "command not found", 17);
+	if (ft_strcmp(commande[0], "exit()") == 0){
+        ft_splitdel(&commande);
+		return (0);
+    }
+	else if (built_command(commande[0]) == 0)
+	{
+		get_path(commande, env);
+		cmd_execution(commande);
+	}
+	else
+		exect_built_commande(commande, env);
+	ft_splitdel(&commande);
+    return (1);
+}
+
 int					main(int ac, char **av, char **env)
 {
 	char	*line;
-	char	**commande;
 
 	(void)ac;
 	(void)av;
@@ -224,23 +246,10 @@ int					main(int ac, char **av, char **env)
 	{
 		write(1, "$aliline> ", 9);
 		get_next_line(0, &line);
-		commande = ft_split(line, ' ');
-		if (commande == NULL)
-			write(1, "command not found", 17);
-		free(line);
-		if (ft_strcmp(commande[0], "exit()") == 0)
-			break ;
-		else if (built_command(commande[0]) == 0)
-		{
-			get_path(commande, env);
-			cmd_execution(commande);
-		}
-		else
-			exect_built_commande(commande, env);
-		ft_splitdel(&commande);
+        if (!ft_commande(line, env))
+            break ;
 		//system("leaks minishell");
 	}
-	_CrtDumpMemoryLeaks();
-	//system("leaks minishell");
+	system("leaks minishell");
 	return (0);
 }
