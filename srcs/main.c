@@ -69,8 +69,11 @@ char **ft_getenv(char **env)
 	int 	i;
 
 	i = 0;
-	if (!(envi = (char**)malloc(sizeof(env))))
+	while (env[i])
+		i++;
+	if (!(envi = (char**)malloc(sizeof(env) * i + 1)))
 		return (0);
+	i = 0;
 	while (env[i])
 	{
 		if (!(envi[i] = (char *)malloc(sizeof(char *) * ft_strlen(env[i]) + 1)))
@@ -79,12 +82,6 @@ char **ft_getenv(char **env)
 		i++;
 	}
 	envi[i] = NULL;
-	i = 0;
-	while (envi[i])
-	{
-		printf("%s\n", envi[i]);
-		i++;
-	}
 	return(envi);
 }
 
@@ -119,27 +116,33 @@ int ft_access(char *bin)
 		return (-1);
 }
 
-static void get_path(char **cmd, char **env)
+static bool get_path(char **cmd, char **env)
 {
 	char	*path;
 	char	*bin;
 	char	**split_path;
 	int 	i;
 
-	path = ft_strdup(my_getenv(env, "PATH"));
 	bin = NULL;
+	path = NULL;
 	split_path = NULL;
-	if (path == NULL)
-		path = ft_strdup("/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin");
 	if (cmd[0][0] != '/' && ft_strncmp(cmd[0], "./", 2) != 0)
 	{
+		for (int i = 0; env[i]; i++) {
+			if (!strncmp(env[i], "PATH=", 5)) {
+				path = strdup(&env[i][5]);
+				break ;
+			}
+		}
+		if (path == NULL)
+			return (false);
 		split_path = ft_split(path, ':');
-		i = 0;
 		free(path);
 		path = NULL;
+		i = 0;
 		while (split_path[i])
 		{
-			bin = (char *)ft_calloc(sizeof(char), ft_strlen(split_path[i]) + 1 * ft_strlen(cmd[0]) + 1);
+			bin = (char *)ft_calloc(sizeof(char), (ft_strlen(split_path[i]) + 1 + ft_strlen(cmd[0])) + 1);
 			if (bin == NULL)
 				break ;
 			ft_strcat(bin, split_path[i]);
@@ -152,16 +155,20 @@ static void get_path(char **cmd, char **env)
 			i++;
 		}
 		ft_splitdel(&split_path);
-		free(cmd[0]);
-		cmd[0] = bin;
+		if (bin != NULL)
+		{
+			free(cmd[0]);
+			cmd[0] = bin;
+		}
 	}
 	else
 	{
-		free(bin);
-		bin = NULL;
 		free(path);
 		path = NULL;
+		return (true);
 	}
+
+	return (bin == NULL ? false : true);
 }
 
 static void	cmd_execution(char **cmd)
@@ -182,7 +189,11 @@ static void	cmd_execution(char **cmd)
 	else
 	{
 		if (execve(cmd[0], cmd, NULL) == -1)
-			perror("shell");
+		{
+			write(1, "zsh: No such file or directory: ", 32);
+			ft_putstr(cmd[0]);
+			write(1, "\n", 1);
+		}
 		exit(EXIT_FAILURE);
 	}
 }
@@ -214,25 +225,38 @@ int 				built_command(char *cmd)
 
 int                ft_commande(char *line, char **env)
 {
-    char    **commande;
+  char    **commande;
+	char		**tenv;
 
-    commande = ft_split(line, ' ');
-    free(line);
-	if (commande == NULL)
-		write(1, "command not found", 17);
-	if (ft_strcmp(commande[0], "exit()") == 0){
-        ft_splitdel(&commande);
-		return (0);
-    }
-	else if (built_command(commande[0]) == 0)
+	commande = NULL;
+	tenv = NULL;
+  commande = ft_split(line, ' ');
+	if (commande[0] == NULL)
+		write(1, "", 0);
+	else if (ft_strcmp(commande[0], "exit()") == 0)
 	{
-		get_path(commande, env);
-		cmd_execution(commande);
-	}
-	else
+    ft_splitdel(&commande);
+		system("leaks minishell");
+		exit(0);
+  }
+	else if (built_command(commande[0]) == 1)
 		exect_built_commande(commande, env);
+	else
+	{
+		tenv = ft_getenv(env);
+		if (get_path(commande, tenv) == true)
+			cmd_execution(commande);
+		else
+		{
+			write(1, "zsh: command not found: ", 25);
+			ft_putstr(commande[0]);
+			write(1, "\n", 1);
+		}
+		ft_splitdel(&tenv);
+		tenv = NULL;
+	}
 	ft_splitdel(&commande);
-    return (1);
+	return (1);
 }
 
 int					main(int ac, char **av, char **env)
@@ -242,13 +266,12 @@ int					main(int ac, char **av, char **env)
 	(void)ac;
 	(void)av;
 	line = NULL;
-	while (42)
+	while (1)
 	{
-		write(1, "$aliline> ", 9);
+		write(1, "$alilin> ", 9);
 		get_next_line(0, &line);
-        if (!ft_commande(line, env))
-            break ;
-		//system("leaks minishell");
+    ft_commande(line, env);
+		free(line);
 	}
 	system("leaks minishell");
 	return (0);
