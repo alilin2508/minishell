@@ -118,6 +118,30 @@ char *my_getenv(char **env, char *path)
 	return (usable);
 }
 
+void ft_export(char **cmd, char **env)
+{
+	int i;
+
+	i = 1;
+	(void)env;
+	while (cmd[i])
+	{
+		if (ft_strchr(cmd[i], '=') != NULL && cmd[i][0] != '=')
+		{
+
+		}
+		if (cmd[i][0] == '=' && ft_strlen(cmd[i]) != 1)
+		{
+			write(1, "zsh: ", 5);
+			write(1, &cmd[i][1], ft_strlen(cmd[i]) - 1);
+			write(1, " not found\n", 11);
+		}
+		if (ft_strlen(cmd[i]) == 1 && ft_strcmp(cmd[i], "=") == 0)
+			write(1, "zsh: bad assignment\n", 20);
+		i++;
+	}
+}
+
 int ft_access(char *bin)
 {
 	int fd;
@@ -218,11 +242,13 @@ static void exect_built_commande(char **cmd, char **env)
 		environment(env);
 	else if (!ft_strcmp(cmd[0], "pwd"))
 		position(env);
+	else if (!ft_strcmp(cmd[0], "export"))
+		ft_export(cmd, envi);
 }
 
 int 				built_command(char *cmd)
 {
-	char	*build_com[] = {"cd", "env", "pwd", NULL};
+	char	*build_com[] = {"cd", "env", "pwd", "export", NULL};
 	int 	i;
 
 	i = 0;
