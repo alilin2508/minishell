@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#define _CRTDBG_MAP_ALLOC
 #include "minishell.h"
 
 void environment(char **env)
@@ -51,16 +50,29 @@ void position(char **env)
 	if (!(path = malloc(sizeof(char) * path_max(env))))
 		return;
 	path = getcwd(buff, sizeof(path));
-	free(buff);
 	ft_putstr(path);
 	write(1, "\n", 1);
 	free(path);
+	free(buff);
 }
 
-void my_cd(const char *path)
+void my_cd(char *path, char **env)
 {
+	char 	*tmp;
+
+	tmp = NULL;
+	if (path == NULL)
+	{
+		tmp = my_getenv(env, "HOME");
+		free(path);
+		path = tmp;
+	}
 	if (chdir(path) == -1)
-		perror("chdir()");
+	{
+		write(1, "cd: No such file or directory: ", 31);
+		ft_putstr(path);
+		write(1, "\n", 1);
+	}
 }
 
 char **ft_getenv(char **env)
@@ -201,7 +213,7 @@ static void	cmd_execution(char **cmd)
 static void exect_built_commande(char **cmd, char **env)
 {
 	if (!ft_strcmp(cmd[0], "cd"))
-		my_cd(cmd[1]);
+		my_cd(cmd[1], env);
 	else if (!ft_strcmp(cmd[0], "env"))
 		environment(env);
 	else if (!ft_strcmp(cmd[0], "pwd"))
@@ -233,7 +245,7 @@ int                ft_commande(char *line, char **env)
   commande = ft_split(line, ' ');
 	if (commande[0] == NULL)
 		write(1, "", 0);
-	else if (ft_strcmp(commande[0], "exit()") == 0)
+	else if (ft_strcmp(commande[0], "exit") == 0)
 	{
     ft_splitdel(&commande);
 		system("leaks minishell");
@@ -262,17 +274,21 @@ int                ft_commande(char *line, char **env)
 int					main(int ac, char **av, char **env)
 {
 	char	*line;
+	char 	**envi;
 
 	(void)ac;
 	(void)av;
 	line = NULL;
+	envi = ft_getenv(env);
 	while (1)
 	{
 		write(1, "$alilin> ", 9);
 		get_next_line(0, &line);
-    ft_commande(line, env);
+    ft_commande(line, envi);
 		free(line);
 	}
+	ft_splitdel(&envi);
+	envi = NULL;
 	system("leaks minishell");
 	return (0);
 }
