@@ -12,6 +12,39 @@
 
 #include "minishell.h"
 
+void ft_puterror(char *error, char *arg)
+{
+	write(1, error, ft_strlen(error));
+	write(1, arg, ft_strlen(arg));
+	write(1, "\n", 1);
+}
+
+int tab_len(char **env)
+{
+	int i;
+
+	i = 0;
+	while (env[i])
+		i++;
+	return (i);
+}
+
+int 	ft_cheakarg(char *str)
+{
+	int i;
+	int nb;
+
+	i = 0;
+	nb = 0;
+	while (str[i])
+	{
+		if (str[i] == ';')
+			nb++;
+		i++;
+	}
+	return (nb);
+}
+
 void environment(char **env)
 {
 	int i;
@@ -41,38 +74,47 @@ size_t path_max(char **env)
 	return (max);
 }
 
-void position(char **env)
+void position(char **cmd, char **env)
 {
-	char *buff;
 	char *path;
 
-	buff = NULL;
-	if (!(path = malloc(sizeof(char) * path_max(env))))
-		return;
-	path = getcwd(buff, sizeof(path));
-	ft_putstr(path);
-	write(1, "\n", 1);
+	path = NULL;
+	if (cmd[1] != NULL)
+		write(1, "pwd: too many arguments\n", 24);
+	else
+	{
+		if (!(path = malloc(sizeof(char) * path_max(env))))
+			return;
+		getcwd(path, path_max(env));
+		ft_putstr(path);
+		write(1, "\n", 1);
+	}
 	free(path);
-	free(buff);
 }
 
-void my_cd(char *path, char **env)
+void my_cd(char *path, char **env, char **cmd)
 {
 	char 	*tmp;
 
 	tmp = NULL;
 	if (path == NULL)
 	{
-		tmp = my_getenv(env, "HOME");
+		tmp = my_getenv(env, "HOME=");
 		free(path);
 		path = tmp;
 	}
-	if (chdir(path) == -1)
+	else if (tab_len(cmd) > 3)
 	{
-		write(1, "cd: No such file or directory: ", 31);
-		ft_putstr(path);
-		write(1, "\n", 1);
+		write(1, "cd: too many arguments\n", 23);
+		return ;
 	}
+	else if (tab_len(cmd) == 3)
+	{
+		ft_puterror("cd: string not in pwd: ", path);
+		return ;
+	}
+	if (chdir(path) == -1 )
+		ft_puterror("cd: No such file or directory: ", path);
 }
 
 char **ft_getenv(char **env)
@@ -108,9 +150,7 @@ char *my_getenv(char **env, char *path)
 	{
 		if (ft_strncmp(env[i], path, ft_strlen(path)) == 0)
 		{
-			if (!(usable = (char *)malloc(sizeof(char) * ft_strlen(env[i]) - ft_strlen(path))))
-				return(0);
-			usable = &env[i][ft_strlen(path)+1];
+			usable = &env[i][ft_strlen(path)];
 			break ;
 		}
 		i++;
@@ -118,7 +158,7 @@ char *my_getenv(char **env, char *path)
 	return (usable);
 }
 
-void ft_export(char **cmd, char **env)
+/*void ft_export(char **cmd, char **env)
 {
 	int i;
 
@@ -140,6 +180,62 @@ void ft_export(char **cmd, char **env)
 			write(1, "zsh: bad assignment\n", 20);
 		i++;
 	}
+}*/
+
+char 	**ft_export(char **cmd, char **env)
+{
+	int i;
+	int j;
+	char **envi;
+
+	i = 1;
+	while (cmd[i])
+	{
+		envi = NULL;
+		if (ft_strchr(cmd[i], '=') != NULL && cmd[i][0] != '=')
+		{
+			j = 0;
+			if (!(envi = (char **)malloc(sizeof(env) * tab_len(env) + 2)))
+				return NULL;
+			while (env[j])
+			{
+				if (j < tab_len(env) - 1)
+				{
+					if (!(envi[j] = (char *)malloc(sizeof(char *) * ft_strlen(env[j]) + 1)))
+						return NULL;
+					ft_strcpy(envi[j], env[j]);
+				}
+				else
+				{
+					if (!(envi[j] = (char *)malloc(sizeof(char *) * ft_strlen(cmd[i]) + 1)))
+						return NULL;
+					ft_strcpy(envi[j], cmd[i]);
+				}
+				j++;
+			}
+			if (!(envi[j] = (char *)malloc(sizeof(char *) * ft_strlen(env[j - 1]) + 1)))
+				return NULL;
+			ft_strcpy(envi[j], env[j - 1]);
+			envi[j + 1] = NULL;
+		}
+		if (envi != NULL)
+		{
+			j = 0;
+			ft_splitdel(&env);
+			if (!(env = (char **)malloc(sizeof(env) * tab_len(envi) + 2)))
+				return NULL;
+			while (envi[j])
+			{
+				if (!(env[j] = (char *)malloc(sizeof(char) * ft_strlen(envi[j]) + 1)))
+					return NULL;
+				ft_strcpy(env[j], envi[j]);
+				j++;
+			}
+			env[j] = NULL;
+		}
+		i++;
+	}
+	return (env);
 }
 
 int ft_access(char *bin)
@@ -225,25 +321,21 @@ static void	cmd_execution(char **cmd)
 	else
 	{
 		if (execve(cmd[0], cmd, NULL) == -1)
-		{
-			write(1, "zsh: No such file or directory: ", 32);
-			ft_putstr(cmd[0]);
-			write(1, "\n", 1);
-		}
+			ft_puterror("zsh: No such file or directory: ", cmd[0]);
 		exit(EXIT_FAILURE);
 	}
 }
 
-static void exect_built_commande(char **cmd, char **env)
+static void exect_built_commande(char **cmd, char ***env)
 {
 	if (!ft_strcmp(cmd[0], "cd"))
-		my_cd(cmd[1], env);
+		my_cd(cmd[1], *env, cmd);
 	else if (!ft_strcmp(cmd[0], "env"))
-		environment(env);
+		environment(*env);
 	else if (!ft_strcmp(cmd[0], "pwd"))
-		position(env);
+		position(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "export"))
-		ft_export(cmd, envi);
+		*env = ft_export(cmd, *env);
 }
 
 int 				built_command(char *cmd)
@@ -261,7 +353,7 @@ int 				built_command(char *cmd)
 	return (0);
 }
 
-int                ft_commande(char *line, char **env)
+int                ft_commande(char *line, char ***env)
 {
   char    **commande;
 	char		**tenv;
@@ -274,26 +366,50 @@ int                ft_commande(char *line, char **env)
 	else if (ft_strcmp(commande[0], "exit") == 0)
 	{
     ft_splitdel(&commande);
+		ft_splitdel(env);
 		system("leaks minishell");
 		exit(0);
   }
 	else if (built_command(commande[0]) == 1)
+	{
 		exect_built_commande(commande, env);
+		//environment(env);
+	}
 	else
 	{
-		tenv = ft_getenv(env);
+		tenv = ft_getenv(*env);
 		if (get_path(commande, tenv) == true)
 			cmd_execution(commande);
 		else
-		{
-			write(1, "zsh: command not found: ", 25);
-			ft_putstr(commande[0]);
-			write(1, "\n", 1);
-		}
+			ft_puterror("zsh: command not found: ", commande[0]);
 		ft_splitdel(&tenv);
 		tenv = NULL;
 	}
 	ft_splitdel(&commande);
+	return (1);
+}
+
+int 				ft_precommande(char *line, char ***env)
+{
+	int nbarg;
+	char **commande;
+	int i;
+
+	commande = NULL;
+	nbarg = ft_cheakarg(line);
+	if (nbarg == 0)
+		ft_commande(line, env);
+	else
+	{
+		commande = ft_split(line, ';');
+		i = 0;
+		while (commande[i])
+		{
+			ft_commande(commande[i], env);
+			i++;
+		}
+		ft_splitdel(&commande);
+	}
 	return (1);
 }
 
@@ -310,8 +426,9 @@ int					main(int ac, char **av, char **env)
 	{
 		write(1, "$alilin> ", 9);
 		get_next_line(0, &line);
-    ft_commande(line, envi);
+    ft_precommande(line, &envi);
 		free(line);
+		//system("leaks minishell");
 	}
 	ft_splitdel(&envi);
 	envi = NULL;

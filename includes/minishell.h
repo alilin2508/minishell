@@ -19,11 +19,11 @@ char          *my_getenv(char **env, char *path);
 static void   cmd_execution(char **cmd);
 void          environment(char **env);
 size_t        path_max(char **env);
-void          position(char **env);
-void          my_cd(char *path, char **env);
+void          position(char **cmd, char **env);
+void          my_cd(char *path, char **env, char **cmd);
 int           ft_access(char *bin);
-static void   exect_built_commande(char **cmd, char **env);
+static void   exect_built_commande(char **cmd, char ***env);
 int 				  built_command(char *cmd);
-int           ft_commande(char *line, char **env);
+int           ft_commande(char *line, char ***env);
 
 #endif
