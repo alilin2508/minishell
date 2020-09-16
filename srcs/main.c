@@ -158,80 +158,216 @@ char *my_getenv(char **env, char *path)
 	return (usable);
 }
 
-/*void ft_export(char **cmd, char **env)
+int 	ft_checkexport(char **cmd)
 {
 	int i;
 
 	i = 1;
-	(void)env;
 	while (cmd[i])
 	{
-		if (ft_strchr(cmd[i], '=') != NULL && cmd[i][0] != '=')
-		{
-
-		}
-		if (cmd[i][0] == '=' && ft_strlen(cmd[i]) != 1)
-		{
-			write(1, "zsh: ", 5);
-			write(1, &cmd[i][1], ft_strlen(cmd[i]) - 1);
-			write(1, " not found\n", 11);
-		}
-		if (ft_strlen(cmd[i]) == 1 && ft_strcmp(cmd[i], "=") == 0)
-			write(1, "zsh: bad assignment\n", 20);
+		if (cmd[i][0] == '=' && ft_strlen(cmd[i]) > 1)
+			return (i);
 		i++;
 	}
-}*/
+	return (0);
+}
+
+int 	ft_checkex2(char *cmd, char **env)
+{
+	int i;
+	int len;
+
+	i = 0;
+	while (cmd[i] != '=')
+		i++;
+	len = i;
+
+	while (env[i])
+	{
+		if (ft_strncmp(cmd, env[i], len) == 0)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+int 	ft_checkunset(char *cmd, char **env)
+{
+	int i;
+
+	i = 0;
+	while (env[i])
+	{
+		if (!ft_strncmp(env[i], cmd, ft_strlen(cmd)))
+			return (i + 1);
+		i++;
+	}
+	return (0);
+}
+
+char 	**ft_unset(char **cmd, char **env)
+{
+	int i;
+	int error;
+	int j;
+	int idx;
+	char **tmp;
+	char *tcmd;
+	int err;
+
+	tmp = NULL;
+	if ((error = ft_checkexport(cmd)) != 0)
+	{
+		write(1, "zsh: ", 5);
+		write(1, &cmd[error][1], ft_strlen(cmd[error]) - 1);
+		write(1, " not found\n", 11);
+		return (env);
+	}
+	i = 1;
+	while (cmd[i])
+	{
+		j = 0;
+		err = 0;
+		while (cmd[i][j])
+		{
+			if (!ft_isalnum(cmd[i][j]))
+			{
+				write(1, "unset: ", 7);
+				write(1, cmd[i], ft_strlen(cmd[i]));
+				write(1, ": invalid parameter name\n", 25);
+				err = 1;
+			}
+			j++;
+		}
+		if (err == 0)
+		{
+			if (!(tcmd = (char *)malloc(sizeof(char *) * (ft_strlen(cmd[i]) + 2))))
+				return (NULL);
+			j = 0;
+			while (cmd[j])
+			{
+				tcmd[j] = cmd[i][j];
+				j++;
+			}
+			tcmd[j] = '=';
+			tcmd[j + 1] = '\0';
+			if ((idx = ft_checkunset(tcmd, env) - 1) != -1)
+			{
+				if (!(tmp = (char **)malloc(sizeof(char) * (tab_len(env)))))
+					return (NULL);
+				j = 0;
+				while(env[j])
+				{
+					if (j != idx)
+					{
+						if (!(tmp[j] = (char*)malloc(sizeof(char *) * (ft_strlen(env[j]) + 1))))
+							return (NULL);
+						ft_strcpy(tmp[j], env[j]);
+					}
+					j++;
+				}
+				tmp[j] = NULL;
+				ft_splitdel(&env);
+				if (!(env = (char **)malloc(sizeof(char **) * (tab_len(tmp) + 1))))
+					return (NULL);
+				j = 0;
+				while(tmp[j])
+				{
+					if (!(env[j] = (char *)malloc(sizeof(char *) * (ft_strlen(tmp[j]) + 1))))
+						return (NULL);
+					ft_strcpy(env[j], tmp[j]);
+					j++;
+				}
+				env[j] = NULL;
+				ft_splitdel(&tmp);
+				tmp = NULL;
+			}
+		}
+		i++;
+	}
+	return (env);
+}
 
 char 	**ft_export(char **cmd, char **env)
 {
-	int i;
-	int j;
-	char **envi;
+	int 	i;
+	int 	j;
+	int 	error;
+	char 	**tmp;
+	int 	len;
 
 	i = 1;
+	tmp = NULL;
+	if ((error = ft_checkexport(cmd)) != 0)
+	{
+		write(1, "zsh: ", 5);
+		write(1, &cmd[error][1], ft_strlen(cmd[error]) - 1);
+		write(1, " not found\n", 11);
+		return (env);
+	}
 	while (cmd[i])
 	{
-		envi = NULL;
-		if (ft_strchr(cmd[i], '=') != NULL && cmd[i][0] != '=')
+		if (cmd[i][0] == '=')
 		{
+			if (ft_strlen(cmd[i]) == 1 && i == 1)
+				write(1, "zsh: bad assignment\n", 20);
+			else if (ft_strlen(cmd[i]) == 1 && i != 1)
+				write(1, "export: not valid in this context:\n", 35);
+			break ;
+		}
+		if (strchr(cmd[i], '=') != 0 && ft_checkex2(cmd[i], env))
+		{
+			if (!(tmp = (char **)malloc(sizeof(char **) * (tab_len(env) + 2))))
+				return (NULL);
 			j = 0;
-			if (!(envi = (char **)malloc(sizeof(env) * tab_len(env) + 2)))
-				return NULL;
-			while (env[j])
+			while(j < tab_len(env) - 1)
 			{
-				if (j < tab_len(env) - 1)
-				{
-					if (!(envi[j] = (char *)malloc(sizeof(char *) * ft_strlen(env[j]) + 1)))
-						return NULL;
-					ft_strcpy(envi[j], env[j]);
-				}
-				else
-				{
-					if (!(envi[j] = (char *)malloc(sizeof(char *) * ft_strlen(cmd[i]) + 1)))
-						return NULL;
-					ft_strcpy(envi[j], cmd[i]);
-				}
+				if (!(tmp[j] = (char *)malloc(sizeof(char *) * (ft_strlen(env[j]) + 1))))
+					return (NULL);
+				ft_strcpy(tmp[j], env[j]);
 				j++;
 			}
-			if (!(envi[j] = (char *)malloc(sizeof(char *) * ft_strlen(env[j - 1]) + 1)))
-				return NULL;
-			ft_strcpy(envi[j], env[j - 1]);
-			envi[j + 1] = NULL;
-		}
-		if (envi != NULL)
-		{
-			j = 0;
+			if (!(tmp[j] = (char *)malloc(sizeof(char *) * (ft_strlen(cmd[i]) + 1))))
+				return (NULL);
+			ft_strcpy(tmp[j], cmd[i]);
+			if (!(tmp[j + 1] = (char *)malloc(sizeof(char *) * (ft_strlen(env[j]) + 1))))
+				return (NULL);
+			ft_strcpy(tmp[j + 1], env[j]);
+			tmp[j + 2] = NULL;
 			ft_splitdel(&env);
-			if (!(env = (char **)malloc(sizeof(env) * tab_len(envi) + 2)))
-				return NULL;
-			while (envi[j])
+			if (!(env = (char **)malloc(sizeof(char **) * (tab_len(tmp) + 1))))
+				return (NULL);
+			j = 0;
+			while (tmp[j])
 			{
-				if (!(env[j] = (char *)malloc(sizeof(char) * ft_strlen(envi[j]) + 1)))
-					return NULL;
-				ft_strcpy(env[j], envi[j]);
+				if (!(env[j] = (char *)malloc(sizeof(char *) * (ft_strlen(tmp[j]) + 1))))
+					return (NULL);
+				ft_strcpy(env[j], tmp[j]);
 				j++;
 			}
 			env[j] = NULL;
+			ft_splitdel(&tmp);
+			tmp = NULL;
+		}
+		else
+		{
+			j = 0;
+			while (cmd[i][j] != '=')
+				j++;
+			len = j;
+			j = 0;
+			while (env[j])
+			{
+				if (ft_strncmp(cmd[i], env[j], len) == 0)
+				{
+					free(env[j]);
+					if (!(env[j] = (char *)malloc(sizeof(char *) * (ft_strlen(cmd[i]) + 1))))
+						return (NULL);
+					ft_strcpy(env[j], cmd[i]);
+					break ;
+				}
+				j++;
+			}
 		}
 		i++;
 	}
@@ -336,11 +472,13 @@ static void exect_built_commande(char **cmd, char ***env)
 		position(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "export"))
 		*env = ft_export(cmd, *env);
+	else if (!ft_strcmp(cmd[0], "unset"))
+		*env = ft_unset(cmd, *env);
 }
 
 int 				built_command(char *cmd)
 {
-	char	*build_com[] = {"cd", "env", "pwd", "export", NULL};
+	char	*build_com[] = {"cd", "env", "pwd", "export", "unset",NULL};
 	int 	i;
 
 	i = 0;
@@ -366,15 +504,12 @@ int                ft_commande(char *line, char ***env)
 	else if (ft_strcmp(commande[0], "exit") == 0)
 	{
     ft_splitdel(&commande);
-		ft_splitdel(env);
+		write(1, "TROP BIEN CE SHELL\n", 19);
 		system("leaks minishell");
 		exit(0);
   }
 	else if (built_command(commande[0]) == 1)
-	{
 		exect_built_commande(commande, env);
-		//environment(env);
-	}
 	else
 	{
 		tenv = ft_getenv(*env);
