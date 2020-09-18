@@ -488,6 +488,39 @@ static void	cmd_execution(char **cmd)
 	}
 }
 
+void 		ft_echo(char **cmd)
+{
+	int i;
+	int j;
+	int n = 0;
+
+	if (cmd[1] == NULL)
+	{
+		write(1, "\n", 1);
+		return ;
+	}
+	if (!ft_strcmp(cmd[1], "-n"))
+		n = 1;
+	if (n == 0)
+		i = 1;
+	else
+		i = 2;
+	while (cmd[i])
+	{
+		j = 0;
+		while (cmd[i][j])
+		{
+			write(1, &cmd[i][j], 1);
+			j++;
+		}
+		if (cmd[i + 1] != NULL)
+			write(1, " ", 1);
+		i++;
+	}
+	if (n == 0)
+		write(1, "\n",  1);
+}
+
 static void exect_built_commande(char **cmd, char ***env)
 {
 	if (!ft_strcmp(cmd[0], "cd"))
@@ -500,11 +533,13 @@ static void exect_built_commande(char **cmd, char ***env)
 		*env = ft_export(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "unset"))
 		*env = ft_unset(cmd, *env);
+	else if (!ft_strcmp(cmd[0], "echo"))
+		ft_echo(cmd);
 }
 
 int 				built_command(char *cmd)
 {
-	char	*build_com[] = {"cd", "env", "pwd", "export", "unset",NULL};
+	char	*build_com[] = {"cd", "env", "pwd", "export", "unset", "echo", NULL};
 	int 	i;
 
 	i = 0;
