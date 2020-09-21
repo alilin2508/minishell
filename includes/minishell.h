@@ -13,6 +13,8 @@
 # include <stdbool.h>
 # include "../libft/includes/libft.h"
 
+extern int errno ;
+
 static bool   get_path(char **cmd, char **env);
 char          **ft_getenv(char **env);
 char          *my_getenv(char **env, char *path);
