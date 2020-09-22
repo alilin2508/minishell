@@ -435,8 +435,8 @@ static bool get_path(char **cmd, char **env)
 	if (cmd[0][0] != '/' && ft_strncmp(cmd[0], "./", 2) != 0)
 	{
 		for (int i = 0; env[i]; i++) {
-			if (!strncmp(env[i], "PATH=", 5)) {
-				path = strdup(&env[i][5]);
+			if (!ft_strncmp(env[i], "PATH=", 5)) {
+				path = ft_strdup(&env[i][5]);
 				break ;
 			}
 		}
@@ -581,11 +581,44 @@ char  	*ft_variable(char *str, int j, char **env)
 	return (str);
 }
 
+char 		**ft_deletestring(char **str, int idx)
+{
+	int i;
+	int j;
+	char **tmp;
+
+	i = 0;
+	tmp = NULL;
+	if (!(tmp = (char**)malloc(sizeof(char **) * (tab_len(str)))))
+		return (NULL);
+	while (i != idx)
+	{
+		if (!(tmp[i] = (char *)malloc(sizeof(char) * (ft_strlen(str[i]) + 1))))
+			return (NULL);
+		ft_strcpy(tmp[i], str[i]);
+		i++;
+	}
+	j = i;
+	i++;
+	while (str[i])
+	{
+		if (!(tmp[j] = (char *)malloc(sizeof(char) * (ft_strlen(str[i]) + 1))))
+			return (NULL);
+		ft_strcpy(tmp[j], str[i]);
+		i++;
+		j++;
+	}
+	tmp[j] = NULL;
+	ft_splitdel(&str);
+	str = NULL;
+	return (tmp);
+}
+
 char 		**variable$(char **str, char **env)
 {
 	int i;
 	int j;
-	char *tmp;
+	char **tmp;
 
 	tmp = NULL;
 	i = 0;
@@ -596,10 +629,18 @@ char 		**variable$(char **str, char **env)
 		{
 			if (str[i][j] == '$')
 			{
-				str[i] = ft_variable(str[i], j, env);
-				j = 0;
+				if (ft_strlen(str[i]) != 1 && str[i][j+1] != '\0')
+				{
+					str[i] = ft_variable(str[i], j, env);
+					j = -1;
+				}
 			}
 			j++;
+		}
+		if (str[i][0] == '\0')
+		{
+			str = ft_deletestring(str, i);
+			i--;
 		}
 		i++;
 	}
