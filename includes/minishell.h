@@ -8,6 +8,7 @@
 # include <stdio.h>
 # include <math.h>
 # include <errno.h>
+#include <memory.h>
 # include <signal.h>
 # include <dirent.h>
 # include <stdbool.h>

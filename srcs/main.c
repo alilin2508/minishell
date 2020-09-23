@@ -40,6 +40,8 @@ int 	ft_cheakarg(char *str)
 	{
 		if (str[i] == ';')
 			nb++;
+		if (str[i] == '|')
+			nb++;
 		i++;
 	}
 	return (nb);
@@ -485,7 +487,7 @@ static void	cmd_execution(char **cmd)
 	status = 0;
 	pid = fork();
 	if (pid == -1)
-		perror("fork");
+		write(2, "fork fail\n", 10);
 	else if (pid > 0)
 	{
 		waitpid(pid, &status, 0);
@@ -495,7 +497,10 @@ static void	cmd_execution(char **cmd)
 	else
 	{
 		if (execve(cmd[0], cmd, NULL) == -1)
+		{
 			ft_puterror("zsh: No such file or directory: ", cmd[0]);
+			errno = 1;
+		}
 		exit(EXIT_FAILURE);
 	}
 }
@@ -647,6 +652,60 @@ char 		**variable$(char **str, char **env)
 	return (str);
 }
 
+void 		my_pipe(char *cmd, char ***env)
+{
+	int 		pid;
+	int 		pfd[2];
+	int 		status;
+
+	if (pipe(pfd) == -1)
+	{
+		write(2, "pipe failed\n", 12);
+		return ;
+	}
+	if ((pid = fork()) == -1)
+		write(2, "fork failed\n", 12);
+	if (pid == 0)
+		{
+			close(pfd[1]);
+			dup2(pfd[0], 0);
+			close(pfd[0]);
+			if (ft_strlen("ok") == 2)
+				waitpid(0, &status, WNOHANG);
+			else
+				waitpid(pid, &status, WSTOPPED);
+			//execlp("wc", "wc", (char *)0);
+		}
+	else
+		{
+			close(pfd[0]);
+			dup2(pfd[1], 1);
+			close(pfd[1]);
+			//execlp("ls", "ls", (char *)0);
+		}
+	ft_commande(cmd, env);
+}
+
+void 		soon_pipe(int pfd[2])
+{
+
+
+	close(pfd[1]);
+	dup2(pfd[0], 0);
+	close(pfd[0]);
+	execlp("wc", "wc", (char *)0);
+	write(2, "NULL\n", 5);
+}
+
+void  	father_pipe(int pfd[2])
+{
+	close(pfd[0]);
+	dup2(pfd[1], 1);
+	close(pfd[1]);
+	execlp("ls", "ls", (char *)0);
+	write(2, "NULL\n", 5);
+}
+
 static void exect_built_commande(char **cmd, char ***env)
 {
 	if (!ft_strcmp(cmd[0], "cd"))
@@ -731,6 +790,7 @@ int 				ft_precommande(char *line, char ***env)
 		i = 0;
 		while (commande[i])
 		{
+			my_pipe(commande[i], env);
 			ft_commande(commande[i], env);
 			i++;
 		}
@@ -741,7 +801,6 @@ int 				ft_precommande(char *line, char ***env)
 
 void 				end()
 {
-
 	exit(0);
 }
 
@@ -770,10 +829,6 @@ int					main(int ac, char **av, char **env)
 		get_next_line(0, &line);
     ft_precommande(line, &envi);
 		free(line);
-		//system("leaks minishell");
 	}
-	ft_splitdel(&envi);
-	envi = NULL;
-	system("leaks minishell");
 	return (0);
 }
