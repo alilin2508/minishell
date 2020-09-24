@@ -674,14 +674,12 @@ void 		my_pipe(char *cmd, char ***env)
 				waitpid(0, &status, WNOHANG);
 			else
 				waitpid(pid, &status, WSTOPPED);
-			//execlp("wc", "wc", (char *)0);
 		}
 	else
 		{
 			close(pfd[0]);
 			dup2(pfd[1], 1);
 			close(pfd[1]);
-			//execlp("ls", "ls", (char *)0);
 		}
 	ft_commande(cmd, env);
 }
@@ -737,14 +735,81 @@ int 				built_command(char *cmd)
 	return (0);
 }
 
-int                ft_commande(char *line, char ***env)
+int 								ft_cword(char *line)
+{
+	int nb;
+	int i;
+
+	nb = 1;
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] == ' ')
+			nb++;
+		if (line[i] == '"')
+		{
+			while (line[i] != '\"' && line[i])
+				i++;
+			if (line[i] == '\0')
+				return (-1);
+			nb++;
+		}
+		i++;
+	}
+	return (nb);
+}
+
+char 								**creat_list_arg(char *line)
+{
+	char 	**commande;
+	int 	nb;
+	int 	i;
+	int 	length;
+	char 	*sep;
+
+	nb = ft_cword(line);
+	if (!(commande = (char **)malloc(sizeof(char **) * (nb + 1))))
+		return (NULL);
+	i = 0;
+	while (i < nb)
+	{
+		commande[i] = NULL;
+		i++;
+	}
+	commande[i] = NULL;
+	length = ft_strcspn(line, " \"");
+	commande[0] = ft_strndup(line, length);
+	line += length;
+	i = 1;
+	while (ft_strlen(line) > 0)
+	{
+		if (line[0] == ' ')
+			++line;
+		sep = " ";
+		if (line[0] == '"')
+		{
+			sep = "\"";
+			++line;
+		}
+		length = ft_strcspn(line, sep);
+		commande[i] = ft_strndup(line, length);
+		line += length;
+		if (ft_strcmp(sep, "\"") == 0)
+		 	++line;
+		i++;
+	}
+	return (commande);
+}
+
+int                	ft_commande(char *line, char ***env)
 {
   char    **commande;
 	char		**tenv;
 
 	commande = NULL;
 	tenv = NULL;
-  commande = ft_split(line, ' ');
+  //commande = ft_split(line, ' ');
+	commande = creat_list_arg(line);
 	commande = variable$(commande , *env);
 	if (commande[0] == NULL)
 		write(1, "", 0);
@@ -790,7 +855,7 @@ int 				ft_precommande(char *line, char ***env)
 		i = 0;
 		while (commande[i])
 		{
-			my_pipe(commande[i], env);
+			//my_pipe(commande[i], env);
 			ft_commande(commande[i], env);
 			i++;
 		}
