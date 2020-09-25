@@ -106,11 +106,7 @@ void my_cd(char *path, char **env, char **cmd)
 
 	tmp = NULL;
 	if (path == NULL)
-	{
-		tmp = my_getenv(env, "HOME=");
-		free(path);
-		path = tmp;
-	}
+		path = my_getenv(env, "HOME=");
 	else if (tab_len(cmd) > 3)
 	{
 		write(2, "cd: too many arguments\n", 23);
@@ -128,6 +124,7 @@ void my_cd(char *path, char **env, char **cmd)
 		ft_puterror("cd: No such file or directory: ", path);
 		return ;
 	}
+
 	errno = 0;
 }
 
@@ -478,33 +475,6 @@ static bool get_path(char **cmd, char **env)
 	return (bin == NULL ? false : true);
 }
 
-static void	cmd_execution(char **cmd)
-{
-	pid_t	pid;
-	int		status;
-
-	pid = 0;
-	status = 0;
-	pid = fork();
-	if (pid == -1)
-		write(2, "fork fail\n", 10);
-	else if (pid > 0)
-	{
-		waitpid(pid, &status, 0);
-		kill(pid, SIGTERM);
-		errno = 0;
-	}
-	else
-	{
-		if (execve(cmd[0], cmd, NULL) == -1)
-		{
-			ft_puterror("zsh: No such file or directory: ", cmd[0]);
-			errno = 1;
-		}
-		exit(EXIT_FAILURE);
-	}
-}
-
 void 		ft_echo(char **cmd)
 {
 	int i;
@@ -539,7 +509,7 @@ void 		ft_echo(char **cmd)
 	errno = 0;
 }
 
-char  	*ft_variable(char *str, int j, char **env)
+/*char  	*ft_variable(char *str, int idx, char **env)
 {
 	int i;
 	char *tmp;
@@ -551,16 +521,16 @@ char  	*ft_variable(char *str, int j, char **env)
 		return (NULL);
 	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + path_max(env)))))
 		return (NULL);
-	if (j != 0)
-		ft_strlcpy(tmp, str, j + 1);
-	j++;
-	if (str[j] != '?')
+	if (idx != 0)
+		ft_strlcpy(tmp, str, idx + 1);
+	idx++;
+	if (str[idx] != '?')
 	{
 		i = 0;
-		while(str[j] && str[j] != '$')
+		while(str[idx] && str[idx] != '$')
 		{
-			str_tmp[i] = str[j];
-			j++;
+			str_tmp[i] = str[idx];
+			idx++;
 			i++;
 		}
 		str_tmp[i] = '=';
@@ -574,10 +544,10 @@ char  	*ft_variable(char *str, int j, char **env)
 		tenv = ft_itoa(errno);
 		ft_strcat(tmp, tenv);
 		free(tenv);
-		j++;
+		idx++;
 	}
-	if (str[j] != '\0')
-		ft_strcat(tmp, &str[j]);
+	if (str[idx] != '\0')
+		ft_strcat(tmp, &str[idx]);
 	free(str);
 	str = ft_strdup(tmp);
 	free(tmp);
@@ -640,6 +610,14 @@ char 		**variable$(char **str, char **env)
 					j = -1;
 				}
 			}
+			if (str[i][j] == '\'')
+			{
+				j++;
+				while (str[i][j] != '\"' && str[i][j])
+					j++;
+				if (str[i][j] == '\0')
+					return (NULL);
+			}
 			j++;
 		}
 		if (str[i][0] == '\0')
@@ -650,6 +628,187 @@ char 		**variable$(char **str, char **env)
 		i++;
 	}
 	return (str);
+}*/
+
+char 								*ft_variables(char *str, int idx, char **env)
+{
+	int i;
+	char *tmp;
+	char *str_tmp;
+	char *tenv;
+
+	tenv = NULL;
+	if (!(str_tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 2))))
+		return (NULL);
+	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + path_max(env)))))
+		return (NULL);
+	if (idx != 0)
+		ft_strlcpy(tmp, str, idx + 1);
+	idx++;
+	if (str[idx] != '?')
+	{
+		i = 0;
+		while(str[idx] && str[idx] != '$' && str[idx] != ' ' && str[idx] != '"')
+		{
+			str_tmp[i] = str[idx];
+			idx++;
+			i++;
+		}
+		str_tmp[i] = '=';
+		str_tmp[i + 1] = '\0';
+		if ((tenv = my_getenv(env, str_tmp)) != NULL)
+			ft_strcat(tmp, tenv);
+		tenv = NULL;
+	}
+	else
+	{
+		tenv = ft_itoa(errno);
+		ft_strcat(tmp, tenv);
+		free(tenv);
+		idx++;
+	}
+	if (str[idx] != '\0')
+		ft_strcat(tmp, &str[idx]);
+	ft_strcpy(str, tmp);
+	free(tmp);
+	free(str_tmp);
+	errno = 0;
+	return (str);
+}
+
+char 								*variables$(char *str, char **env)
+{
+	int 	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '\'')
+		{
+			i++;
+			while (str[i] != '\'' && str[i])
+				i++;
+			if (str[i] == '\0')
+				return (NULL);
+		}
+		if (str[i] == '$')
+		{
+			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
+			{
+				str = ft_variables(str, i, env);
+				i	= -1;
+			}
+		}
+		i++;
+	}
+	return (str);
+}
+
+int 								ft_cword(char *line)
+{
+	int nb;
+	int i;
+
+	nb = 1;
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] == ' ' && (line[i + 1] != '"' && line[i + 1] != '\''))
+			nb++;
+		if (line[i] == '"')
+		{
+			i++;
+			while (line[i] != '"' && line[i])
+				i++;
+			if (line[i] == '\0')
+				return (-1);
+			else if (line[i + 1] != ' ' && line[i + 1] != '\'' && line[i + 1] != '\0')
+				nb++;
+			nb++;
+		}
+		if (line[i] == '\'')
+		{
+			i++;
+			while (line[i] != '\'' && line[i])
+				i++;
+			if (line[i] == '\0')
+				return (-1);
+			else if (line[i + 1] != ' ' && line[i + 1] != '"' && line[i + 1] != '\0')
+				nb++;
+			nb++;
+		}
+		i++;
+	}
+	return (nb);
+}
+
+char 								**creat_list_arg(char *line)
+{
+	char 	**commande;
+	int 	nb;
+	int 	i;
+	int 	length;
+	char 	*sep;
+
+	if ((nb = ft_cword(line)) == -1)
+		return (NULL);
+	if (!(commande = (char **)malloc(sizeof(char **) * (nb + 1))))
+		return (NULL);
+	i = 0;
+	while (i < nb)
+	{
+		commande[i] = NULL;
+		i++;
+	}
+	commande[i] = NULL;
+	while (line[0] == ' ')
+		++line;
+	length = ft_strcspn(line, " \"'");
+	commande[0] = ft_strndup(line, length);
+	line += length;
+	i = 1;
+	while (ft_strlen(line) > 0)
+	{
+		if (line[0] == ' ')
+		{
+			while (line[0] == ' ')
+				++line;
+			if (line[0] == '\0')
+				return (commande);
+			sep = " ";
+		}
+		if (line[0] == '"' || line[0] == '\'')
+		{
+			if (line[0] == '"')
+				sep = "\"";
+			else
+				sep = "'";
+			++line;
+		}
+		if (ft_strcmp(sep, "o") != 0)
+		{
+			if (ft_strcmp(sep, " ") == 0)
+				length = ft_strcspn(line, " '\"");
+			else
+				length = ft_strcspn(line, sep);
+			commande[i] = ft_strndup(line, length);
+			line += length;
+			if (ft_strcmp(sep, "\"") == 0 || ft_strcmp(sep, "'") == 0)
+		 		++line;
+			sep = "o";
+			i++;
+		}
+		else
+		{
+			length = 0;
+			while (line[length] != '"' && line[length] != ' ' && line[length] != '\'')
+				length++;
+			commande[i] = ft_strndup(line, length);
+			line += length;
+			i++;
+		}
+	}
+	return (commande);
 }
 
 void 		my_pipe(char *cmd, char ***env)
@@ -704,6 +863,33 @@ void  	father_pipe(int pfd[2])
 	write(2, "NULL\n", 5);
 }
 
+static void	cmd_execution(char **cmd)
+{
+	pid_t	pid;
+	int		status;
+
+	pid = 0;
+	status = 0;
+	pid = fork();
+	if (pid == -1)
+		write(2, "fork fail\n", 10);
+	else if (pid > 0)
+	{
+		waitpid(pid, &status, 0);
+		kill(pid, SIGTERM);
+		errno = 0;
+	}
+	else
+	{
+		if (execve(cmd[0], cmd, NULL) == -1)
+		{
+			ft_puterror("zsh: No such file or directory: ", cmd[0]);
+			errno = 1;
+		}
+		exit(EXIT_FAILURE);
+	}
+}
+
 static void exect_built_commande(char **cmd, char ***env)
 {
 	if (!ft_strcmp(cmd[0], "cd"))
@@ -735,72 +921,6 @@ int 				built_command(char *cmd)
 	return (0);
 }
 
-int 								ft_cword(char *line)
-{
-	int nb;
-	int i;
-
-	nb = 1;
-	i = 0;
-	while (line[i])
-	{
-		if (line[i] == ' ')
-			nb++;
-		if (line[i] == '"')
-		{
-			while (line[i] != '\"' && line[i])
-				i++;
-			if (line[i] == '\0')
-				return (-1);
-			nb++;
-		}
-		i++;
-	}
-	return (nb);
-}
-
-char 								**creat_list_arg(char *line)
-{
-	char 	**commande;
-	int 	nb;
-	int 	i;
-	int 	length;
-	char 	*sep;
-
-	nb = ft_cword(line);
-	if (!(commande = (char **)malloc(sizeof(char **) * (nb + 1))))
-		return (NULL);
-	i = 0;
-	while (i < nb)
-	{
-		commande[i] = NULL;
-		i++;
-	}
-	commande[i] = NULL;
-	length = ft_strcspn(line, " \"");
-	commande[0] = ft_strndup(line, length);
-	line += length;
-	i = 1;
-	while (ft_strlen(line) > 0)
-	{
-		if (line[0] == ' ')
-			++line;
-		sep = " ";
-		if (line[0] == '"')
-		{
-			sep = "\"";
-			++line;
-		}
-		length = ft_strcspn(line, sep);
-		commande[i] = ft_strndup(line, length);
-		line += length;
-		if (ft_strcmp(sep, "\"") == 0)
-		 	++line;
-		i++;
-	}
-	return (commande);
-}
-
 int                	ft_commande(char *line, char ***env)
 {
   char    **commande;
@@ -808,9 +928,16 @@ int                	ft_commande(char *line, char ***env)
 
 	commande = NULL;
 	tenv = NULL;
-  //commande = ft_split(line, ' ');
-	commande = creat_list_arg(line);
-	commande = variable$(commande , *env);
+	if ((line = variables$(line, *env)) == NULL)
+	{
+		write(2, "Error: missing quote\n", 21);
+		return (0);
+	}
+	if ((commande = creat_list_arg(line)) == NULL)
+	{
+		write(2, "Error: missing quote\n", 21);
+		return (0);
+	}
 	if (commande[0] == NULL)
 		write(1, "", 0);
 	else if (ft_strcmp(commande[0], "exit") == 0)
