@@ -37,12 +37,13 @@ typedef struct  s_envindex
   struct s_env *tail;
 }               t_envindex;
 
-char	*ft_strndup(const char *s, size_t n);
-size_t	ft_strcspn(const char *s, const char *reject);
-void	ft_putstr(const char *s);
-char	*ft_strcpy(char *dest, char *src);
-int	ft_strcmp(char *s1, char *s2);
-char *ft_strcat(char *dest, char *src);
+char					*ft_strncat(char *dest, char *src, int nb);
+char					*ft_strndup(const char *s, size_t n);
+size_t				ft_strcspn(const char *s, const char *reject);
+void					ft_putstr(const char *s);
+char					*ft_strcpy(char *dest, char *src);
+int						ft_strcmp(char *s1, char *s2);
+char 					*ft_strcat(char *dest, char *src);
 void  ft_del_lst(t_env **p);
 void  ft_addback(t_env **p, char *environement);
 int		ft_atoi(const char *str);

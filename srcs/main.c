@@ -509,127 +509,6 @@ void 		ft_echo(char **cmd)
 	errno = 0;
 }
 
-/*char  	*ft_variable(char *str, int idx, char **env)
-{
-	int i;
-	char *tmp;
-	char *str_tmp;
-	char *tenv;
-
-	tenv = NULL;
-	if (!(str_tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 2))))
-		return (NULL);
-	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + path_max(env)))))
-		return (NULL);
-	if (idx != 0)
-		ft_strlcpy(tmp, str, idx + 1);
-	idx++;
-	if (str[idx] != '?')
-	{
-		i = 0;
-		while(str[idx] && str[idx] != '$')
-		{
-			str_tmp[i] = str[idx];
-			idx++;
-			i++;
-		}
-		str_tmp[i] = '=';
-		str_tmp[i + 1] = '\0';
-		if ((tenv = my_getenv(env, str_tmp)) != NULL)
-			ft_strcat(tmp, tenv);
-		tenv = NULL;
-	}
-	else
-	{
-		tenv = ft_itoa(errno);
-		ft_strcat(tmp, tenv);
-		free(tenv);
-		idx++;
-	}
-	if (str[idx] != '\0')
-		ft_strcat(tmp, &str[idx]);
-	free(str);
-	str = ft_strdup(tmp);
-	free(tmp);
-	free(str_tmp);
-	errno = 0;
-	return (str);
-}
-
-char 		**ft_deletestring(char **str, int idx)
-{
-	int i;
-	int j;
-	char **tmp;
-
-	i = 0;
-	tmp = NULL;
-	if (!(tmp = (char**)malloc(sizeof(char **) * (tab_len(str)))))
-		return (NULL);
-	while (i != idx)
-	{
-		if (!(tmp[i] = (char *)malloc(sizeof(char) * (ft_strlen(str[i]) + 1))))
-			return (NULL);
-		ft_strcpy(tmp[i], str[i]);
-		i++;
-	}
-	j = i;
-	i++;
-	while (str[i])
-	{
-		if (!(tmp[j] = (char *)malloc(sizeof(char) * (ft_strlen(str[i]) + 1))))
-			return (NULL);
-		ft_strcpy(tmp[j], str[i]);
-		i++;
-		j++;
-	}
-	tmp[j] = NULL;
-	ft_splitdel(&str);
-	str = NULL;
-	return (tmp);
-}
-
-char 		**variable$(char **str, char **env)
-{
-	int i;
-	int j;
-	char **tmp;
-
-	tmp = NULL;
-	i = 0;
-	while(str[i])
-	{
-		j = 0;
-		while(str[i][j])
-		{
-			if (str[i][j] == '$')
-			{
-				if (ft_strlen(str[i]) != 1 && str[i][j+1] != '\0')
-				{
-					str[i] = ft_variable(str[i], j, env);
-					j = -1;
-				}
-			}
-			if (str[i][j] == '\'')
-			{
-				j++;
-				while (str[i][j] != '\"' && str[i][j])
-					j++;
-				if (str[i][j] == '\0')
-					return (NULL);
-			}
-			j++;
-		}
-		if (str[i][0] == '\0')
-		{
-			str = ft_deletestring(str, i);
-			i--;
-		}
-		i++;
-	}
-	return (str);
-}*/
-
 char 								*ft_variables(char *str, int idx, char **env)
 {
 	int i;
@@ -706,8 +585,9 @@ char 								*variables$(char *str, char **env)
 
 int 								ft_cword(char *line)
 {
-	int nb;
-	int i;
+	int 	nb;
+	int 	i;
+	char 	c;
 
 	nb = 1;
 	i = 0;
@@ -715,25 +595,13 @@ int 								ft_cword(char *line)
 	{
 		if (line[i] == ' ' && (line[i + 1] != '"' && line[i + 1] != '\''))
 			nb++;
-		if (line[i] == '"')
+		if (line[i] == '"' || line[i] == '\'')
 		{
+			c = line[i];
 			i++;
-			while (line[i] != '"' && line[i])
+			while (line[i] != c && line[i])
 				i++;
-			if (line[i] == '\0')
-				return (-1);
-			else if (line[i + 1] != ' ' && line[i + 1] != '\'' && line[i + 1] != '\0')
-				nb++;
-			nb++;
-		}
-		if (line[i] == '\'')
-		{
-			i++;
-			while (line[i] != '\'' && line[i])
-				i++;
-			if (line[i] == '\0')
-				return (-1);
-			else if (line[i + 1] != ' ' && line[i + 1] != '"' && line[i + 1] != '\0')
+			if (line[i + 1] != ' ' && line[i + 1] != c && line[i + 1] != '\0')
 				nb++;
 			nb++;
 		}
@@ -742,7 +610,65 @@ int 								ft_cword(char *line)
 	return (nb);
 }
 
+int  								ft_sepcount(char *line, char c)
+{
+	int len;
+
+	line++;
+	len = 0;
+	while (line[len] != c)
+		len++;
+	return (len);
+}
+
 char 								**creat_list_arg(char *line)
+{
+	char 	**commande;
+	int 	nb;
+	int 	i;
+	int 	length;
+	//char 	*sep;
+
+	nb = ft_cword(line);
+	if (!(commande = (char **)malloc(sizeof(char **) * (nb + 1))))
+		return (NULL);
+	i = 0;
+	while (i < nb)
+	{
+		commande[i] = NULL;
+		i++;
+	}
+	commande[i] = NULL;
+	while (line[0] == ' ')
+		++line;
+	length = 0;
+	i = 0;
+	while (line)
+	{
+		if(!(commande[i] = (char *)malloc(sizeof(char) * (ft_strlen(line) + 1))))
+			return (NULL);
+		while (line[length] != ' ')
+		{
+			if (line[length] == '\'' || line[length] == '"')
+			{
+				ft_strncat(commande[i], line, length);
+				line += length;
+				length = 0;
+				length = ft_sepcount(line, line[0]);
+				ft_strncat(commande[i], line, length);
+				line += length + 1;
+				length = -1;
+			}
+			length++;
+		}
+		ft_strncat(commande[i], line, length);
+		line += length;
+		length = 0;
+		i++;
+	}
+	return (commande);
+}
+/*char 								**creat_list_arg(char *line)
 {
 	char 	**commande;
 	int 	nb;
@@ -750,8 +676,7 @@ char 								**creat_list_arg(char *line)
 	int 	length;
 	char 	*sep;
 
-	if ((nb = ft_cword(line)) == -1)
-		return (NULL);
+	nb = ft_cword(line);
 	if (!(commande = (char **)malloc(sizeof(char **) * (nb + 1))))
 		return (NULL);
 	i = 0;
@@ -764,6 +689,12 @@ char 								**creat_list_arg(char *line)
 	while (line[0] == ' ')
 		++line;
 	length = ft_strcspn(line, " \"'");
+	while (line[length] != ' ')
+	{
+		if (line[length] == '\'')
+			length += ft_sepcount(line[length])
+		length++;
+	}
 	commande[0] = ft_strndup(line, length);
 	line += length;
 	i = 1;
@@ -809,6 +740,89 @@ char 								**creat_list_arg(char *line)
 		}
 	}
 	return (commande);
+}*/
+
+int 		ft_nb_cmd(const char *line)
+{
+	int 	i;
+	int 	nb;
+	char 	c;
+
+	i = 0;
+	nb = 1;
+	while (line[i])
+	{
+		if (line[i] == '"' || line[i] == '\'')
+		{
+			c = line[i];
+			i++;
+			while (line[i] && line[i] != c)
+				i++;
+			if (line[i] == '\0')
+				return (-1);
+		}
+		if (line[i] == ';')
+			nb++;
+		i++;
+	}
+	return (nb);
+}
+
+char 		*ft_takecmd(char *str, int first, int last)
+{
+	int 	i;
+	char 	*s;
+
+	while (str[first] == ';')
+		first++;
+	if (!(s = (char *)malloc(sizeof(char) * (last - first + 2))))
+		return (NULL);
+	i = 0;
+	while (first < last)
+	{
+		s[i] = str[first];
+		i++;
+		first++;
+	}
+	s[i] = '\0';
+	return (s);
+}
+
+char 		**ft_splitcmd(char *str)
+{
+	char 	**tab;
+	int	 	first;
+	int 	i;
+	int 	j;
+	char 	c;
+
+	if (ft_nb_cmd(str) == -1)
+		return (NULL);
+	if (!(tab = (char **)malloc(sizeof(char*) * (ft_nb_cmd(str) + 1))))
+		return (NULL);
+	i = 0;
+	j = 0;
+	first = 0;
+	while (str[j])
+	{
+		if (str[j] == '"' || str[j] == '\'')
+		{
+			c = str[j];
+			j++;
+			while (str[j] && str[j] != c)
+				j++;
+		}
+		if (str[j] == ';')
+		{
+			tab[i] = ft_takecmd(str, first, j);
+			first = j;
+			i++;
+		}
+		j++;
+	}
+	tab[i] = ft_takecmd(str, first, j);
+	tab[i + 1] = NULL;
+	return (tab);
 }
 
 void 		my_pipe(char *cmd, char ***env)
@@ -978,7 +992,11 @@ int 				ft_precommande(char *line, char ***env)
 		ft_commande(line, env);
 	else
 	{
-		commande = ft_split(line, ';');
+		if ((commande = ft_splitcmd(line)) == NULL)
+		{
+			write(2, "Error: missing quote\n", 21);
+			return (0);
+		}
 		i = 0;
 		while (commande[i])
 		{
