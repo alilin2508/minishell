@@ -585,24 +585,25 @@ char 								*variables$(char *str, char **env)
 
 int 								ft_cword(char *line)
 {
-	int 	nb;
 	int 	i;
-	char 	c;
+	int 	nb;
+	char 	sep;
 
-	nb = 1;
 	i = 0;
+	nb = 1;
 	while (line[i])
 	{
-		if (line[i] == ' ' && (line[i + 1] != '"' && line[i + 1] != '\''))
-			nb++;
-		if (line[i] == '"' || line[i] == '\'')
+		if (line[i] == '\'' || line[i] == '"')
 		{
-			c = line[i];
+			sep = line[i];
 			i++;
-			while (line[i] != c && line[i])
+			while (line[i] != sep && line[i])
 				i++;
-			if (line[i + 1] != ' ' && line[i + 1] != c && line[i + 1] != '\0')
-				nb++;
+		}
+		if (line[i] == ' ')
+		{
+			while (line[i + 1] == ' ')
+				i++;
 			nb++;
 		}
 		i++;
@@ -614,133 +615,77 @@ int  								ft_sepcount(char *line, char c)
 {
 	int len;
 
-	line++;
 	len = 0;
 	while (line[len] != c)
 		len++;
-	return (len);
+	return (len + 1);
 }
 
-char 								**creat_list_arg(char *line)
+char 									**creat_list_arg(char *line)
 {
-	char 	**commande;
-	int 	nb;
+	char	**commande;
 	int 	i;
-	int 	length;
-	//char 	*sep;
+	int 	j;
+	int 	first;
 
-	nb = ft_cword(line);
-	if (!(commande = (char **)malloc(sizeof(char **) * (nb + 1))))
+	if (!(commande = (char **)malloc(sizeof(char **) * (ft_cword(line) + 1))))
 		return (NULL);
 	i = 0;
-	while (i < nb)
+	first = 0;
+	j = 0;
+	while (line[i])
 	{
-		commande[i] = NULL;
-		i++;
-	}
-	commande[i] = NULL;
-	while (line[0] == ' ')
-		++line;
-	length = 0;
-	i = 0;
-	while (line)
-	{
-		if(!(commande[i] = (char *)malloc(sizeof(char) * (ft_strlen(line) + 1))))
-			return (NULL);
-		while (line[length] != ' ')
+		if (i == 0)
 		{
-			if (line[length] == '\'' || line[length] == '"')
+			if (!(commande[j] = (char *)malloc(sizeof(char *) * (ft_strlen(line) + 1))))
+				return (NULL);
+		}
+		if (line[i] == '\'' || line[i] == '"')
+		{
+			if (i != first)
 			{
-				ft_strncat(commande[i], line, length);
-				line += length;
-				length = 0;
-				length = ft_sepcount(line, line[0]);
-				ft_strncat(commande[i], line, length);
-				line += length + 1;
-				length = -1;
+				commande[j] = ft_strncat(commande[j], &line[first], i - first);
+				i++;
+				first = i;
+				commande[j] = ft_strncat(commande[j], &line[first], ft_sepcount(&line[first], line[i - 1]) - 1);
+				i += ft_sepcount(&line[first], line[i - 1]);
+				//printf("line2 = %c\n", line[i]);
+				first = i;
+				i--;
 			}
-			length++;
+			else
+			{
+				i++;
+				commande[j] = ft_strncat(commande[j], &line[i], ft_sepcount(&line[i], line[i - 1]) - 1);
+				i += ft_sepcount(&line[i], line[i - 1]);
+				first = i;
+				i--;
+			}
 		}
-		ft_strncat(commande[i], line, length);
-		line += length;
-		length = 0;
+		if (line[i] == ' ')
+		{
+			if (line[i + 1] == '\0')
+				break ;
+			commande[j] = ft_strncat(commande[j], &line[first], i - first);
+			while (line[i + 1] == ' ')
+				i++;
+			first = i + 1;
+			j++;
+			if (line[i] != '\0')
+				if (!(commande[j] = (char *)malloc(sizeof(char *) * (ft_strlen(&line[i]) + 1))))
+					return (NULL);
+		}
 		i++;
 	}
+	if (first != i)
+	{
+		commande[j] = ft_strncat(commande[j], &line[first], i - first);
+		commande[j + 1] = NULL;
+	}
+	else
+		commande[j] = NULL;
 	return (commande);
 }
-/*char 								**creat_list_arg(char *line)
-{
-	char 	**commande;
-	int 	nb;
-	int 	i;
-	int 	length;
-	char 	*sep;
-
-	nb = ft_cword(line);
-	if (!(commande = (char **)malloc(sizeof(char **) * (nb + 1))))
-		return (NULL);
-	i = 0;
-	while (i < nb)
-	{
-		commande[i] = NULL;
-		i++;
-	}
-	commande[i] = NULL;
-	while (line[0] == ' ')
-		++line;
-	length = ft_strcspn(line, " \"'");
-	while (line[length] != ' ')
-	{
-		if (line[length] == '\'')
-			length += ft_sepcount(line[length])
-		length++;
-	}
-	commande[0] = ft_strndup(line, length);
-	line += length;
-	i = 1;
-	while (ft_strlen(line) > 0)
-	{
-		if (line[0] == ' ')
-		{
-			while (line[0] == ' ')
-				++line;
-			if (line[0] == '\0')
-				return (commande);
-			sep = " ";
-		}
-		if (line[0] == '"' || line[0] == '\'')
-		{
-			if (line[0] == '"')
-				sep = "\"";
-			else
-				sep = "'";
-			++line;
-		}
-		if (ft_strcmp(sep, "o") != 0)
-		{
-			if (ft_strcmp(sep, " ") == 0)
-				length = ft_strcspn(line, " '\"");
-			else
-				length = ft_strcspn(line, sep);
-			commande[i] = ft_strndup(line, length);
-			line += length;
-			if (ft_strcmp(sep, "\"") == 0 || ft_strcmp(sep, "'") == 0)
-		 		++line;
-			sep = "o";
-			i++;
-		}
-		else
-		{
-			length = 0;
-			while (line[length] != '"' && line[length] != ' ' && line[length] != '\'')
-				length++;
-			commande[i] = ft_strndup(line, length);
-			line += length;
-			i++;
-		}
-	}
-	return (commande);
-}*/
 
 int 		ft_nb_cmd(const char *line)
 {
@@ -773,8 +718,10 @@ char 		*ft_takecmd(char *str, int first, int last)
 	int 	i;
 	char 	*s;
 
-	while (str[first] == ';')
+	while (str[first] == ';' || str[first] == ' ')
 		first++;
+	if (str[first] == '\0')
+		return (NULL);
 	if (!(s = (char *)malloc(sizeof(char) * (last - first + 2))))
 		return (NULL);
 	i = 0;
@@ -802,7 +749,10 @@ char 		**ft_splitcmd(char *str)
 		return (NULL);
 	i = 0;
 	j = 0;
-	first = 0;
+	while (str[j] == ' ' || str[j] == ';')
+		j++;
+	printf("j = %d", j);
+	first = j;
 	while (str[j])
 	{
 		if (str[j] == '"' || str[j] == '\'')
@@ -814,13 +764,21 @@ char 		**ft_splitcmd(char *str)
 		}
 		if (str[j] == ';')
 		{
-			tab[i] = ft_takecmd(str, first, j);
-			first = j;
+			if ((tab[i] = ft_takecmd(str, first, j)) == NULL)
+			{
+				i = -1;
+				break ;
+			}
 			i++;
+			j++;
+			while (str[j] == ' ')
+				j++;
+			first = j;
 		}
 		j++;
 	}
-	tab[i] = ft_takecmd(str, first, j);
+	if (i != -1)
+		tab[i] = ft_takecmd(str, first, j);
 	tab[i + 1] = NULL;
 	return (tab);
 }
@@ -989,7 +947,11 @@ int 				ft_precommande(char *line, char ***env)
 	commande = NULL;
 	nbarg = ft_cheakarg(line);
 	if (nbarg == 0)
+	{
+		while (*line == ' ')
+			line++;
 		ft_commande(line, env);
+	}
 	else
 	{
 		if ((commande = ft_splitcmd(line)) == NULL)
@@ -1037,7 +999,8 @@ int					main(int ac, char **av, char **env)
 	{
 		write(1, "$alilin> ", 9);
 		get_next_line(0, &line);
-    ft_precommande(line, &envi);
+		if (ft_strcmp(line, "\0") != 0)
+    	ft_precommande(line, &envi);
 		free(line);
 	}
 	return (0);
