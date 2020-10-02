@@ -628,8 +628,14 @@ char 									**creat_list_arg(char *line)
 	int 	j;
 	int 	first;
 
-	if (!(commande = (char **)malloc(sizeof(char **) * (ft_cword(line) + 1))))
+	if (!(commande = (char **)malloc(sizeof(char *) * (ft_cword(line) + 1))))
 		return (NULL);
+	i = 0;
+	while (i < ft_cword(line) + 1)
+	{
+		commande[i] = NULL;
+		i++;
+	}
 	i = 0;
 	first = 0;
 	j = 0;
@@ -637,7 +643,7 @@ char 									**creat_list_arg(char *line)
 	{
 		if (i == 0)
 		{
-			if (!(commande[j] = (char *)malloc(sizeof(char *) * (ft_strlen(line) + 1))))
+			if (!(commande[j] = (char *)malloc(sizeof(char) * (ft_strlen(&line[i]) + 1))))
 				return (NULL);
 		}
 		if (line[i] == '\'' || line[i] == '"')
@@ -649,7 +655,6 @@ char 									**creat_list_arg(char *line)
 				first = i;
 				commande[j] = ft_strncat(commande[j], &line[first], ft_sepcount(&line[first], line[i - 1]) - 1);
 				i += ft_sepcount(&line[first], line[i - 1]);
-				//printf("line2 = %c\n", line[i]);
 				first = i;
 				i--;
 			}
@@ -671,8 +676,8 @@ char 									**creat_list_arg(char *line)
 				i++;
 			first = i + 1;
 			j++;
-			if (line[i] != '\0')
-				if (!(commande[j] = (char *)malloc(sizeof(char *) * (ft_strlen(&line[i]) + 1))))
+			if (line[i + 1] != '\0')
+				if (!(commande[j] = (char *)malloc(sizeof(char) * (ft_strlen(&line[i]) + 1))))
 					return (NULL);
 		}
 		i++;
@@ -749,10 +754,9 @@ char 		**ft_splitcmd(char *str)
 		return (NULL);
 	i = 0;
 	j = 0;
-	while (str[j] == ' ' || str[j] == ';')
-		j++;
-	printf("j = %d", j);
-	first = j;
+//	while (str[j] == ' ' || str[j] == ';')
+//		j++;
+	first = 0;
 	while (str[j])
 	{
 		if (str[j] == '"' || str[j] == '\'')
@@ -946,14 +950,12 @@ int 				ft_precommande(char *line, char ***env)
 
 	commande = NULL;
 	nbarg = ft_cheakarg(line);
-	if (nbarg == 0)
-	{
-		while (*line == ' ')
-			line++;
-		ft_commande(line, env);
-	}
-	else
-	{
+	while (line[0] == ' ' || line[0] == ';')
+		line += 1;
+	//if (nbarg == 0)
+	//	ft_commande(line, env);
+	//else
+	//{
 		if ((commande = ft_splitcmd(line)) == NULL)
 		{
 			write(2, "Error: missing quote\n", 21);
@@ -967,7 +969,7 @@ int 				ft_precommande(char *line, char ***env)
 			i++;
 		}
 		ft_splitdel(&commande);
-	}
+	//}
 	return (1);
 }
 
