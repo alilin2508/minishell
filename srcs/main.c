@@ -90,7 +90,7 @@ void position(char **cmd, char **env)
 	}
 	else
 	{
-		if (!(path = malloc(sizeof(char) * path_max(env))))
+		if (!(path = (char*)malloc(sizeof(char) * path_max(env))))
 			return;
 		getcwd(path, path_max(env));
 		ft_putstr(path);
@@ -136,12 +136,12 @@ char **ft_getenv(char **env)
 	i = 0;
 	while (env[i])
 		i++;
-	if (!(envi = (char**)malloc(sizeof(env) * i + 1)))
+	if (!(envi = (char**)malloc(sizeof(char *) * i + 1)))
 		return (0);
 	i = 0;
 	while (env[i])
 	{
-		if (!(envi[i] = (char *)malloc(sizeof(char *) * ft_strlen(env[i]) + 1)))
+		if (!(envi[i] = (char *)malloc(sizeof(char) * ft_strlen(env[i]) + 1)))
 			return (0);
 		ft_strlcpy(envi[i], env[i], ft_strlen(env[i]) + 1);
 		i++;
@@ -251,7 +251,7 @@ char 	**ft_unset(char **cmd, char **env)
 		}
 		if (j != -1)
 		{
-			if (!(tcmd = (char *)malloc(sizeof(char *) * (ft_strlen(cmd[i]) + 2))))
+			if (!(tcmd = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 2))))
 				return (NULL);
 			j = 0;
 			while (cmd[i][j])
@@ -263,12 +263,12 @@ char 	**ft_unset(char **cmd, char **env)
 			tcmd[j + 1] = '\0';
 			if ((idx = ft_checkunset(tcmd, env) - 1) != -1)
 			{
-				if (!(tmp = (char **)malloc(sizeof(char **) * (tab_len(env)))))
+				if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(env)))))
 					return (NULL);
 				j = 0;
 				while(j < idx)
 				{
-					if (!(tmp[j] = (char *)malloc(sizeof(char *) * (ft_strlen(env[j]) + 1))))
+					if (!(tmp[j] = (char *)malloc(sizeof(char) * (ft_strlen(env[j]) + 1))))
 						return (NULL);
 					ft_strcpy(tmp[j], env[j]);
 					j++;
@@ -276,19 +276,19 @@ char 	**ft_unset(char **cmd, char **env)
 				j++;
 				while (j < tab_len(env))
 				{
-					if (!(tmp[j-1] = (char *)malloc(sizeof(char*) * ft_strlen(env[j]) + 1)))
+					if (!(tmp[j-1] = (char *)malloc(sizeof(char) * ft_strlen(env[j]) + 1)))
 						return (NULL);
 					ft_strcpy(tmp[j-1], env[j]);
 					j++;
 				}
 				tmp[j-1] = NULL;
 				ft_splitdel(&env);
-				if (!(env = (char **)malloc(sizeof(char **) * (tab_len(tmp) + 1))))
+				if (!(env = (char **)malloc(sizeof(char *) * (tab_len(tmp) + 1))))
 					return (NULL);
 				j = 0;
 				while(tmp[j])
 				{
-					if (!(env[j] = (char *)malloc(sizeof(char *) * (ft_strlen(tmp[j]) + 1))))
+					if (!(env[j] = (char *)malloc(sizeof(char) * (ft_strlen(tmp[j]) + 1))))
 						return (NULL);
 					ft_strcpy(env[j], tmp[j]);
 					j++;
@@ -353,30 +353,30 @@ char 	**ft_export(char **cmd, char **env)
 			}
 			if (strchr(cmd[i], '=') != 0 && ft_checkex2(cmd[i], env))
 			{
-				if (!(tmp = (char **)malloc(sizeof(char **) * (tab_len(env) + 2))))
+				if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(env) + 2))))
 					return (NULL);
 				j = 0;
 				while(j < tab_len(env) - 1)
 				{
-					if (!(tmp[j] = (char *)malloc(sizeof(char *) * (ft_strlen(env[j]) + 1))))
+					if (!(tmp[j] = (char *)malloc(sizeof(char) * (ft_strlen(env[j]) + 1))))
 						return (NULL);
 					ft_strcpy(tmp[j], env[j]);
 					j++;
 				}
-				if (!(tmp[j] = (char *)malloc(sizeof(char *) * (ft_strlen(cmd[i]) + 1))))
+				if (!(tmp[j] = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
 					return (NULL);
 				ft_strcpy(tmp[j], cmd[i]);
-				if (!(tmp[j + 1] = (char *)malloc(sizeof(char *) * (ft_strlen(env[j]) + 1))))
+				if (!(tmp[j + 1] = (char *)malloc(sizeof(char) * (ft_strlen(env[j]) + 1))))
 					return (NULL);
 				ft_strcpy(tmp[j + 1], env[j]);
 				tmp[j + 2] = NULL;
 				ft_splitdel(&env);
-				if (!(env = (char **)malloc(sizeof(char **) * (tab_len(tmp) + 1))))
+				if (!(env = (char **)malloc(sizeof(char *) * (tab_len(tmp) + 1))))
 					return (NULL);
 				j = 0;
 				while (tmp[j])
 				{
-					if (!(env[j] = (char *)malloc(sizeof(char *) * (ft_strlen(tmp[j]) + 1))))
+					if (!(env[j] = (char *)malloc(sizeof(char) * (ft_strlen(tmp[j]) + 1))))
 						return (NULL);
 					ft_strcpy(env[j], tmp[j]);
 					j++;
@@ -388,7 +388,7 @@ char 	**ft_export(char **cmd, char **env)
 			else
 			{
 				j = 0;
-				while (cmd[i][j] != '=')
+				while (cmd[i][j] != '=' && cmd[i][j])
 					j++;
 				len = j;
 				j = 0;
@@ -397,7 +397,7 @@ char 	**ft_export(char **cmd, char **env)
 					if (ft_strncmp(cmd[i], env[j], len) == 0)
 					{
 						free(env[j]);
-						if (!(env[j] = (char *)malloc(sizeof(char *) * (ft_strlen(cmd[i]) + 1))))
+						if (!(env[j] = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
 							return (NULL);
 						ft_strcpy(env[j], cmd[i]);
 						break ;
@@ -565,10 +565,8 @@ char 								*variables$(char *str, char **env)
 		if (str[i] == '\'')
 		{
 			i++;
-			while (str[i] != '\'' && str[i])
+			while (str[i] != '\'')
 				i++;
-			if (str[i] == '\0')
-				return (NULL);
 		}
 		if (str[i] == '$')
 		{
@@ -576,6 +574,22 @@ char 								*variables$(char *str, char **env)
 			{
 				str = ft_variables(str, i, env);
 				i	= -1;
+			}
+		}
+		if (str[i] == '"')
+		{
+			i++;
+			while (str[i] != '"' && str[i])
+			{
+				if (str[i] == '$')
+				{
+					if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
+					{
+						str = ft_variables(str, i, env);
+						i	= -1;
+					}
+				}
+				i++;
 			}
 		}
 		i++;
@@ -639,13 +653,10 @@ char 									**creat_list_arg(char *line)
 	i = 0;
 	first = 0;
 	j = 0;
+	if (!(commande[j] = (char *)ft_calloc(sizeof(char), (ft_strlen(line) + 1))))
+		return (NULL);
 	while (line[i])
 	{
-		if (i == 0)
-		{
-			if (!(commande[j] = (char *)malloc(sizeof(char) * (ft_strlen(&line[i]) + 1))))
-				return (NULL);
-		}
 		if (line[i] == '\'' || line[i] == '"')
 		{
 			if (i != first)
@@ -677,7 +688,7 @@ char 									**creat_list_arg(char *line)
 			first = i + 1;
 			j++;
 			if (line[i + 1] != '\0')
-				if (!(commande[j] = (char *)malloc(sizeof(char) * (ft_strlen(&line[i]) + 1))))
+				if (!(commande[j] = (char *)ft_calloc(sizeof(char), (ft_strlen(line) + 1))))
 					return (NULL);
 		}
 		i++;
@@ -688,7 +699,7 @@ char 									**creat_list_arg(char *line)
 		commande[j + 1] = NULL;
 	}
 	else
-		commande[j] = NULL;
+		commande[j + 1] = NULL;
 	return (commande);
 }
 
@@ -904,7 +915,7 @@ int                	ft_commande(char *line, char ***env)
 
 	commande = NULL;
 	tenv = NULL;
-	if ((line = variables$(line, *env)) == NULL)
+	if ((variables$(line, *env)) == NULL)
 	{
 		write(2, "Error: missing quote\n", 21);
 		return (0);
