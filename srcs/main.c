@@ -12,6 +12,9 @@
 
 #include "minishell.h"
 
+pid_t pid;
+char 	*mess;
+
 void ft_puterror(char *error, char *arg)
 {
 	write(2, error, ft_strlen(error));
@@ -82,6 +85,7 @@ void position(char **cmd, char **env)
 	char *path;
 
 	path = NULL;
+	(void )env;
 	if (cmd[1] != NULL)
 	{
 		write(2, "pwd: too many arguments\n", 24);
@@ -90,9 +94,9 @@ void position(char **cmd, char **env)
 	}
 	else
 	{
-		if (!(path = (char*)malloc(sizeof(char) * path_max(env))))
+		if (!(path = (char*)malloc(sizeof(char) * PATH_MAX)))
 			return;
-		getcwd(path, path_max(env));
+		getcwd(path, PATH_MAX);
 		ft_putstr(path);
 		write(1, "\n", 1);
 	}
@@ -103,6 +107,9 @@ void position(char **cmd, char **env)
 void my_cd(char *path, char **env, char **cmd)
 {
 	char 	*tmp;
+	char 	*oldpwd;
+	char	*newpwd;
+	int   i;
 
 	tmp = NULL;
 	if (path == NULL)
@@ -119,10 +126,47 @@ void my_cd(char *path, char **env, char **cmd)
 		errno = 1;
 		return ;
 	}
+	if (!(oldpwd = (char *)malloc(sizeof(char) * (PATH_MAX + 1))))
+		return ;
+	getcwd(oldpwd, PATH_MAX);
 	if (chdir(path) == -1 )
 	{
 		ft_puterror("cd: No such file or directory: ", path);
+		free(oldpwd);
 		return ;
+	}
+	i = 0;
+	while (env[i])
+	{
+		if (!ft_strncmp("PWD=", env[i], 4))
+		{
+			free(env[i]);
+			if (!(newpwd = (char *)malloc(sizeof(char) * (PATH_MAX + 1))))
+				return ;
+			getcwd(newpwd, PATH_MAX);
+			if (!(env[i] = (char *)malloc(sizeof(char) * (ft_strlen(newpwd) + 5))))
+				return ;
+			ft_strcpy(env[i], "PWD=");
+			ft_strcat(env[i], newpwd);
+			free(newpwd);
+			break ;
+		}
+		i++;
+	}
+	i = 0;
+	while (env[i])
+	{
+		if (!ft_strncmp("OLDPWD=", env[i], 7))
+		{
+			free(env[i]);
+			if (!(env[i] = (char *)malloc(sizeof(char) * (ft_strlen(oldpwd) + 8))))
+				return ;
+			ft_strcpy(env[i], "OLDPWD=");
+			ft_strcat(env[i], oldpwd);
+			free(oldpwd);
+			break ;
+		}
+		i++;
 	}
 
 	errno = 0;
@@ -324,6 +368,7 @@ char 	**ft_export(char **cmd, char **env)
 	while (cmd[i])
 	{
 		j = 0;
+		error = 0;
 		while (cmd[i][j])
 		{
 			if (!ft_isalnum(cmd[i][j]) && cmd[i][j] != '=')
@@ -339,6 +384,8 @@ char 	**ft_export(char **cmd, char **env)
 				j = -1;
 				break ;
 			}
+			if (cmd[i][j] == '=')
+				break;
 			j++;
 		}
 		if (j != -1)
@@ -519,7 +566,7 @@ char 								*ft_variables(char *str, int idx, char **env)
 	tenv = NULL;
 	if (!(str_tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 2))))
 		return (NULL);
-	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + path_max(env)))))
+	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + PATH_MAX))))
 		return (NULL);
 	if (idx != 0)
 		ft_strlcpy(tmp, str, idx + 1);
@@ -759,6 +806,7 @@ char 		**ft_splitcmd(char *str)
 	int 	j;
 	char 	c;
 
+	//printf("%s\n", str);
 	if (ft_nb_cmd(str) == -1)
 		return (NULL);
 	if (!(tab = (char **)malloc(sizeof(char*) * (ft_nb_cmd(str) + 1))))
@@ -781,20 +829,24 @@ char 		**ft_splitcmd(char *str)
 		{
 			if ((tab[i] = ft_takecmd(str, first, j)) == NULL)
 			{
+				i++;
+				tab[i] = NULL;
 				i = -1;
 				break ;
 			}
 			i++;
 			j++;
-			while (str[j] == ' ')
+			while (str[j] == ' ' && str[j] == ';')
 				j++;
 			first = j;
 		}
 		j++;
 	}
 	if (i != -1)
+	{
 		tab[i] = ft_takecmd(str, first, j);
-	tab[i + 1] = NULL;
+		tab[i + 1] = NULL;
+	}
 	return (tab);
 }
 
@@ -852,7 +904,6 @@ void  	father_pipe(int pfd[2])
 
 static void	cmd_execution(char **cmd)
 {
-	pid_t	pid;
 	int		status;
 
 	pid = 0;
@@ -912,6 +963,7 @@ int                	ft_commande(char *line, char ***env)
 {
   char    **commande;
 	char		**tenv;
+	int 		ex;
 
 	commande = NULL;
 	tenv = NULL;
@@ -929,10 +981,15 @@ int                	ft_commande(char *line, char ***env)
 		write(1, "", 0);
 	else if (ft_strcmp(commande[0], "exit") == 0)
 	{
+		ex = 0;
+		if (commande[1] != NULL && ft_isdigit(commande[1][0]))
+		{
+			ex = ft_atoi(commande[1]);
+		}
     ft_splitdel(&commande);
 		write(1, "TROP BIEN CE SHELL\n", 19);
 		system("leaks minishell");
-		exit(0);
+		exit(ex);
   }
 	else if (built_command(commande[0]))
 		exect_built_commande(commande, env);
@@ -984,17 +1041,37 @@ int 				ft_precommande(char *line, char ***env)
 	return (1);
 }
 
-void 				end()
+void 				end(int sig)
 {
-	exit(0);
+	(void)sig;
+	if (pid != 0)
+	{
+		printf("[1]    %d quit       %s\n", pid, mess);
+		kill(pid, SIGQUIT);
+	}
+	else
+		ft_putstr("\b \b\b \b");
 }
 
 void 				recovery(int sig)
 {
-	switch(sig){
-		case SIGINT:
-			write(1, "\n$alilin> ", 10);
+	(void)sig;
+	if (pid == 0)
+	{
+		ft_putstr("\b \b\b \b\n");
+		write(1, "$alilin> ", 9);
 	}
+	else
+	{
+		kill(pid, SIGINT);
+		write(1, "\n", 1);
+	}
+}
+
+static void     my_signal_sigcont(int sig)
+{
+  (void)sig;
+  write(1, "$alilin> ", 9);
 }
 
 int					main(int ac, char **av, char **env)
@@ -1007,13 +1084,17 @@ int					main(int ac, char **av, char **env)
 	line = NULL;
 	envi = ft_getenv(env);
 	signal(SIGINT, recovery);
-	signal(SIGABRT, end);
+	signal(SIGCONT, &my_signal_sigcont);
+	signal(SIGQUIT, end);
 	while (1)
 	{
 		write(1, "$alilin> ", 9);
 		get_next_line(0, &line);
+		mess = line;
 		if (ft_strcmp(line, "\0") != 0)
     	ft_precommande(line, &envi);
+		pid = 0;
+		mess = NULL;
 		free(line);
 	}
 	return (0);
