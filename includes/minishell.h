@@ -17,6 +17,9 @@
 extern int  errno ;
 # define    PATH_MAX 4096
 
+void 		      my_redir_right(char **cmd);
+void          my_redirection(char *str);
+int 		      detectcmd(char **cmd);
 static bool   get_path(char **cmd, char **env);
 char          **ft_getenv(char **env);
 char          *my_getenv(char **env, char *path);
