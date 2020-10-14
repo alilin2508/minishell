@@ -16,6 +16,7 @@
 
 extern int  errno ;
 int         g_file;
+int         g_fd;
 # define    PATH_MAX 4096
 
 char 		      **my_redir_right(char **cmd);
@@ -32,6 +33,6 @@ void          my_cd(char *path, char **env);
 int           ft_access(char *bin);
 static void   exect_built_commande(char **cmd, char ***env);
 int 				  built_command(char *cmd);
-int           ft_commande(char **commande, char ***env);
+int           ft_commande(char *line, char ***env);
 
 #endif

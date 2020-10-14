@@ -1004,12 +1004,13 @@ char 		**my_redir_right(char **cmd)
 	}
 	cmd[i] = NULL;
 	ft_splitdel(&tmp);
-	if (dup2(g_file, 1) == -1)
+	g_fd = dup(STDOUT_FILENO);
+	if (dup2(g_file, STDOUT_FILENO) == -1)
 		write(2, "error: dup2 failed\n", 19);
 	return (cmd);
 }
 
-/*void 		my_pipe(char *cmd, char ***env)
+void 		my_pipe(char *cmd, char ***env)
 {
 	int 		pid;
 	int 		pfd[2];
@@ -1059,7 +1060,7 @@ void  	father_pipe(int pfd[2])
 	close(pfd[1]);
 	execlp("ls", "ls", (char *)0);
 	write(2, "NULL\n", 5);
-}*/
+}
 
 static void	cmd_execution(char **cmd)
 {
@@ -1149,18 +1150,18 @@ int 								ft_exit(char **commande)
 	exit(ex);
 }
 
-int                	ft_commande(char **commande, char ***env)
+int                	ft_commande(char *line, char ***env)
 {
-  //char    **commande;
+  char    **commande;
 	char		**tenv;
 
-	//commande = NULL;
+	commande = NULL;
 	tenv = NULL;
-	//if ((variables$(line, *env)) == NULL)
-	//	return (0);
-	//if ((commande = creat_list_arg(line)) == NULL)
-	//	return (0);
-	//commande = detectcmd(commande);
+	if ((variables$(line, *env)) == NULL)
+		return (0);
+	if ((commande = creat_list_arg(line)) == NULL)
+		return (0);
+	commande = detectcmd(commande);
 	if (commande[0] == NULL)
 		write(1, "", 0);
 	else if (ft_strcmp(commande[0], "exit") == 0)
@@ -1181,6 +1182,14 @@ int                	ft_commande(char **commande, char ***env)
 		tenv = NULL;
 	}
 	ft_splitdel(&commande);
+	if (g_fd != 0)
+	{
+		if (dup2(g_fd, STDOUT_FILENO) == -1)
+			write(2, "error: dup2 failed\n", 19);
+		close(g_file);
+		close(g_fd);
+		g_fd = 0;
+	}
 	return (1);
 }
 
@@ -1188,7 +1197,6 @@ int 				ft_precommande(char *line, char ***env)
 {
 	int nbarg;
 	char **commande;
-	char **commande2;
 	int i;
 
 	commande = NULL;
@@ -1205,12 +1213,7 @@ int 				ft_precommande(char *line, char ***env)
 	{
 		//my_pipe(commande[i], env);
 		my_redirection(commande[i]);
-		if ((variables$(commande[i], *env)) == NULL)
-			return (0);
-		if ((commande2 = creat_list_arg(commande[i])) == NULL)
-			return (0);
-		commande2 = detectcmd(commande2);
-		ft_commande(commande2, env);
+		ft_commande(commande[i], env);
 		i++;
 	}
 	ft_splitdel(&commande);
