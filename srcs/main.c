@@ -32,20 +32,21 @@ int tab_len(char **env)
 	return (i);
 }
 
-int 		detectcmd(char **cmd)
+char 		**detectcmd(char **cmd)
 {
 	int i;
 
 	i = 0;
 	while (cmd[i])
 	{
-		if (!ft_strcmp(cmd[i], ">"))
-			my_redir_right(cmd);
-		if (!ft_strcmp(cmd[i], ">>"))
-			my_redir_right(cmd);
+		if (!ft_strcmp(cmd[i], ">") || !ft_strcmp(cmd[i], ">>"))
+		{
+			cmd = my_redir_right(cmd);
+			break ;
+		}
 		i++;
 	}
-	return (0);
+	return (cmd);
 }
 
 int 		ft_cheakarg(char *str)
@@ -926,39 +927,36 @@ void my_redirection(char *str)
 	ft_checkredir(str);
 }
 
-void 		my_redir_right(char **cmd)
+char 		**my_redir_right(char **cmd)
 {
 	int 	i;
 	int 	file_open;
-	int   fd;
 	int 	nb;
 	char 	**tmp;
 
 	i = 0;
 	file_open = 0;
 	nb = 0;
-	fd = 0;
+	g_file = 0;
 	tmp = NULL;
 	while (cmd[i])
 	{
 		if (!ft_strcmp(cmd[i], ">"))
 		{
 			if (file_open)
-				close(fd);
-			printf("%s\n", cmd[i+1]);
-			if ((fd = open(cmd[i + 1], O_CREAT | O_WRONLY | O_TRUNC,
+				close(g_file);
+			if ((g_file = open(cmd[i + 1], O_CREAT | O_WRONLY | O_TRUNC,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
 				write(2, "error: open failed\n", 19);
 			else
 				file_open = 1;
 			nb++;
-			printf("%d\n", fd);
 		}
 		if (!ft_strcmp(cmd[i], ">>"))
 		{
 			if (file_open)
-				close(fd);
-			if ((fd = open(cmd[i + 1], O_CREAT | O_WRONLY | O_APPEND,
+				close(g_file);
+			if ((g_file = open(cmd[i + 1], O_CREAT | O_WRONLY | O_APPEND,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
 				write(2, "error: open failed\n", 19);
 			else
@@ -967,58 +965,51 @@ void 		my_redir_right(char **cmd)
 		}
 		i++;
 	}
-	//if (dup2(fd, 1) == -1)
-		//write(2, "error: dup2 failed\n", 19);
-	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - (nb*2) + 1))))
-		return ;
+	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - (nb * 2) + 1))))
+		return (NULL);
 	i = 0;
 	nb = 0;
 	while (cmd[i])
 	{
 		if (i != 0)
 		{
-			if (ft_strcmp(cmd[i], ">") && ft_strcmp(cmd[i-1], ">"))
+			if (ft_strcmp(cmd[i], ">") && ft_strcmp(cmd[i - 1], ">") && ft_strcmp(cmd[i], ">>") && ft_strcmp(cmd[i - 1], ">>"))
 			{
-				write(1, "ok1\n", 3);
 				if (!(tmp[nb] = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
-					return ;
+					return (NULL);
 				ft_strcpy(tmp[nb], cmd[i]);
 				nb++;
-				write(1, "ok2\n", 3);
 			}
 		}
 		else
 		{
 			if (!(tmp[nb] = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
-				return ;
+				return (NULL);
 			ft_strcpy(tmp[nb], cmd[i]);
 			nb++;
 		}
-		printf("i = %d\n", i);
 		i++;
 	}
 	tmp[nb] = NULL;
-	for (int j = 0; tmp[j]; j++)
-		printf("tmp = %s\n", tmp[j]);
-	printf("ok\n");
-	cmd = tmp;
-	for (int j = 0 ; cmd[j]; j++)
-		printf("cmd[%d] = %s\n", j, cmd[j]);
-	/*i = 0;
-	if (!(cmd = (char **)malloc(sizeof(char *) * (tab_len(tmp) + 1))))
-		return ;
-	while (tmp[i])
+	ft_splitdel(&cmd);
+	if (!(cmd = (char **)malloc(sizeof(char*) * (tab_len(tmp) + 1))))
+		return (NULL);
+		i = 0;
+	while(tmp[i])
 	{
 		if (!(cmd[i] = (char *)malloc(sizeof(char) * (ft_strlen(tmp[i]) + 1))))
-			return ;
+			return (NULL);
 		ft_strcpy(cmd[i], tmp[i]);
 		i++;
 	}
 	cmd[i] = NULL;
-	ft_splitdel(&tmp);*/
+	ft_splitdel(&tmp);
+	if (dup2(g_file, 1) == -1)
+		write(2, "error: dup2 failed\n", 19);
+	return (cmd);
 }
 
-void 		my_pipe(char *cmd, char ***env)
+/*void 		my_pipe(char *cmd, char ***env)
 {
 	int 		pid;
 	int 		pfd[2];
@@ -1068,7 +1059,7 @@ void  	father_pipe(int pfd[2])
 	close(pfd[1]);
 	execlp("ls", "ls", (char *)0);
 	write(2, "NULL\n", 5);
-}
+}*/
 
 static void	cmd_execution(char **cmd)
 {
@@ -1158,18 +1149,18 @@ int 								ft_exit(char **commande)
 	exit(ex);
 }
 
-int                	ft_commande(char *line, char ***env)
+int                	ft_commande(char **commande, char ***env)
 {
-  char    **commande;
+  //char    **commande;
 	char		**tenv;
 
-	commande = NULL;
+	//commande = NULL;
 	tenv = NULL;
-	if ((variables$(line, *env)) == NULL)
-		return (0);
-	if ((commande = creat_list_arg(line)) == NULL)
-		return (0);
-	detectcmd(commande);
+	//if ((variables$(line, *env)) == NULL)
+	//	return (0);
+	//if ((commande = creat_list_arg(line)) == NULL)
+	//	return (0);
+	//commande = detectcmd(commande);
 	if (commande[0] == NULL)
 		write(1, "", 0);
 	else if (ft_strcmp(commande[0], "exit") == 0)
@@ -1197,6 +1188,7 @@ int 				ft_precommande(char *line, char ***env)
 {
 	int nbarg;
 	char **commande;
+	char **commande2;
 	int i;
 
 	commande = NULL;
@@ -1213,7 +1205,12 @@ int 				ft_precommande(char *line, char ***env)
 	{
 		//my_pipe(commande[i], env);
 		my_redirection(commande[i]);
-		ft_commande(commande[i], env);
+		if ((variables$(commande[i], *env)) == NULL)
+			return (0);
+		if ((commande2 = creat_list_arg(commande[i])) == NULL)
+			return (0);
+		commande2 = detectcmd(commande2);
+		ft_commande(commande2, env);
 		i++;
 	}
 	ft_splitdel(&commande);
