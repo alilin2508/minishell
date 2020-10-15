@@ -593,58 +593,6 @@ char 								*ft_backslash(char *str, int bsl)
 	return (str);
 }
 
-int 								ft_nbchevron(char *str)
-{
-	int i;
-	int nb;
-
-	i = 0;
-	nb= 0;
-	while (str[i])
-	{
-		if ((str[i - 1] != '>' && str[i] == '>' && str[i + 1] != '>'
-		&& (str[i + 1] != ' ' || str[i - 1] != ' '))
-		|| (str[i] == '>' && str[i + 1] == '>' &&
-		(str[i + 2] != ' ' || str[i - 1] != ' ')))
-			nb++;
-		i++;
-	}
-	return (nb);
-}
-
-void 								ft_chevronspace(char *str)
-{
-	char 		*tmp;
-	int 		i;
-	int 		j;
-	int			nb;
-
-	nb = ft_nbchevron(str) * 2;
-	if (!(tmp = (char *)malloc(sizeof(char) * (nb + 1))))
-		return ;
-	i = 0;
-	j = 0;
-	while (str[i])
-	{
-		if (str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>')
-		{
-			tmp[j] = ' ';
-			j++;
-		}
-		else if (str[i - 1] == '>' && str[i] != ' ' && str[i] != '>')
-		{
-			tmp[j] = ' ';
-			j++;
-		}
-		tmp[j] = str[i];
-		j++;
-		i++;
-	}
-	tmp[j] = '\0';
-	ft_strcpy(str, tmp);
-	free(tmp);
-}
-
 char 								*variables$(char *str, char **env)
 {
 	int 	i;
@@ -898,6 +846,78 @@ char 		**ft_splitcmd(char *str)
 	return (tab);
 }
 
+int 								ft_nbchevron(char *str)
+{
+	int 	i;
+	int 	nb;
+	char 	c;
+
+	i = 0;
+	nb= 0;
+	while (str[i])
+	{
+		if (str[i] == '"' || str[i] == '\'')
+		{
+			c = str[i];
+			i++;
+			while (str[i] != c && str[i])
+				i++;
+		}
+		if ((str[i - 1] != '>' && str[i] == '>' && str[i + 1] != '>'
+		&& (str[i + 1] != ' ' || str[i - 1] != ' '))
+		|| (str[i] == '>' && str[i + 1] == '>' &&
+		(str[i + 2] != ' ' || str[i - 1] != ' '))
+		|| (str[i] == '<' && (str[i - 1] != ' ' || str[i + 1] != ' ')))
+			nb++;
+		i++;
+	}
+	return (nb);
+}
+
+void 								ft_chevronspace(char *str)
+{
+	char 		*tmp;
+	int 		i;
+	int 		j;
+	char		c;
+
+	printf("%d\n", ft_nbchevron(str));
+	if (!(tmp = (char *)malloc(sizeof(char) *
+	(ft_strlen(str) + ft_nbchevron(str) * 2 + 1))))
+		return ;
+	i = 0;
+	j = 0;
+	while (str[i])
+	{
+		if (str[i] == '"' || str[i] == '\'')
+		{
+			c = str[i];
+			i++;
+			while (str[i] != c && str[i])
+				i++;
+		}
+		if ((str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>')
+		|| (str[i] == '<' && str[i - 1] != ' '))
+		{
+			tmp[j] = ' ';
+			j++;
+		}
+		else if ((str[i - 1] == '>' && str[i] != ' ' && str[i] != '>')
+		|| (str[i - 1] == '<' && str[i] != ' '))
+		{
+			tmp[j] = ' ';
+			j++;
+		}
+		tmp[j] = str[i];
+		j++;
+		i++;
+	}
+	tmp[j] = '\0';
+	ft_strcpy(str, tmp);
+	printf("OK\n");
+	free(tmp);
+}
+
 void ft_checkredir(char *str)
 {
 	int 	i;
@@ -916,15 +936,105 @@ void ft_checkredir(char *str)
 		if ((str[i - 1] != '>' && str[i] == '>' && str[i + 1] != '>'
 		&& (str[i + 1] != ' ' || str[i - 1] != ' '))
 		|| (str[i] == '>' && str[i + 1] == '>'
-		&& (str[i + 2] != ' ' || str[i - 1] != ' ')))
+		&& (str[i + 2] != ' ' || str[i - 1] != ' '))
+		|| (str[i] == '<' && (str[i - 1] != ' ' || str[i + 1] != ' ')))
 			ft_chevronspace(str);
+		i++;
+	}
+}
+
+int 		ft_nbpipe(const char *str)
+{
+	int i;
+	int nb;
+	char c;
+
+	i = 0;
+	nb = 0;
+	while(str[i])
+	{
+		if (str[i] == '\'' || str[i] == '"')
+		{
+			c = str[i];
+			i++;
+			while(str[i] != c && str[i])
+				i++;
+		}
+		if (str[i] == '|' && (str[i - 1] != ' ' || str[i + 1] != ' '))
+			nb++;
+		i++;
+	}
+	return(nb);
+}
+
+void 		ft_pipespace(char *str)
+{
+		char 	*tmp;
+		int 	i;
+		int 	j;
+		char 	c;
+
+
+		if (!(tmp = (char *)malloc(sizeof(char) *
+		(ft_strlen(str) + ft_nbpipe((const char *)str) * 2 + 1))))
+			return ;
+		i = 0;
+		j = 0;
+		while (str[i])
+		{
+			if (str[i] == '"' || str[i] =='\'')
+			{
+				c = str[i];
+				i++;
+				while (str[i] == c && str[i])
+					i++;
+			}
+			if (str[i] == '|' && str[i - 1] != ' ')
+			{
+				tmp[j] = ' ';
+				j++;
+			}
+			else if (str[i - 1] == '|' && str[i] != ' ')
+			{
+				tmp[j] = ' ';
+				j++;
+			}
+			tmp[j] = str[i];
+			j++;
+			i++;
+		}
+		tmp[j] = '\0';
+		ft_strcpy(str, tmp);
+		free(tmp);
+}
+
+void 		ft_checkpipe(char *str)
+{
+	int 	i;
+	char 	c;
+
+	i = 0;
+	while(str[i])
+	{
+		if (str[i] == '"' || str[i] == '\'')
+		{
+			c = str[i];
+			i++;
+			while (str[i] != c && str[i])
+				i++;
+		}
+		if (str[i] == '|' && (str[i - 1] != ' ' || str[i + 1] != ' '))
+			ft_pipespace(str);
 		i++;
 	}
 }
 
 void my_redirection(char *str)
 {
-	ft_checkredir(str);
+	if (ft_strchr(str, '>') || ft_strchr(str, '<'))
+		ft_checkredir(str);
+	if (ft_strchr(str, '|'))
+		ft_checkpipe(str);
 }
 
 char 		**my_redir_right(char **cmd)
