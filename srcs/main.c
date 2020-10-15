@@ -22,6 +22,14 @@ void ft_puterror(char *errorstart, char *arg, char *errorend)
 	write(2, errorend, ft_strlen(errorend));
 }
 
+int 		parse_error(int t_e)
+{
+	if (t_e == 1)
+		write(2, "bash: syntax error near unexpected token `;;'\n", 46);
+
+	return(t_e);
+}
+
 int tab_len(char **env)
 {
 	int i;
@@ -32,56 +40,19 @@ int tab_len(char **env)
 	return (i);
 }
 
-char 		**detectcmd(char **cmd)
+int 		ft_checkerror(const char *str)
 {
-	int i;
-	int file_open;
+	int 	i;
 
 	i = 0;
-	g_cvrd = 0;
-	g_file = 0;
-	file_open = 0;
-	while (cmd[i])
-	{
-		if (!ft_strcmp(cmd[i], ">") || !ft_strcmp(cmd[i], ">>"))
-		{
-			cmd = my_redir_right(cmd, i, file_open);
-			g_cvrd = 1;
-			file_open = 1;
-			i--;
-		}
-		/*if (!ft_strcmp(cmd[i], "<"))
-		{
-
-		}*/
-		i++;
-	}
-	if (g_cvrd)
-	{
-		g_fd = dup(STDOUT_FILENO);
-		close(STDOUT_FILENO);
-		if (dup2(g_file, STDOUT_FILENO) == -1)
-			write(2, "error: dup2 failed\n", 19);
-	}
-	return (cmd);
-}
-
-int 		ft_cheakarg(char *str)
-{
-	int i;
-	int nb;
-
-	i = 0;
-	nb = 0;
 	while (str[i])
 	{
-		if (str[i] == ';')
-			nb++;
-		if (str[i] == '|')
-			nb++;
+		if (str[i] == ';' && str[i + 1] == ';')
+			return (parse_error(1));
+		//if ()
 		i++;
 	}
-	return (nb);
+	return (0);
 }
 
 void environment(char **env)
@@ -96,22 +67,6 @@ void environment(char **env)
 		i++;
 	}
 	errno = 0;
-}
-
-size_t path_max(char **env)
-{
-	int i;
-	size_t max;
-
-	i = 0;
-	max = 0;
-	while (env[i])
-	{
-		if (ft_strlen(env[i]) >= max)
-			max = ft_strlen(env[i]);
-		i++;
-	}
-	return (max);
 }
 
 void position(char **env)
@@ -912,8 +867,8 @@ void 								ft_chevronspace(char *str)
 			while (str[i] != c && str[i])
 				i++;
 		}
-		if ((str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>')
-		|| (str[i] == '<' && str[i - 1] != ' '))
+		if (((str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>')
+		|| (str[i] == '<' && str[i - 1] != ' ')) && i != 0)
 		{
 			tmp[j] = ' ';
 			j++;
@@ -1052,7 +1007,7 @@ void my_redirection(char *str)
 		ft_checkpipe(str);
 }
 
-char 		**my_redir_right(char **cmd, int idx, int file_open)
+char 		**my_redir_right(char **cmd, int idx, int f_open[2])
 {
 	int 	i;
 	int 	j;
@@ -1060,80 +1015,30 @@ char 		**my_redir_right(char **cmd, int idx, int file_open)
 
 	i = 0;
 	tmp = NULL;
-	/*while (cmd[i])
-	{
-		if (!ft_strcmp(cmd[i], ">"))
-		{
-			if (file_open)
-				close(g_file);
-			if ((g_file = open(cmd[i + 1], O_CREAT | O_WRONLY | O_TRUNC,
-				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
-				write(2, "error: open failed\n", 19);
-			else
-				file_open = 1;
-			nb++;
-		}
-		if (!ft_strcmp(cmd[i], ">>"))
-		{
-			if (file_open)
-				close(g_file);
-			if ((g_file = open(cmd[i + 1], O_CREAT | O_WRONLY | O_APPEND,
-				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
-				write(2, "error: open failed\n", 19);
-			else
-				file_open = 1;
-			nb++;
-		}
-		i++;
-	}*/
-	printf("%d\n", file_open);
 	if (!ft_strcmp(cmd[idx], ">"))
 	{
-		printf("g_file before %d\n", g_file);
-		if (file_open == 1)
-			close(g_file);
-		if ((g_file = open(cmd[idx + 1], O_CREAT | O_WRONLY | O_TRUNC,
+		if (f_open[0] == 1)
+			close(g_file[0]);
+		if ((g_file[0] = open(cmd[idx + 1], O_CREAT | O_WRONLY | O_TRUNC,
 			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
 			write(2, "error: open failed\n", 19);
 		else
-			file_open = 1;
+			f_open[0] = 1;
 	}
 	else if (!ft_strcmp(cmd[idx], ">>"))
 	{
-		if (file_open)
-			close(g_file);
-		if ((g_file = open(cmd[idx + 1], O_CREAT | O_WRONLY | O_APPEND,
+		if (f_open[0])
+			close(g_file[0]);
+		if ((g_file[0] = open(cmd[idx + 1], O_CREAT | O_WRONLY | O_APPEND,
 			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
 			write(2, "error: open failed\n", 19);
 		else
-			file_open = 1;
+			f_open[0] = 1;
 	}
-	printf("g_file after %d\n", g_file);
 	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - 2 + 1))))
 		return (NULL);
 	i = 0;
 	j = 0;
-	/*while (cmd[i])
-	{
-		if (i != 0)
-		{
-			if (ft_strcmp(cmd[i], ">") && ft_strcmp(cmd[i - 1], ">") && ft_strcmp(cmd[i], ">>") && ft_strcmp(cmd[i - 1], ">>"))
-			{
-				if (!(tmp[nb] = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
-					return (NULL);
-				ft_strcpy(tmp[nb], cmd[i]);
-				nb++;
-			}
-		}
-		else
-		{
-			if (!(tmp[nb] = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
-				return (NULL);
-			ft_strcpy(tmp[nb], cmd[i]);
-			nb++;
-		}
-		i++;
-	}*/
 	while (cmd[i])
 	{
 		if (i != idx && i != idx + 1)
@@ -1159,10 +1064,112 @@ char 		**my_redir_right(char **cmd, int idx, int file_open)
 	}
 	cmd[i] = NULL;
 	ft_splitdel(&tmp);
-	/*g_fd = dup(STDOUT_FILENO);
-	close(STDOUT_FILENO);
-	if (dup2(g_file, STDOUT_FILENO) == -1)
-		write(2, "error: dup2 failed\n", 19);*/
+	if (i == 0)
+	{
+		ft_splitdel(&cmd);
+		return (NULL);
+	}
+	return (cmd);
+}
+
+char 		**my_redir_left(char **cmd, int idx, int f_open[2])
+{
+	int	i;
+	int	j;
+	char **tmp;
+
+	if (f_open[1])
+		close(g_file[1]);
+	if ((g_file[1] = open(cmd[idx + 1], O_RDONLY)) == -1)
+	{
+		ft_puterror("bash: ", cmd[idx + 1], ": No such file or directory\n");
+		ft_splitdel(&cmd);
+		return NULL;
+	}
+	f_open[1] = 1;
+	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - 2 + 1))))
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (cmd[i])
+	{
+		if (i != idx && i != idx + 1)
+		{
+			if (!(tmp[j] = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
+				return (NULL);
+			ft_strcpy(tmp[j], cmd[i]);
+			j++;
+		}
+		i++;
+	}
+	tmp[j] = NULL;
+	ft_splitdel(&cmd);
+	if (!(cmd = (char **)malloc(sizeof(char*) * (tab_len(tmp) + 1))))
+		return (NULL);
+	i = 0;
+	while(tmp[i])
+	{
+		if (!(cmd[i] = (char *)malloc(sizeof(char) * (ft_strlen(tmp[i]) + 1))))
+			return (NULL);
+		ft_strcpy(cmd[i], tmp[i]);
+		i++;
+	}
+	cmd[i] = NULL;
+	ft_splitdel(&tmp);
+	if (cmd[0] == NULL)
+	{
+		ft_splitdel(&cmd);
+		return (NULL);
+	}
+	return (cmd);
+}
+
+char 		**detectcmd(char **cmd)
+{
+	int i;
+	int f_open[2];
+
+	i = 0;
+	g_cvr[0] = 0;
+	g_cvr[1] = 0;
+	g_file[0] = 0;
+	g_file[1] = 0;
+	f_open[0] = 0;
+	f_open[1] = 0;
+	while (cmd[i])
+	{
+		if (!ft_strcmp(cmd[i], ">") || !ft_strcmp(cmd[i], ">>"))
+		{
+			if (!(cmd = my_redir_right(cmd, i, f_open)))
+				return (NULL);
+			g_cvr[0] = 1;
+			f_open[0] = 1;
+			i--;
+		}
+		if (!ft_strcmp(cmd[i], "<"))
+		{
+			if (!(cmd = my_redir_left(cmd, i, f_open)))
+				return (NULL);
+			g_cvr[1] = 1;
+			f_open[1] = 1;
+			i--;
+		}
+		i++;
+	}
+	if (g_cvr[0])
+	{
+		g_fd[0] = dup(STDOUT_FILENO);
+		close(STDOUT_FILENO);
+		if (dup2(g_file[0], STDOUT_FILENO) == -1)
+			write(2, "error: dup2 failed\n", 19);
+	}
+	if (g_cvr[1])
+	{
+		g_fd[1] = dup(0);
+		close(0);
+		if (dup2(g_file[1], 0) == -1)
+			write(2, "error: dup2 failed\n", 19);
+	}
 	return (cmd);
 }
 
@@ -1318,7 +1325,7 @@ int                	ft_commande(char *line, char ***env)
 	if ((commande = creat_list_arg(line)) == NULL)
 		return (0);
 	commande = detectcmd(commande);
-	if (commande[0] == NULL)
+	if (commande == NULL)
 		write(1, "", 0);
 	else if (ft_strcmp(commande[0], "exit") == 0)
 		ft_exit(commande);
@@ -1337,27 +1344,37 @@ int                	ft_commande(char *line, char ***env)
 		ft_splitdel(&tenv);
 		tenv = NULL;
 	}
-	ft_splitdel(&commande);
-	if (g_fd != 0 && g_cvrd)
+	if (commande)
+		ft_splitdel(&commande);
+	if (g_fd[0] != 0 && g_cvr[0])
 	{
 		close(STDOUT_FILENO);
-		if (dup2(g_fd, STDOUT_FILENO) == -1)
+		if (dup2(g_fd[0], STDOUT_FILENO) == -1)
 			write(2, "error: dup2 failed\n", 19);
-		close(g_file);
-		close(g_fd);
-		g_fd = 0;
+		close(g_file[0]);
+		close(g_fd[0]);
+		g_fd[0] = 0;
+	}
+	if (g_fd[1] != 0 && g_cvr[1])
+	{
+		close(0);
+		if (dup2(g_fd[1], 0) == -1)
+			write(2, "error: dup2 failed\n", 19);
+		close(g_file[1]);
+		close(g_fd[1]);
+		g_fd[1] = 0;
 	}
 	return (1);
 }
 
 int 				ft_precommande(char *line, char ***env)
 {
-	int nbarg;
 	char **commande;
 	int i;
 
 	commande = NULL;
-	nbarg = ft_cheakarg(line);
+	if (ft_checkerror(line))
+		return (0);
 	while (line[0] == ' ' || line[0] == ';')
 		line += 1;
 	if ((commande = ft_splitcmd(line)) == NULL)

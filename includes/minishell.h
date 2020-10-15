@@ -15,12 +15,12 @@
 # include "../libft/includes/libft.h"
 
 extern int  errno ;
-int         g_file;
-int         g_fd;
-int 				g_cvrd;
+int         g_file[2];
+int         g_fd[2];
+int 				g_cvr[2];
 # define    PATH_MAX 4096
 
-char 		      **my_redir_right(char **cmd, int idx, int file_open);
+char 		      **my_redir_right(char **cmd, int idx, int f_open[2]);
 void          my_redirection(char *str);
 char 		      **detectcmd(char **cmd);
 static bool   get_path(char **cmd, char **env);
