@@ -35,16 +35,33 @@ int tab_len(char **env)
 char 		**detectcmd(char **cmd)
 {
 	int i;
+	int file_open;
 
 	i = 0;
+	g_cvrd = 0;
+	g_file = 0;
+	file_open = 0;
 	while (cmd[i])
 	{
 		if (!ft_strcmp(cmd[i], ">") || !ft_strcmp(cmd[i], ">>"))
 		{
-			cmd = my_redir_right(cmd);
-			break ;
+			cmd = my_redir_right(cmd, i, file_open);
+			g_cvrd = 1;
+			file_open = 1;
+			i--;
 		}
+		/*if (!ft_strcmp(cmd[i], "<"))
+		{
+
+		}*/
 		i++;
+	}
+	if (g_cvrd)
+	{
+		g_fd = dup(STDOUT_FILENO);
+		close(STDOUT_FILENO);
+		if (dup2(g_file, STDOUT_FILENO) == -1)
+			write(2, "error: dup2 failed\n", 19);
 	}
 	return (cmd);
 }
@@ -881,7 +898,6 @@ void 								ft_chevronspace(char *str)
 	int 		j;
 	char		c;
 
-	printf("%d\n", ft_nbchevron(str));
 	if (!(tmp = (char *)malloc(sizeof(char) *
 	(ft_strlen(str) + ft_nbchevron(str) * 2 + 1))))
 		return ;
@@ -914,7 +930,6 @@ void 								ft_chevronspace(char *str)
 	}
 	tmp[j] = '\0';
 	ft_strcpy(str, tmp);
-	printf("OK\n");
 	free(tmp);
 }
 
@@ -1037,19 +1052,15 @@ void my_redirection(char *str)
 		ft_checkpipe(str);
 }
 
-char 		**my_redir_right(char **cmd)
+char 		**my_redir_right(char **cmd, int idx, int file_open)
 {
 	int 	i;
-	int 	file_open;
-	int 	nb;
+	int 	j;
 	char 	**tmp;
 
 	i = 0;
-	file_open = 0;
-	nb = 0;
-	g_file = 0;
 	tmp = NULL;
-	while (cmd[i])
+	/*while (cmd[i])
 	{
 		if (!ft_strcmp(cmd[i], ">"))
 		{
@@ -1074,12 +1085,35 @@ char 		**my_redir_right(char **cmd)
 			nb++;
 		}
 		i++;
+	}*/
+	printf("%d\n", file_open);
+	if (!ft_strcmp(cmd[idx], ">"))
+	{
+		printf("g_file before %d\n", g_file);
+		if (file_open == 1)
+			close(g_file);
+		if ((g_file = open(cmd[idx + 1], O_CREAT | O_WRONLY | O_TRUNC,
+			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
+			write(2, "error: open failed\n", 19);
+		else
+			file_open = 1;
 	}
-	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - (nb * 2) + 1))))
+	else if (!ft_strcmp(cmd[idx], ">>"))
+	{
+		if (file_open)
+			close(g_file);
+		if ((g_file = open(cmd[idx + 1], O_CREAT | O_WRONLY | O_APPEND,
+			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
+			write(2, "error: open failed\n", 19);
+		else
+			file_open = 1;
+	}
+	printf("g_file after %d\n", g_file);
+	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - 2 + 1))))
 		return (NULL);
 	i = 0;
-	nb = 0;
-	while (cmd[i])
+	j = 0;
+	/*while (cmd[i])
 	{
 		if (i != 0)
 		{
@@ -1099,12 +1133,23 @@ char 		**my_redir_right(char **cmd)
 			nb++;
 		}
 		i++;
+	}*/
+	while (cmd[i])
+	{
+		if (i != idx && i != idx + 1)
+		{
+			if (!(tmp[j] = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
+				return (NULL);
+			ft_strcpy(tmp[j], cmd[i]);
+			j++;
+		}
+		i++;
 	}
-	tmp[nb] = NULL;
+	tmp[j] = NULL;
 	ft_splitdel(&cmd);
 	if (!(cmd = (char **)malloc(sizeof(char*) * (tab_len(tmp) + 1))))
 		return (NULL);
-		i = 0;
+	i = 0;
 	while(tmp[i])
 	{
 		if (!(cmd[i] = (char *)malloc(sizeof(char) * (ft_strlen(tmp[i]) + 1))))
@@ -1114,9 +1159,10 @@ char 		**my_redir_right(char **cmd)
 	}
 	cmd[i] = NULL;
 	ft_splitdel(&tmp);
-	g_fd = dup(STDOUT_FILENO);
+	/*g_fd = dup(STDOUT_FILENO);
+	close(STDOUT_FILENO);
 	if (dup2(g_file, STDOUT_FILENO) == -1)
-		write(2, "error: dup2 failed\n", 19);
+		write(2, "error: dup2 failed\n", 19);*/
 	return (cmd);
 }
 
@@ -1292,8 +1338,9 @@ int                	ft_commande(char *line, char ***env)
 		tenv = NULL;
 	}
 	ft_splitdel(&commande);
-	if (g_fd != 0)
+	if (g_fd != 0 && g_cvrd)
 	{
+		close(STDOUT_FILENO);
 		if (dup2(g_fd, STDOUT_FILENO) == -1)
 			write(2, "error: dup2 failed\n", 19);
 		close(g_file);

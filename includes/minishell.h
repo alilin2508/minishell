@@ -17,9 +17,10 @@
 extern int  errno ;
 int         g_file;
 int         g_fd;
+int 				g_cvrd;
 # define    PATH_MAX 4096
 
-char 		      **my_redir_right(char **cmd);
+char 		      **my_redir_right(char **cmd, int idx, int file_open);
 void          my_redirection(char *str);
 char 		      **detectcmd(char **cmd);
 static bool   get_path(char **cmd, char **env);
