@@ -15,7 +15,7 @@
 # include "../libft/includes/libft.h"
 
 extern int  errno ;
-int         g_file[2];
+int         g_file[3];
 int         g_fd[2];
 int 				g_cvr[2];
 # define    PATH_MAX 4096

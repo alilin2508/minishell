@@ -22,10 +22,12 @@ void ft_puterror(char *errorstart, char *arg, char *errorend)
 	write(2, errorend, ft_strlen(errorend));
 }
 
-int 		parse_error(int t_e)
+int 		parse_error(int t_e, char *err)
 {
 	if (t_e == 1)
-		write(2, "bash: syntax error near unexpected token `;;'\n", 46);
+		ft_puterror("bash: syntax error near unexpected token `", err, "'\n");
+	if (t_e == 2)
+		write(1, "bash: missing quote\n", 20);
 
 	return(t_e);
 }
@@ -43,13 +45,88 @@ int tab_len(char **env)
 int 		ft_checkerror(const char *str)
 {
 	int 	i;
+	int   err;
+	char 	c;
 
 	i = 0;
 	while (str[i])
 	{
-		if (str[i] == ';' && str[i + 1] == ';')
-			return (parse_error(1));
-		//if ()
+		if (str[i] == '\'' || str[i] == '"')
+		{
+			c = str[i];
+			i++;
+			while (str[i] && str[i] != c)
+				i++;
+			if (str[i] == '\0')
+				return (parse_error(2, NULL));
+		}
+		if (str[i] == ';')
+		{
+			if (i == 0)
+				return (parse_error(1, ";"));
+			err = i + 1;
+			while(str[err] == ' ')
+				err++;
+			if (str[err] == ';')
+				return (parse_error(1, ";"));
+		}
+		if (str[i] == '>')
+		{
+			if (str[i+1] == '>' && str[i+2] == '>')
+				return (parse_error(1, ">"));
+			if (str[i+1] == ' ' || str[i+1] == '\0' || (str[i+1] == '>' &&
+					(str[i+2] == ' ' || str[i+2] == '\0')) || str[i + 1] == '<')
+			{
+				if (str[i + 1] == '>')
+					err = i + 2;
+				else
+					err = i + 1;
+				while (str[err] && str[err] == ' ')
+					err++;
+				if (str[err] == '\0')
+					return (parse_error(1, "newline"));
+				if (str[err] == '>')
+					return (parse_error(1, ">"));
+				if (str[err] == '<')
+					return (parse_error(1, "<"));
+				if (str[err] == '|')
+					return (parse_error(1, "|"));
+			}
+		}
+		if (str[i] == '<')
+		{
+			if (str[i + 1] == '<' || str[i + 1] == '>' || str[i + 1] == '\0')
+				return (parse_error(1, "newline"));
+			if (str[i+1] == ' ' || str[i + 1] == '\0')
+			{
+				err = i + 1;
+				while (str[err] && str[err] == ' ')
+					err++;
+				if (str[err] == '\0')
+					return (parse_error(1, "newline"));
+				if (str[err] == '<')
+					return (parse_error(1, "<"));
+				if (str[err] == '>')
+					return (parse_error(1, ">"));
+				if (str[err] == '|')
+					return (parse_error(1, "|"));
+			}
+		}
+		if (str[i] == '|')
+		{
+			if (str[i + 1] == '|' || i == 0)
+				return (parse_error(1, "|"));
+			if (str[i + 1] == ' ' || str[i + 1] == '\0')
+			{
+				err = i + 1;
+				while(str[err] && str[err] == ' ')
+					err++;
+				if (str[err] == '\0')
+					return (parse_error(1, "newline"));
+				if (str[err] == '|')
+					return (parse_error(1, "|"));
+			}
+		}
 		i++;
 	}
 	return (0);
@@ -789,7 +866,20 @@ char 		**ft_splitcmd(char *str)
 			c = str[j];
 			j++;
 			while (str[j] && str[j] != c)
+			{
+				if (str[j] == '>' && str[j-1] == c && str[j+1] == c && str[j-2] == ' ')
+					str[j] = 1;
+				else if (str[j] == '<' && str[j-1] == c && str[j+1] == c &&
+						str[j-2] == ' ')
+					str[j] = 2;
+				else if (str[j] == '>' && str[j + 1] == '>' && str[j - 1] == c &&
+						str[j + 2] == c && str[j - 2] == ' ')
+				{
+					str[j + 1] = 1;
+					str[j] = 1;
+				}
 				j++;
+			}
 		}
 		if (str[j] == ';')
 		{
@@ -1154,6 +1244,15 @@ char 		**detectcmd(char **cmd)
 			f_open[1] = 1;
 			i--;
 		}
+		if (cmd[i][0] == 1 && cmd[i][1] == '\0')
+			cmd[i][0] = '>';
+		if (cmd[i][0] == 1 && cmd[i][1] == 1 && cmd[i][2] == '\0')
+		{
+			cmd[i][0] = '>';
+			cmd[i][1] = '>';
+		}
+		if (cmd[i][0] == 2 && cmd[i][1] == '\0')
+			cmd[i][0] = '<';
 		i++;
 	}
 	if (g_cvr[0])
@@ -1379,13 +1478,12 @@ int 				ft_precommande(char *line, char ***env)
 		line += 1;
 	if ((commande = ft_splitcmd(line)) == NULL)
 	{
-		write(2, "bash: error: missing quote\n", 27);
+		write(2, "bash: error: malloc failed\n", 27);
 		return (0);
 	}
 	i = 0;
 	while (commande[i])
 	{
-		//my_pipe(commande[i], env);
 		my_redirection(commande[i]);
 		ft_commande(commande[i], env);
 		i++;
