@@ -12,6 +12,7 @@
 # include <signal.h>
 # include <dirent.h>
 # include <stdbool.h>
+# include <sys/wait.h>
 # include "../libft/includes/libft.h"
 
 extern int  errno ;

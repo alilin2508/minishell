@@ -12,8 +12,7 @@
 
 #include "minishell.h"
 
-pid_t pid;
-char 	*mess;
+pid_t 	pid;
 
 void ft_puterror(char *errorstart, char *arg, char *errorend)
 {
@@ -1027,6 +1026,30 @@ int 		ft_nbpipe(const char *str)
 	return(nb);
 }
 
+int 		ft_nbpipe2(const char *str)
+{
+	int i;
+	int nb;
+	char c;
+
+	i = 0;
+	nb = 0;
+	while(str[i])
+	{
+		if (str[i] == '\'' || str[i] == '"')
+		{
+			c = str[i];
+			i++;
+			while(str[i] != c && str[i])
+				i++;
+		}
+		if (str[i] == '|')
+			nb++;
+		i++;
+	}
+	return(nb);
+}
+
 void 		ft_pipespace(char *str)
 {
 		char 	*tmp;
@@ -1272,63 +1295,85 @@ char 		**detectcmd(char **cmd)
 	return (cmd);
 }
 
-void 		my_pipe(char *cmd, char ***env)
+void   			my_pipe(char **cmd, char ***env)
 {
-	int 		pid;
 	int 		pfd[2];
-	int 		status;
+	pid_t   ppid;
+	int  		fd_in;
+	int 		i;
 
-	if (pipe(pfd) == -1)
+	fd_in = 0;
+	i = 0;
+	while (*cmd != 0)
 	{
-		write(2, "pipe failed\n", 12);
-		return ;
+		pipe(pfd);
+		if ((ppid = fork()) == -1)
+			exit(EXIT_FAILURE);
+		else if (ppid == 0)
+		{
+			dup2(fd_in, 0);
+			if (cmd[i + 1] != NULL)
+				dup2(pfd[1], 1);
+			close(pfd[0]);
+			ft_commande(cmd[i], env);
+			return ;
+		}
+		else
+		{
+			wait(NULL);
+			close(pfd[1]);
+			fd_in = pfd[0];
+			i++;
+		}
 	}
-	if ((pid = fork()) == -1)
-		write(2, "fork failed\n", 12);
-	if (pid == 0)
-		{
-			close(pfd[1]);
-			dup2(pfd[0], 0);
-			close(pfd[0]);
-			if (ft_strlen("ok") == 2)
-				waitpid(0, &status, WNOHANG);
-			else
-				waitpid(pid, &status, WSTOPPED);
-		}
-	else
-		{
-			close(pfd[0]);
-			dup2(pfd[1], 1);
-			close(pfd[1]);
-		}
-	ft_commande(cmd, env);
 }
 
-void 		soon_pipe(int pfd[2])
+void 				ft_pipe(char *str, char ***env, int nb)
 {
+	char 	**command;
+	int 	i;
+	int 	j;
+	int 	first;
+	char	c;
 
-
-	close(pfd[1]);
-	dup2(pfd[0], 0);
-	close(pfd[0]);
-	execlp("wc", "wc", (char *)0);
-	write(2, "NULL\n", 5);
-}
-
-void  	father_pipe(int pfd[2])
-{
-	close(pfd[0]);
-	dup2(pfd[1], 1);
-	close(pfd[1]);
-	execlp("ls", "ls", (char *)0);
-	write(2, "NULL\n", 5);
+	if (!(command = (char **)malloc(sizeof(char *) * (nb + 2))))
+		return ;
+	i = 0;
+	j = 0;
+	first = 0;
+	while(str[i])
+	{
+		if (str[i] == '\'' || str[i] == '"')
+		{
+			c = str[i];
+			i++;
+			while (str[i] != c && str[i])
+				i++;
+		}
+		if (str[i] == '|')
+		{
+			if (!(command[j] = (char *)malloc(sizeof(char) * (i - first) + 1)))
+				return ;
+			ft_strlcpy(command[j], &str[first], i - first);
+			i++;
+			first = i + 1;
+			j++;
+		}
+		i++;
+	}
+	if (!(command[j] = (char *)malloc(sizeof(char) * (i - first) + 1)))
+		return ;
+	ft_strlcpy(command[j], &str[first], i - first + 1);
+	j++;
+	command[j] = NULL;
+	my_pipe(command, env);
+	ft_splitdel(&command);
 }
 
 static void	cmd_execution(char **cmd)
 {
-	int		status;
+	int			status;
 
-	pid = 0;
 	status = 0;
 	pid = fork();
 	if (pid == -1)
@@ -1470,6 +1515,7 @@ int 				ft_precommande(char *line, char ***env)
 {
 	char **commande;
 	int i;
+	int nbpipe;
 
 	commande = NULL;
 	if (ft_checkerror(line))
@@ -1485,7 +1531,10 @@ int 				ft_precommande(char *line, char ***env)
 	while (commande[i])
 	{
 		my_redirection(commande[i]);
-		ft_commande(commande[i], env);
+		if ((nbpipe = ft_nbpipe2(commande[i])) != 0)
+			ft_pipe(commande[i], env, nbpipe);
+		else
+			ft_commande(commande[i], env);
 		i++;
 	}
 	ft_splitdel(&commande);
@@ -1536,11 +1585,9 @@ int					main(int ac, char **av, char **env)
 		write(1, "\033[1;34m$alilin> \033[0;37m", 23);
 		if (get_next_line(0, &line) == 0)
 			ft_exit(NULL);
-		mess = line;
 		if (ft_strcmp(line, "\0") != 0)
     	ft_precommande(line, &envi);
 		pid = 0;
-		mess = NULL;
 		free(line);
 		line = NULL;
 	}
