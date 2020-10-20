@@ -22,22 +22,36 @@ int 				g_cvr[2];
 pid_t 	    g_pid;
 # define    PATH_MAX 4096
 
+int 					ft_exit(char **commande);
 char 		      **my_redir_right(char **cmd, int idx, int f_open[2]);
+int 				  ft_precommande(char *line, char ***env);
 void          my_redirection(char *str);
 char 		      **detectcmd(char **cmd);
-//static bool   get_path(char **cmd, char **env);
+bool          get_path(char **cmd, char **env);
 char          **ft_getenv(char **env);
 char          *my_getenv(char **env, char *path);
-//static void   cmd_execution(char **cmd);
+void          cmd_execution(char **cmd);
 void          environment(char **cmd, char **env);
 size_t        path_max(char **env);
-void          position(char **env);
+void          position(void);
 void          my_cd(char *path, char **env);
 int           ft_access(char *bin);
-//static void   exect_built_commande(char **cmd, char ***env);
+void          exect_built_commande(char **cmd, char ***env);
 int 				  built_command(char *cmd);
 int           ft_commande(char *line, char ***env);
 void 				  end(int sig);
 void 				  recovery(int sig);
+char 					*variables1(char *str, char **env);
+void          ft_puterror(char *errorstart, char *arg, char *errorend);
+int 		      ft_checkerror(const char *str);
+char 					**creat_list_arg(char *line);
+char 		      **ft_splitcmd(char *str);
+void 				  ft_pipe(char *str, char ***env, int nb);
+int 		      ft_nbpipe2(const char *str);
+void          ft_checkpipe(char *str);
+int           parse_error(int t_e, char *err);
+void          ft_puterror(char *errorstart, char *arg, char *errorend);
+int           ft_checkex2(char *cmd, char **env);
+int           ft_checkunset(char *cmd, char **env);
 
 #endif

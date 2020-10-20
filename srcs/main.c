@@ -12,23 +12,6 @@
 
 #include "minishell.h"
 
-void ft_puterror(char *errorstart, char *arg, char *errorend)
-{
-	write(2, errorstart, ft_strlen(errorstart));
-	write(2, arg, ft_strlen(arg));
-	write(2, errorend, ft_strlen(errorend));
-}
-
-int 		parse_error(int t_e, char *err)
-{
-	if (t_e == 1)
-		ft_puterror("bash: syntax error near unexpected token `", err, "'\n");
-	if (t_e == 2)
-		write(1, "bash: missing quote\n", 20);
-
-	return(t_e);
-}
-
 int tab_len(char **env)
 {
 	int i;
@@ -129,40 +112,6 @@ int 		ft_checkerror(const char *str)
 	return (0);
 }
 
-void environment(char **cmd, char **env)
-{
-	int i;
-
-	i = 0;
-	if (cmd[1] != NULL)
-	{
-		write(1, "bash: to many arguments\n", 24);
-		return ;
-	}
-	while (env[i])
-	{
-		ft_putstr(env[i]);
-		write(1, "\n", 1);
-		i++;
-	}
-	errno = 0;
-}
-
-void position(char **env)
-{
-	char *path;
-
-	path = NULL;
-	(void )env;
-	if (!(path = (char*)malloc(sizeof(char) * PATH_MAX)))
-		return;
-	getcwd(path, PATH_MAX);
-	ft_putstr(path);
-	write(1, "\n", 1);
-	free(path);
-	errno = 0;
-}
-
 void my_cd(char *path, char **env)
 {
 	char 	*tmp;
@@ -210,101 +159,12 @@ void my_cd(char *path, char **env)
 				return ;
 			ft_strcpy(env[i], "OLDPWD=");
 			ft_strcat(env[i], oldpwd);
-			free(oldpwd);
 			break ;
 		}
 		i++;
 	}
-
+	free(oldpwd);
 	errno = 0;
-}
-
-char **ft_getenv(char **env)
-{
-	char 	**envi;
-	int 	i;
-
-	i = 0;
-	while (env[i])
-		i++;
-	if (!(envi = (char**)malloc(sizeof(char *) * i + 1)))
-		return (0);
-	i = 0;
-	while (env[i])
-	{
-		if (!(envi[i] = (char *)malloc(sizeof(char) * ft_strlen(env[i]) + 1)))
-			return (0);
-		ft_strlcpy(envi[i], env[i], ft_strlen(env[i]) + 1);
-		i++;
-	}
-	envi[i] = NULL;
-	return(envi);
-}
-
-char *my_getenv(char **env, char *path)
-{
-	int i;
-	char *usable;
-
-	usable = NULL;
-	i = 0;
-	while (env[i])
-	{
-		if (ft_strncmp(env[i], path, ft_strlen(path)) == 0)
-		{
-			usable = &env[i][ft_strlen(path)];
-			break ;
-		}
-		i++;
-	}
-	return (usable);
-}
-
-int 	ft_checkexport(char **cmd)
-{
-	int i;
-
-	i = 1;
-	while (cmd[i])
-	{
-		if (cmd[i][0] == '=' && ft_strlen(cmd[i]) > 1)
-			return (i);
-		i++;
-	}
-	return (0);
-}
-
-int 	ft_checkex2(char *cmd, char **env)
-{
-	int i;
-	int len;
-
-	i = 0;
-	while (cmd[i] != '=')
-		i++;
-	len = i;
-
-	while (env[i])
-	{
-		if (ft_strncmp(cmd, env[i], len) == 0)
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-int 	ft_checkunset(char *cmd, char **env)
-{
-	int i;
-
-	i = 0;
-	while (env[i])
-	{
-		if (!ft_strncmp(env[i], cmd, ft_strlen(cmd)))
-			return (i + 1);
-		i++;
-	}
-	return (0);
 }
 
 char 	**ft_unset(char **cmd, char **env)
@@ -474,70 +334,6 @@ char 	**ft_export(char **cmd, char **env)
 	return (env);
 }
 
-int ft_access(char *bin)
-{
-	int fd;
-
-	if ((fd = open(bin, O_RDONLY)) > 0)
-		return (0);
-	else
-		return (-1);
-}
-
-static bool get_path(char **cmd, char **env)
-{
-	char	*path;
-	char	*bin;
-	char	**split_path;
-	int 	i;
-
-	bin = NULL;
-	path = NULL;
-	split_path = NULL;
-	if (cmd[0][0] != '/' && ft_strncmp(cmd[0], "./", 2) != 0)
-	{
-		for (int i = 0; env[i]; i++) {
-			if (!ft_strncmp(env[i], "PATH=", 5)) {
-				path = ft_strdup(&env[i][5]);
-				break ;
-			}
-		}
-		if (path == NULL)
-			return (false);
-		split_path = ft_split(path, ':');
-		free(path);
-		path = NULL;
-		i = 0;
-		while (split_path[i])
-		{
-			bin = (char *)ft_calloc(sizeof(char), (ft_strlen(split_path[i]) + 1 + ft_strlen(cmd[0])) + 1);
-			if (bin == NULL)
-				break ;
-			ft_strcat(bin, split_path[i]);
-			ft_strcat(bin, "/");
-			ft_strcat(bin, cmd[0]);
-			if (ft_access(bin) == 0)
-				break ;
-			free(bin);
-			bin = NULL;
-			i++;
-		}
-		ft_splitdel(&split_path);
-		if (bin != NULL)
-		{
-			free(cmd[0]);
-			cmd[0] = bin;
-		}
-	}
-	else
-	{
-		free(path);
-		path = NULL;
-		return (true);
-	}
-	return (bin == NULL ? false : true);
-}
-
 void 		ft_echo(char **cmd)
 {
 	int i;
@@ -644,7 +440,7 @@ char 								*ft_backslash(char *str, int bsl)
 	return (str);
 }
 
-char 								*variables$(char *str, char **env)
+char 								*variables1(char *str, char **env)
 {
 	int 	i;
 
@@ -796,120 +592,6 @@ char 									**creat_list_arg(char *line)
 	return (commande);
 }
 
-int 		ft_nb_cmd(const char *line)
-{
-	int 	i;
-	int 	nb;
-	char 	c;
-
-	i = 0;
-	nb = 1;
-	while (line[i])
-	{
-		if (line[i] == '"' || line[i] == '\'')
-		{
-			c = line[i];
-			i++;
-			while (line[i] && line[i] != c)
-				i++;
-			if (line[i] == '\0')
-				return (-1);
-		}
-		if (line[i] == ';')
-			nb++;
-		if (line[i] == '\\')
-			i++;
-		i++;
-	}
-	return (nb);
-}
-
-char 		*ft_takecmd(char *str, int first, int last)
-{
-	int 	i;
-	char 	*s;
-
-	while (str[first] == ';' || str[first] == ' ')
-		first++;
-	if (str[first] == '\0')
-		return (NULL);
-	if (!(s = (char *)malloc(sizeof(char) * (last - first + 2))))
-		return (NULL);
-	i = 0;
-	while (first < last)
-	{
-		s[i] = str[first];
-		i++;
-		first++;
-	}
-	s[i] = '\0';
-	return (s);
-}
-
-char 		**ft_splitcmd(char *str)
-{
-	char 	**tab;
-	int	 	first;
-	int 	i;
-	int 	j;
-	char 	c;
-
-	if (ft_nb_cmd(str) == -1)
-		return (NULL);
-	if (!(tab = (char **)malloc(sizeof(char*) * (ft_nb_cmd(str) + 1))))
-		return (NULL);
-	i = 0;
-	j = 0;
-	first = 0;
-	while (str[j])
-	{
-		if (str[j] == '"' || str[j] == '\'')
-		{
-			c = str[j];
-			j++;
-			while (str[j] && str[j] != c)
-			{
-				if (str[j] == '>' && str[j-1] == c && str[j+1] == c && str[j-2] == ' ')
-					str[j] = 1;
-				else if (str[j] == '<' && str[j-1] == c && str[j+1] == c &&
-						str[j-2] == ' ')
-					str[j] = 2;
-				else if (str[j] == '>' && str[j + 1] == '>' && str[j - 1] == c &&
-						str[j + 2] == c && str[j - 2] == ' ')
-				{
-					str[j + 1] = 1;
-					str[j] = 1;
-				}
-				j++;
-			}
-		}
-		if (str[j] == ';')
-		{
-			if ((tab[i] = ft_takecmd(str, first, j)) == NULL)
-			{
-				i++;
-				tab[i] = NULL;
-				i = -1;
-				break ;
-			}
-			i++;
-			j++;
-			while (str[j] == ' ' && str[j] == ';')
-				j++;
-			first = j;
-		}
-		if (str[j] == '\\')
-			j++;
-		j++;
-	}
-	if (i != -1)
-	{
-		tab[i] = ft_takecmd(str, first, j);
-		tab[i + 1] = NULL;
-	}
-	return (tab);
-}
-
 int 								ft_nbchevron(char *str)
 {
 	int 	i;
@@ -1005,122 +687,10 @@ void ft_checkredir(char *str)
 	}
 }
 
-int 		ft_nbpipe(const char *str)
-{
-	int i;
-	int nb;
-	char c;
-
-	i = 0;
-	nb = 0;
-	while(str[i])
-	{
-		if (str[i] == '\'' || str[i] == '"')
-		{
-			c = str[i];
-			i++;
-			while(str[i] != c && str[i])
-				i++;
-		}
-		if (str[i] == '|' && (str[i - 1] != ' ' || str[i + 1] != ' '))
-			nb++;
-		i++;
-	}
-	return(nb);
-}
-
-int 		ft_nbpipe2(const char *str)
-{
-	int i;
-	int nb;
-	char c;
-
-	i = 0;
-	nb = 0;
-	while(str[i])
-	{
-		if (str[i] == '\'' || str[i] == '"')
-		{
-			c = str[i];
-			i++;
-			while(str[i] != c && str[i])
-				i++;
-		}
-		if (str[i] == '|')
-			nb++;
-		i++;
-	}
-	return(nb);
-}
-
-void 		ft_pipespace(char *str)
-{
-		char 	*tmp;
-		int 	i;
-		int 	j;
-		char 	c;
-
-
-		if (!(tmp = (char *)malloc(sizeof(char) *
-		(ft_strlen(str) + ft_nbpipe((const char *)str) * 2 + 1))))
-			return ;
-		i = 0;
-		j = 0;
-		while (str[i])
-		{
-			if (str[i] == '"' || str[i] =='\'')
-			{
-				c = str[i];
-				i++;
-				while (str[i] == c && str[i])
-					i++;
-			}
-			if (str[i] == '|' && str[i - 1] != ' ')
-			{
-				tmp[j] = ' ';
-				j++;
-			}
-			else if (str[i - 1] == '|' && str[i] != ' ')
-			{
-				tmp[j] = ' ';
-				j++;
-			}
-			tmp[j] = str[i];
-			j++;
-			i++;
-		}
-		tmp[j] = '\0';
-		ft_strcpy(str, tmp);
-		free(tmp);
-}
-
-void 		ft_checkpipe(char *str)
-{
-	int 	i;
-	char 	c;
-
-	i = 0;
-	while(str[i])
-	{
-		if (str[i] == '"' || str[i] == '\'')
-		{
-			c = str[i];
-			i++;
-			while (str[i] != c && str[i])
-				i++;
-		}
-		if (str[i] == '|' && (str[i - 1] != ' ' || str[i + 1] != ' '))
-			ft_pipespace(str);
-		i++;
-	}
-}
-
 void my_redirection(char *str)
 {
 	if (ft_strchr(str, '>') || ft_strchr(str, '<'))
 		ft_checkredir(str);
-	if (ft_strchr(str, '|'))
-		ft_checkpipe(str);
 }
 
 char 		**my_redir_right(char **cmd, int idx, int f_open[2])
@@ -1298,82 +868,7 @@ char 		**detectcmd(char **cmd)
 	return (cmd);
 }
 
-void   			my_pipe(char **cmd, char ***env)
-{
-	int 		pfd[2];
-	pid_t   ppid;
-	int  		fd_in;
-	int 		i;
-
-	fd_in = 0;
-	i = 0;
-	while (cmd[i] != 0)
-	{
-		pipe(pfd);
-		if ((ppid = fork()) == -1)
-			exit(EXIT_FAILURE);
-		else if (ppid == 0)
-		{
-			dup2(fd_in, 0);
-			if (cmd[i + 1] != NULL)
-				dup2(pfd[1], 1);
-			close(pfd[0]);
-			ft_commande(cmd[i], env);
-			exit(EXIT_FAILURE);
-		}
-		else
-		{
-			wait(NULL);
-			close(pfd[1]);
-			fd_in = pfd[0];
-			i++;
-		}
-	}
-}
-
-void 				ft_pipe(char *str, char ***env, int nb)
-{
-	char 	**command;
-	int 	i;
-	int 	j;
-	int 	first;
-	char	c;
-
-	if (!(command = (char **)malloc(sizeof(char *) * (nb + 2))))
-		return ;
-	i = 0;
-	j = 0;
-	first = 0;
-	while(str[i])
-	{
-		if (str[i] == '\'' || str[i] == '"')
-		{
-			c = str[i];
-			i++;
-			while (str[i] != c && str[i])
-				i++;
-		}
-		if (str[i] == '|')
-		{
-			if (!(command[j] = (char *)malloc(sizeof(char) * (i - first) + 1)))
-				return ;
-			ft_strlcpy(command[j], &str[first], i - first);
-			i++;
-			first = i + 1;
-			j++;
-		}
-		i++;
-	}
-	if (!(command[j] = (char *)malloc(sizeof(char) * (i - first) + 1)))
-		return ;
-	ft_strlcpy(command[j], &str[first], i - first + 1);
-	j++;
-	command[j] = NULL;
-	my_pipe(command, env);
-	ft_splitdel(&command);
-}
-
-static void	cmd_execution(char **cmd)
+void	cmd_execution(char **cmd)
 {
 	int			status;
 
@@ -1406,14 +901,14 @@ void ft_grosse_merde(){
 	write(1, "\033[0;31mtoi même connard !\033[0;37m\n", 34);
 }
 
-static void exect_built_commande(char **cmd, char ***env)
+void exect_built_commande(char **cmd, char ***env)
 {
 	if (!ft_strcmp(cmd[0], "cd"))
 		my_cd(cmd[1], *env);
 	else if (!ft_strcmp(cmd[0], "env"))
 		environment(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "pwd"))
-		position(*env);
+		position();
 	else if (!ft_strcmp(cmd[0], "export"))
 		*env = ft_export(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "unset"))
@@ -1458,90 +953,6 @@ int 								ft_exit(char **commande)
 		exit(ex);
 	}
 	exit(ex);
-}
-
-int                	ft_commande(char *line, char ***env)
-{
-  char    **commande;
-	char		**tenv;
-
-	commande = NULL;
-	tenv = NULL;
-	if ((variables$(line, *env)) == NULL)
-		return (0);
-	if ((commande = creat_list_arg(line)) == NULL)
-		return (0);
-	commande = detectcmd(commande);
-	if (commande == NULL)
-		write(1, "", 0);
-	else if (ft_strcmp(commande[0], "exit") == 0)
-		ft_exit(commande);
-	else if (built_command(commande[0]))
-		exect_built_commande(commande, env);
-	else
-	{
-		tenv = ft_getenv(*env);
-		if (get_path(commande, tenv) == true)
-			cmd_execution(commande);
-		else
-		{
-			ft_puterror("bash: ", commande[0], ": command not found\n");
-			errno = 127;
-		}
-		ft_splitdel(&tenv);
-		tenv = NULL;
-	}
-	if (commande)
-		ft_splitdel(&commande);
-	if (g_fd[0] != 0 && g_cvr[0])
-	{
-		close(STDOUT_FILENO);
-		if (dup2(g_fd[0], STDOUT_FILENO) == -1)
-			write(2, "error: dup2 failed\n", 19);
-		close(g_file[0]);
-		close(g_fd[0]);
-		g_fd[0] = 0;
-	}
-	if (g_fd[1] != 0 && g_cvr[1])
-	{
-		close(0);
-		if (dup2(g_fd[1], 0) == -1)
-			write(2, "error: dup2 failed\n", 19);
-		close(g_file[1]);
-		close(g_fd[1]);
-		g_fd[1] = 0;
-	}
-	return (1);
-}
-
-int 				ft_precommande(char *line, char ***env)
-{
-	char **commande;
-	int i;
-	int nbpipe;
-
-	commande = NULL;
-	if (ft_checkerror(line))
-		return (0);
-	while (line[0] == ' ' || line[0] == ';')
-		line += 1;
-	if ((commande = ft_splitcmd(line)) == NULL)
-	{
-		write(2, "bash: error: malloc failed\n", 27);
-		return (0);
-	}
-	i = 0;
-	while (commande[i])
-	{
-		my_redirection(commande[i]);
-		if ((nbpipe = ft_nbpipe2(commande[i])) != 0)
-			ft_pipe(commande[i], env, nbpipe);
-		else
-			ft_commande(commande[i], env);
-		i++;
-	}
-	ft_splitdel(&commande);
-	return (1);
 }
 
 int					main(int ac, char **av, char **env)

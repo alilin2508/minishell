@@ -6,7 +6,14 @@ INCDIR = ./includes
 OBJDIR = ./obj
 
 SRC = main.c \
-				signal.c
+				signal.c \
+				command.c \
+				splitcmd.c \
+				get_path.c \
+				pipe.c \
+				checkerror.c \
+				env.c \
+				utilsexport.c
 
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 
