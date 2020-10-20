@@ -12,8 +12,6 @@
 
 #include "minishell.h"
 
-pid_t 	pid;
-
 void ft_puterror(char *errorstart, char *arg, char *errorend)
 {
 	write(2, errorstart, ft_strlen(errorstart));
@@ -131,11 +129,16 @@ int 		ft_checkerror(const char *str)
 	return (0);
 }
 
-void environment(char **env)
+void environment(char **cmd, char **env)
 {
 	int i;
 
 	i = 0;
+	if (cmd[1] != NULL)
+	{
+		write(1, "bash: to many arguments\n", 24);
+		return ;
+	}
 	while (env[i])
 	{
 		ft_putstr(env[i]);
@@ -1304,7 +1307,7 @@ void   			my_pipe(char **cmd, char ***env)
 
 	fd_in = 0;
 	i = 0;
-	while (*cmd != 0)
+	while (cmd[i] != 0)
 	{
 		pipe(pfd);
 		if ((ppid = fork()) == -1)
@@ -1316,7 +1319,7 @@ void   			my_pipe(char **cmd, char ***env)
 				dup2(pfd[1], 1);
 			close(pfd[0]);
 			ft_commande(cmd[i], env);
-			return ;
+			exit(EXIT_FAILURE);
 		}
 		else
 		{
@@ -1375,13 +1378,13 @@ static void	cmd_execution(char **cmd)
 	int			status;
 
 	status = 0;
-	pid = fork();
-	if (pid == -1)
+	g_pid = fork();
+	if (g_pid == -1)
 		write(2, "fork fail\n", 10);
-	else if (pid > 0)
+	else if (g_pid > 0)
 	{
-		waitpid(pid, &status, 0);
-		kill(pid, SIGTERM);
+		waitpid(g_pid, &status, 0);
+		kill(g_pid, SIGTERM);
 		errno = 0;
 	}
 	else
@@ -1408,7 +1411,7 @@ static void exect_built_commande(char **cmd, char ***env)
 	if (!ft_strcmp(cmd[0], "cd"))
 		my_cd(cmd[1], *env);
 	else if (!ft_strcmp(cmd[0], "env"))
-		environment(*env);
+		environment(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "pwd"))
 		position(*env);
 	else if (!ft_strcmp(cmd[0], "export"))
@@ -1541,34 +1544,6 @@ int 				ft_precommande(char *line, char ***env)
 	return (1);
 }
 
-void 				end(int sig)
-{
-	(void)sig;
-
-	if (pid != 0)
-	{
-		write(2, "Quit: 3\n", 8);
-		kill(pid, SIGQUIT);
-	}
-	else
-		ft_putstr("\b \b\b \b");
-}
-
-void 				recovery(int sig)
-{
-	(void)sig;
-	if (pid == 0)
-	{
-		ft_putstr("\b \b\b \b\n");
-		write(1, "\033[1;34m$alilin> \033[0;37m", 23);
-	}
-	else
-	{
-		kill(pid, SIGINT);
-		write(1, "\n", 1);
-	}
-}
-
 int					main(int ac, char **av, char **env)
 {
 	char	*line;
@@ -1587,7 +1562,7 @@ int					main(int ac, char **av, char **env)
 			ft_exit(NULL);
 		if (ft_strcmp(line, "\0") != 0)
     	ft_precommande(line, &envi);
-		pid = 0;
+		g_pid = 0;
 		free(line);
 		line = NULL;
 	}

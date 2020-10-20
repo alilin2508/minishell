@@ -6,6 +6,7 @@ INCDIR = ./includes
 OBJDIR = ./obj
 
 SRC = main.c \
+				signal.c
 
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 
