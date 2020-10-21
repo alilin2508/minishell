@@ -15,11 +15,10 @@
 # include <sys/wait.h>
 # include "../libft/includes/libft.h"
 
-extern int  errno ;
 int         g_file[3];
 int         g_fd[2];
 int 				g_cvr[2];
-pid_t 	    g_pid;
+pid_t 	    g_pid[2];
 # define    PATH_MAX 4096
 
 int 					ft_exit(char **commande);
@@ -31,10 +30,10 @@ bool          get_path(char **cmd, char **env);
 char          **ft_getenv(char **env);
 char          *my_getenv(char **env, char *path);
 void          cmd_execution(char **cmd);
-void          environment(char **cmd, char **env);
+int           environment(char **cmd, char **env);
 size_t        path_max(char **env);
-void          position(void);
-void          my_cd(char *path, char **env);
+int           position(void);
+int           my_cd(char *path, char **env);
 int           ft_access(char *bin);
 void          exect_built_commande(char **cmd, char ***env);
 int 				  built_command(char *cmd);

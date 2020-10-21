@@ -112,7 +112,7 @@ int 		ft_checkerror(const char *str)
 	return (0);
 }
 
-void my_cd(char *path, char **env)
+int		my_cd(char *path, char **env)
 {
 	char 	*tmp;
 	char 	*oldpwd;
@@ -123,13 +123,13 @@ void my_cd(char *path, char **env)
 	if (path == NULL)
 		path = my_getenv(env, "HOME=");
 	if (!(oldpwd = (char *)malloc(sizeof(char) * (PATH_MAX + 1))))
-		return ;
+		return (2);
 	getcwd(oldpwd, PATH_MAX);
 	if (chdir(path) == -1 )
 	{
 		ft_puterror("bash: cd: ", path, ": No such file or directory\n");
 		free(oldpwd);
-		return ;
+		return (1);
 	}
 	i = 0;
 	while (env[i])
@@ -138,10 +138,10 @@ void my_cd(char *path, char **env)
 		{
 			free(env[i]);
 			if (!(newpwd = (char *)malloc(sizeof(char) * (PATH_MAX + 1))))
-				return ;
+				return (2);
 			getcwd(newpwd, PATH_MAX);
 			if (!(env[i] = (char *)malloc(sizeof(char) * (ft_strlen(newpwd) + 5))))
-				return ;
+				return (2);
 			ft_strcpy(env[i], "PWD=");
 			ft_strcat(env[i], newpwd);
 			free(newpwd);
@@ -156,7 +156,7 @@ void my_cd(char *path, char **env)
 		{
 			free(env[i]);
 			if (!(env[i] = (char *)malloc(sizeof(char) * (ft_strlen(oldpwd) + 8))))
-				return ;
+				return (2);
 			ft_strcpy(env[i], "OLDPWD=");
 			ft_strcat(env[i], oldpwd);
 			break ;
@@ -164,7 +164,7 @@ void my_cd(char *path, char **env)
 		i++;
 	}
 	free(oldpwd);
-	errno = 0;
+	return (0);
 }
 
 char 	**ft_unset(char **cmd, char **env)
@@ -177,6 +177,7 @@ char 	**ft_unset(char **cmd, char **env)
 
 	tmp = NULL;
 	i = 1;
+	errno = 0;
 	while (cmd[i])
 	{
 		j = 0;
@@ -185,6 +186,7 @@ char 	**ft_unset(char **cmd, char **env)
 			if (!ft_isalnum(cmd[i][j]) && cmd[i][j] != '_')
 			{
 				ft_puterror("bash: unset: `", cmd[i], "': not a valid identifier\n");
+				errno = 1;
 				j = -1;
 				break ;
 			}
@@ -249,22 +251,22 @@ char 	**ft_export(char **cmd, char **env)
 {
 	int 	i;
 	int 	j;
-	int 	error;
 	char 	**tmp;
 	int 	len;
 
 	tmp = NULL;
 	i = 1;
+	errno = 0;
 	while (cmd[i])
 	{
 		j = 0;
-		error = 0;
 		while (cmd[i][j])
 		{
 			if ((!ft_isalnum(cmd[i][j]) && cmd[i][j] != '=' && cmd[i][j] != '_')
 			|| cmd[i][0] == '=')
 			{
 				ft_puterror("bash: export: `", cmd[i], "': not a valid identifier\n");
+				errno = 1;
 				j = -1;
 				break ;
 			}
@@ -334,7 +336,7 @@ char 	**ft_export(char **cmd, char **env)
 	return (env);
 }
 
-void 		ft_echo(char **cmd)
+int 		ft_echo(char **cmd)
 {
 	int i;
 	int j;
@@ -343,7 +345,7 @@ void 		ft_echo(char **cmd)
 	if (cmd[1] == NULL)
 	{
 		write(1, "\n", 1);
-		return ;
+		return (0);
 	}
 	if (!ft_strcmp(cmd[1], "-n"))
 		n = 1;
@@ -365,7 +367,7 @@ void 		ft_echo(char **cmd)
 	}
 	if (n == 0)
 		write(1, "\n",  1);
-	errno = 0;
+	return (0);
 }
 
 char 								*ft_variables(char *str, int idx, char **env)
@@ -410,7 +412,6 @@ char 								*ft_variables(char *str, int idx, char **env)
 	ft_strcpy(str, tmp);
 	free(tmp);
 	free(str_tmp);
-	errno = 0;
 	return (str);
 }
 
@@ -873,22 +874,17 @@ void	cmd_execution(char **cmd)
 	int			status;
 
 	status = 0;
-	g_pid = fork();
-	if (g_pid == -1)
+	if ((g_pid[0] = fork()) == -1)
 		write(2, "fork fail\n", 10);
-	else if (g_pid > 0)
+	else if (g_pid[0] > 0)
 	{
-		waitpid(g_pid, &status, 0);
-		kill(g_pid, SIGTERM);
-		errno = 0;
+		waitpid(g_pid[0], &status, 0);
+		kill(g_pid[0], SIGTERM);
 	}
 	else
 	{
 		if (execve(cmd[0], cmd, NULL) == -1)
-		{
-			ft_puterror("bash: ", cmd[0], ": command not found\n");
-			errno = 1;
-		}
+			write(2, "error: execve failed\n", 21);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -904,17 +900,17 @@ void ft_grosse_merde(){
 void exect_built_commande(char **cmd, char ***env)
 {
 	if (!ft_strcmp(cmd[0], "cd"))
-		my_cd(cmd[1], *env);
+		errno = my_cd(cmd[1], *env);
 	else if (!ft_strcmp(cmd[0], "env"))
-		environment(cmd, *env);
+		errno = environment(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "pwd"))
-		position();
+		errno = position();
 	else if (!ft_strcmp(cmd[0], "export"))
 		*env = ft_export(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "unset"))
 		*env = ft_unset(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "echo"))
-		ft_echo(cmd);
+		errno = ft_echo(cmd);
 	else if (!ft_strcmp(cmd[0], "pute"))
 		ft_pute();
 	else if (!ft_strcmp(cmd[0], "grosse_merde"))
@@ -923,9 +919,18 @@ void exect_built_commande(char **cmd, char ***env)
 
 int 				built_command(char *cmd)
 {
-	char	*build_com[] = {"cd", "env", "pwd", "export", "unset", "echo", "pute", "grosse_merde", NULL};
+	char *build_com[9];
 	int 	i;
 
+	build_com[0] = "cd";
+	build_com[1] = "env";
+	build_com[2] = "pwd";
+	build_com[3] = "export";
+	build_com[4] = "unset";
+	build_com[5] = "echo";
+	build_com[6] = "pute";
+	build_com[7] = "grosse_merde";
+	build_com[8] = NULL;
 	i = 0;
 	while (build_com[i])
 	{
@@ -934,25 +939,6 @@ int 				built_command(char *cmd)
 		i++;
 	}
 	return (0);
-}
-
-int 								ft_exit(char **commande)
-{
-	int ex;
-
-	ex = 0;
-	if (commande != NULL)
-	{
-		if (commande[1] != NULL && ft_isdigit(commande[1][0]))
-		{
-			ex = ft_atoi(commande[1]);
-		}
-		ft_splitdel(&commande);
-		write(1, "TROP BIEN CE SHELL\n", 19);
-		system("leaks minishell");
-		exit(ex);
-	}
-	exit(ex);
 }
 
 int					main(int ac, char **av, char **env)
@@ -973,7 +959,6 @@ int					main(int ac, char **av, char **env)
 			ft_exit(NULL);
 		if (ft_strcmp(line, "\0") != 0)
     	ft_precommande(line, &envi);
-		g_pid = 0;
 		free(line);
 		line = NULL;
 	}

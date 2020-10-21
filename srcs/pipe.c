@@ -39,18 +39,19 @@ int			ft_nbpipe2(const char *str)
 void		my_pipe(char **cmd, char ***env)
 {
 	int		pfd[2];
-	pid_t	ppid;
 	int		fd_in;
 	int		i;
+	int 	status;
 
 	fd_in = 0;
 	i = 0;
+	status = 0;
 	while (cmd[i] != 0)
 	{
 		pipe(pfd);
-		if ((ppid = fork()) == -1)
+		if ((g_pid[1] = fork()) == -1)
 			exit(EXIT_FAILURE);
-		else if (ppid == 0)
+		else if (g_pid[1] == 0)
 		{
 			dup2(fd_in, 0);
 			if (cmd[i + 1] != NULL)
@@ -61,6 +62,12 @@ void		my_pipe(char **cmd, char ***env)
 		}
 		else
 		{
+			if (!ft_strcmp(cmd[i], "cat"))
+			{
+				waitpid(g_pid[1], NULL, WSTOPPED);
+				//kill(g_pid[1], SIGTERM);
+				//waitpid(g_pid[1], NULL, WNOHANG);
+			}
 			wait(NULL);
 			close(pfd[1]);
 			fd_in = pfd[0];
@@ -75,7 +82,7 @@ void		ft_pipe(char *str, char ***env, int nb)
 	int		i;
 	int		j;
 	int		first;
-	char	c;
+	int 	c;
 
 	if (!(command = (char **)malloc(sizeof(char *) * (nb + 2))))
 		return ;
@@ -93,9 +100,12 @@ void		ft_pipe(char *str, char ***env, int nb)
 		}
 		if (str[i] == '|')
 		{
-			if (!(command[j] = (char *)malloc(sizeof(char) * (i - first) + 1)))
+			c = i;
+			while (str[c - 1] == ' ')
+				c--;
+			if (!(command[j] = (char *)malloc(sizeof(char) * (c - first) + 1)))
 				return ;
-			ft_strlcpy(command[j], &str[first], i - first + 1);
+			ft_strlcpy(command[j], &str[first], c - first + 1);
 			while (str[i + 1] == ' ')
 				i++;
 			first = i + 1;

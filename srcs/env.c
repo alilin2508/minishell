@@ -53,7 +53,7 @@ char	*my_getenv(char **env, char *path)
 	return (usable);
 }
 
-void	environment(char **cmd, char **env)
+int		environment(char **cmd, char **env)
 {
 	int		i;
 
@@ -61,7 +61,7 @@ void	environment(char **cmd, char **env)
 	if (cmd[1] != NULL)
 	{
 		write(1, "bash: to many arguments\n", 24);
-		return ;
+		return (127);
 	}
 	while (env[i])
 	{
@@ -69,19 +69,19 @@ void	environment(char **cmd, char **env)
 		write(1, "\n", 1);
 		i++;
 	}
-	errno = 0;
+	return (0);
 }
 
-void	position(void)
+int		position(void)
 {
 	char	*path;
 
 	path = NULL;
 	if (!(path = (char*)malloc(sizeof(char) * PATH_MAX)))
-		return ;
+		return (2);
 	getcwd(path, PATH_MAX);
 	ft_putstr(path);
 	write(1, "\n", 1);
 	free(path);
-	errno = 0;
+	return(0);
 }
