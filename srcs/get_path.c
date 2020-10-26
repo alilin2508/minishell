@@ -80,10 +80,6 @@ bool	get_path(char **cmd, char **env)
 		bin = creatbin(split_path, cmd);
 	}
 	else
-	{
-		free(path);
-		path = NULL;
 		return (true);
-	}
 	return (bin == NULL ? false : true);
 }

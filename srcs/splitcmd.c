@@ -28,8 +28,6 @@ int		ft_nb_cmd(const char *line)
 			i++;
 			while (line[i] && line[i] != c)
 				i++;
-			if (line[i] == '\0')
-				return (-1);
 		}
 		if (line[i] == ';')
 			nb++;
@@ -49,14 +47,13 @@ char	*ft_takecmd(char *str, int first, int last)
 		first++;
 	if (str[first] == '\0')
 		return (NULL);
-	if (!(s = (char *)malloc(sizeof(char) * (last - first + 2))))
+	if (!(s = (char *)malloc(sizeof(char) * (last - first + 1))))
 		return (NULL);
 	i = 0;
-	while (first < last)
+	while (first + i < last)
 	{
-		s[i] = str[first];
+		s[i] = str[first + i];
 		i++;
-		first++;
 	}
 	s[i] = '\0';
 	return (s);
@@ -95,9 +92,7 @@ char	**ft_splitcmd(char *str)
 	int		i;
 	int		j;
 
-	if (ft_nb_cmd(str) == -1)
-		return (NULL);
-	if (!(tab = (char **)malloc(sizeof(char*) * (ft_nb_cmd(str) + 1))))
+	if (!(tab = (char **)malloc(sizeof(char *) * (ft_nb_cmd(str) + 1))))
 		return (NULL);
 	i = 0;
 	j = 0;
@@ -108,12 +103,9 @@ char	**ft_splitcmd(char *str)
 			j += ft_strnext(str, j);
 		if (str[j] == ';')
 		{
-			if ((tab[i++] = ft_takecmd(str, first, j)) == NULL)
-			{
-				tab[i] = NULL;
-				i = -1;
-				break ;
-			}
+			if ((tab[i] = ft_takecmd(str, first, j)) == NULL)
+				return (NULL);
+			i++;
 			j++;
 			while (str[j] == ' ' && str[j] == ';')
 				j++;
@@ -123,10 +115,7 @@ char	**ft_splitcmd(char *str)
 			j++;
 		j++;
 	}
-	if (i != -1)
-	{
-		tab[i] = ft_takecmd(str, first, j);
-		tab[i + 1] = NULL;
-	}
+	tab[i] = ft_takecmd(str, first, j);
+	tab[i + 1] = NULL;
 	return (tab);
 }

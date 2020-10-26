@@ -22,96 +22,6 @@ int tab_len(char **env)
 	return (i);
 }
 
-int 		ft_checkerror(const char *str)
-{
-	int 	i;
-	int   err;
-	char 	c;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '\'' || str[i] == '"')
-		{
-			c = str[i];
-			i++;
-			while (str[i] && str[i] != c)
-				i++;
-			if (str[i] == '\0')
-				return (parse_error(2, NULL));
-		}
-		if (str[i] == ';')
-		{
-			if (i == 0)
-				return (parse_error(1, ";"));
-			err = i + 1;
-			while(str[err] == ' ')
-				err++;
-			if (str[err] == ';')
-				return (parse_error(1, ";"));
-		}
-		if (str[i] == '>')
-		{
-			if (str[i+1] == '>' && str[i+2] == '>')
-				return (parse_error(1, ">"));
-			if (str[i+1] == ' ' || str[i+1] == '\0' || (str[i+1] == '>' &&
-					(str[i+2] == ' ' || str[i+2] == '\0')) || str[i + 1] == '<')
-			{
-				if (str[i + 1] == '>')
-					err = i + 2;
-				else
-					err = i + 1;
-				while (str[err] && str[err] == ' ')
-					err++;
-				if (str[err] == '\0')
-					return (parse_error(1, "newline"));
-				if (str[err] == '>')
-					return (parse_error(1, ">"));
-				if (str[err] == '<')
-					return (parse_error(1, "<"));
-				if (str[err] == '|')
-					return (parse_error(1, "|"));
-			}
-		}
-		if (str[i] == '<')
-		{
-			if (str[i + 1] == '<' || str[i + 1] == '>' || str[i + 1] == '\0')
-				return (parse_error(1, "newline"));
-			if (str[i+1] == ' ' || str[i + 1] == '\0')
-			{
-				err = i + 1;
-				while (str[err] && str[err] == ' ')
-					err++;
-				if (str[err] == '\0')
-					return (parse_error(1, "newline"));
-				if (str[err] == '<')
-					return (parse_error(1, "<"));
-				if (str[err] == '>')
-					return (parse_error(1, ">"));
-				if (str[err] == '|')
-					return (parse_error(1, "|"));
-			}
-		}
-		if (str[i] == '|')
-		{
-			if (str[i + 1] == '|' || i == 0)
-				return (parse_error(1, "|"));
-			if (str[i + 1] == ' ' || str[i + 1] == '\0')
-			{
-				err = i + 1;
-				while(str[err] && str[err] == ' ')
-					err++;
-				if (str[err] == '\0')
-					return (parse_error(1, "newline"));
-				if (str[err] == '|')
-					return (parse_error(1, "|"));
-			}
-		}
-		i++;
-	}
-	return (0);
-}
-
 int		my_cd(char *path, char **env)
 {
 	char 	*tmp;
@@ -127,7 +37,7 @@ int		my_cd(char *path, char **env)
 	getcwd(oldpwd, PATH_MAX);
 	if (chdir(path) == -1 )
 	{
-		ft_puterror("bash: cd: ", path, ": No such file or directory\n");
+		ft_puterror("bash: cd: ", path, ": No such file or directory\n", 1);
 		free(oldpwd);
 		return (1);
 	}
@@ -185,8 +95,7 @@ char 	**ft_unset(char **cmd, char **env)
 		{
 			if (!ft_isalnum(cmd[i][j]) && cmd[i][j] != '_')
 			{
-				ft_puterror("bash: unset: `", cmd[i], "': not a valid identifier\n");
-				errno = 1;
+				ft_puterror("bash: unset: `", cmd[i], "': not a valid identifier\n", 1);
 				j = -1;
 				break ;
 			}
@@ -265,8 +174,7 @@ char 	**ft_export(char **cmd, char **env)
 			if ((!ft_isalnum(cmd[i][j]) && cmd[i][j] != '=' && cmd[i][j] != '_')
 			|| cmd[i][0] == '=')
 			{
-				ft_puterror("bash: export: `", cmd[i], "': not a valid identifier\n");
-				errno = 1;
+				ft_puterror("bash: export: `", cmd[i], "': not a valid identifier\n", 1);
 				j = -1;
 				break ;
 			}
@@ -378,15 +286,16 @@ char 								*ft_variables(char *str, int idx, char **env)
 	char *tenv;
 
 	tenv = NULL;
-	if (!(str_tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 2))))
-		return (NULL);
-	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + PATH_MAX))))
+	str_tmp = NULL;
+	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + PATH_MAX + 1))))
 		return (NULL);
 	if (idx != 0)
 		ft_strlcpy(tmp, str, idx + 1);
 	idx++;
 	if (str[idx] != '?')
 	{
+		if (!(str_tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1))))
+			return (NULL);
 		i = 0;
 		while(str[idx] && str[idx] != '$' && str[idx] != ' ' && str[idx] != '"')
 		{
@@ -399,6 +308,7 @@ char 								*ft_variables(char *str, int idx, char **env)
 		if ((tenv = my_getenv(env, str_tmp)) != NULL)
 			ft_strcat(tmp, tenv);
 		tenv = NULL;
+		free(str_tmp);
 	}
 	else
 	{
@@ -409,9 +319,11 @@ char 								*ft_variables(char *str, int idx, char **env)
 	}
 	if (str[idx] != '\0')
 		ft_strcat(tmp, &str[idx]);
+	free(str);
+	if (!(str = (char *)malloc(sizeof(char) * (ft_strlen(tmp) + 1))))
+		return (NULL);
 	ft_strcpy(str, tmp);
 	free(tmp);
-	free(str_tmp);
 	return (str);
 }
 
@@ -436,6 +348,9 @@ char 								*ft_backslash(char *str, int bsl)
 		bsl++;
 	}
 	tmp[i] = '\0';
+	free(str);
+	if (!(str = (char *)malloc(sizeof(char*) + (ft_strlen(tmp) + 1))))
+		return (NULL);
 	ft_strcpy(str, tmp);
 	free(tmp);
 	return (str);
@@ -458,7 +373,7 @@ char 								*variables1(char *str, char **env)
 		{
 			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
 			{
-				ft_variables(str, i, env);
+				str = ft_variables(str, i, env);
 				i	= -1;
 			}
 		}
@@ -470,18 +385,15 @@ char 								*variables1(char *str, char **env)
 				if (str[i] == '$')
 				{
 					if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
-					{
-						ft_variables(str, i, env);
-						i	= -1;
-					}
+						str = ft_variables(str, i, env);
 				}
 				if (str[i] == '\\' && str[i + 1] == '\\')
-					ft_backslash(str, i);
+					str = ft_backslash(str, i);
 				i++;
 			}
 		}
 		if (str[i] == '\\')
-			ft_backslash(str, i);
+			str = ft_backslash(str, i);
 		i++;
 	}
 	return (str);
@@ -535,12 +447,6 @@ char 									**creat_list_arg(char *line)
 	if (!(commande = (char **)malloc(sizeof(char *) * (ft_cword(line) + 1))))
 		return (NULL);
 	i = 0;
-	while (i < ft_cword(line) + 1)
-	{
-		commande[i] = NULL;
-		i++;
-	}
-	i = 0;
 	first = 0;
 	j = 0;
 	if (!(commande[j] = (char *)ft_calloc(sizeof(char), (ft_strlen(line) + 1))))
@@ -593,105 +499,11 @@ char 									**creat_list_arg(char *line)
 	return (commande);
 }
 
-int 								ft_nbchevron(char *str)
-{
-	int 	i;
-	int 	nb;
-	char 	c;
-
-	i = 0;
-	nb= 0;
-	while (str[i])
-	{
-		if (str[i] == '"' || str[i] == '\'')
-		{
-			c = str[i];
-			i++;
-			while (str[i] != c && str[i])
-				i++;
-		}
-		if ((str[i - 1] != '>' && str[i] == '>' && str[i + 1] != '>'
-		&& (str[i + 1] != ' ' || str[i - 1] != ' '))
-		|| (str[i] == '>' && str[i + 1] == '>' &&
-		(str[i + 2] != ' ' || str[i - 1] != ' '))
-		|| (str[i] == '<' && (str[i - 1] != ' ' || str[i + 1] != ' ')))
-			nb++;
-		i++;
-	}
-	return (nb);
-}
-
-void 								ft_chevronspace(char *str)
-{
-	char 		*tmp;
-	int 		i;
-	int 		j;
-	char		c;
-
-	if (!(tmp = (char *)malloc(sizeof(char) *
-	(ft_strlen(str) + ft_nbchevron(str) * 2 + 1))))
-		return ;
-	i = 0;
-	j = 0;
-	while (str[i])
-	{
-		if (str[i] == '"' || str[i] == '\'')
-		{
-			c = str[i];
-			i++;
-			while (str[i] != c && str[i])
-				i++;
-		}
-		if (((str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>')
-		|| (str[i] == '<' && str[i - 1] != ' ')) && i != 0)
-		{
-			tmp[j] = ' ';
-			j++;
-		}
-		else if ((str[i - 1] == '>' && str[i] != ' ' && str[i] != '>')
-		|| (str[i - 1] == '<' && str[i] != ' '))
-		{
-			tmp[j] = ' ';
-			j++;
-		}
-		tmp[j] = str[i];
-		j++;
-		i++;
-	}
-	tmp[j] = '\0';
-	ft_strcpy(str, tmp);
-	free(tmp);
-}
-
-void ft_checkredir(char *str)
-{
-	int 	i;
-	char 	c;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '"' || str[i] == '\'')
-		{
-			c = str[i];
-			i++;
-			while (str[i] != c && str[i])
-				i++;
-		}
-		if ((str[i - 1] != '>' && str[i] == '>' && str[i + 1] != '>'
-		&& (str[i + 1] != ' ' || str[i - 1] != ' '))
-		|| (str[i] == '>' && str[i + 1] == '>'
-		&& (str[i + 2] != ' ' || str[i - 1] != ' '))
-		|| (str[i] == '<' && (str[i - 1] != ' ' || str[i + 1] != ' ')))
-			ft_chevronspace(str);
-		i++;
-	}
-}
-
-void my_redirection(char *str)
+char  *my_redirection(char *str)
 {
 	if (ft_strchr(str, '>') || ft_strchr(str, '<'))
-		ft_checkredir(str);
+		str = ft_checkredir(str);
+	return (str);
 }
 
 char 		**my_redir_right(char **cmd, int idx, int f_open[2])
@@ -769,7 +581,7 @@ char 		**my_redir_left(char **cmd, int idx, int f_open[2])
 		close(g_file[1]);
 	if ((g_file[1] = open(cmd[idx + 1], O_RDONLY)) == -1)
 	{
-		ft_puterror("bash: ", cmd[idx + 1], ": No such file or directory\n");
+		ft_puterror("bash: ", cmd[idx + 1], ": No such file or directory\n", errno);
 		ft_splitdel(&cmd);
 		return NULL;
 	}
@@ -884,7 +696,7 @@ void	cmd_execution(char **cmd)
 	else
 	{
 		if (execve(cmd[0], cmd, NULL) == -1)
-			write(2, "error: execve failed\n", 21);
+			ft_puterror("bash: ", cmd[0], ": command not found\n", 127);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -957,8 +769,7 @@ int					main(int ac, char **av, char **env)
 		write(1, "\033[1;34m$alilin> \033[0;37m", 23);
 		if (get_next_line(0, &line) == 0)
 			ft_exit(NULL);
-		if (ft_strcmp(line, "\0") != 0)
-    	ft_precommande(line, &envi);
+    ft_precommande(line, &envi);
 		free(line);
 		line = NULL;
 	}

@@ -36,43 +36,64 @@ int			ft_nbpipe2(const char *str)
 	return (nb);
 }
 
-void		my_pipe(char **cmd, char ***env)
+void   			my_pipe(char **cmd, char ***env)
 {
-	int		pfd[2];
-	int		fd_in;
-	int		i;
-	int 	status;
+	int 		pfd[2];
+	int			ppfd[2];
+	pid_t   ppid[2];
+	int  		fd_in;
+	int 		i;
 
 	fd_in = 0;
 	i = 0;
-	status = 0;
 	while (cmd[i] != 0)
 	{
 		pipe(pfd);
-		if ((g_pid[1] = fork()) == -1)
+		if ((ppid[0] = fork()) == -1)
 			exit(EXIT_FAILURE);
-		else if (g_pid[1] == 0)
+		else if (ppid[0] == 0)
 		{
 			dup2(fd_in, 0);
-			if (cmd[i + 1] != NULL)
-				dup2(pfd[1], 1);
 			close(pfd[0]);
-			ft_commande(cmd[i], env);
+			if (cmd[i + 1] != NULL)
+				dup2(pfd[1], STDOUT_FILENO);
+			close(pfd[1]);
+			ft_command(cmd[i], env);
 			exit(EXIT_FAILURE);
 		}
 		else
 		{
-			if (!ft_strcmp(cmd[i], "cat"))
+			if (cmd[i + 1] != NULL)
 			{
-				waitpid(g_pid[1], NULL, WSTOPPED);
-				//kill(g_pid[1], SIGTERM);
-				//waitpid(g_pid[1], NULL, WNOHANG);
+				pipe(ppfd);
+				if ((ppid[1] = fork()) == -1)
+					exit(EXIT_FAILURE);
+				else if (ppid[1] == 0)
+				{
+					close(pfd[1]);
+					dup2(pfd[0], STDIN_FILENO);
+					close(pfd[0]);
+					close(ppfd[0]);
+					if (cmd[i + 2] != NULL)
+						dup2(ppfd[1], STDOUT_FILENO);
+					close(ppfd[1]);
+					ft_command(cmd[i + 1], env);
+					exit(EXIT_FAILURE);
+				}
+				else
+				{
+					close(pfd[0]);
+					close(pfd[1]);
+					close(ppfd[1]);
+					fd_in = dup(ppfd[0]);
+					close(ppfd[0]);
+					i++;
+				}
 			}
 			wait(NULL);
-			close(pfd[1]);
-			fd_in = pfd[0];
-			i++;
+			wait(NULL);
 		}
+		i++;
 	}
 }
 

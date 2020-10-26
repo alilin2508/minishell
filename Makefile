@@ -13,7 +13,9 @@ SRC = main.c \
 				pipe.c \
 				checkerror.c \
 				env.c \
-				utilsexport.c
+				utilsexport.c \
+				ft_checkerror.c \
+				ft_chevron.c
 
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 

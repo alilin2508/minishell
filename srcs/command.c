@@ -42,63 +42,66 @@ void	exect_command(char **commande, char ***env)
 	if (get_path(commande, tenv) == true)
 		cmd_execution(commande);
 	else
-	{
-		ft_puterror("bash: ", commande[0], ": command not found\n");
-		errno = 127;
-	}
+		ft_puterror("bash: ", commande[0], ": command not found\n", 127);
 	ft_splitdel(&tenv);
 	tenv = NULL;
 }
 
-int		ft_commande(char *line, char ***env)
+int		ft_command(char *line, char ***env)
 {
-	char	**commande;
+	char	**command;
 	char	**tenv;
 
-	commande = NULL;
+	command = NULL;
 	tenv = NULL;
-	if ((variables1(line, *env)) == NULL)
+	if (ft_strchr(line, '$')|| ft_strchr(line, '\\'))
+	{
+		if ((line = variables1(line, *env)) == NULL)
+			return (0);
+	}
+	if ((command = creat_list_arg(line)) == NULL)
 		return (0);
-	if ((commande = creat_list_arg(line)) == NULL)
-		return (0);
-	commande = detectcmd(commande);
-	if (commande == NULL)
+	//if (line != NULL)
+	//free(line);
+	command = detectcmd(command);
+	if (command == NULL)
 		write(1, "", 0);
-	else if (ft_strcmp(commande[0], "exit") == 0)
-		ft_exit(commande);
-	else if (built_command(commande[0]))
-		exect_built_commande(commande, env);
+	else if (ft_strcmp(command[0], "exit") == 0)
+		ft_exit(command);
+	else if (built_command(command[0]))
+		exect_built_commande(command, env);
 	else
-		exect_command(commande, env);
-	if (commande)
-		ft_splitdel(&commande);
+		exect_command(command, env);
+	if (command)
+		ft_splitdel(&command);
 	ft_closefile();
 	return (1);
 }
 
 int		ft_precommande(char *line, char ***env)
 {
-	char	**commande;
+	char	**command;
 	int		i;
 	int		nbpipe;
 
-	commande = NULL;
+	command = NULL;
 	if (ft_checkerror(line))
 		return (0);
 	while (line[0] == ' ' || line[0] == ';')
 		line += 1;
-	if ((commande = ft_splitcmd(line)) == NULL)
+	if ((command = ft_splitcmd(line)) == NULL)
 		return (0);
 	i = 0;
-	while (commande[i])
+	while (command[i])
 	{
-		my_redirection(commande[i]);
-		if ((nbpipe = ft_nbpipe2(commande[i])) != 0)
-			ft_pipe(commande[i], env, nbpipe);
+		command[i] = my_redirection(command[i]);
+		if ((nbpipe = ft_nbpipe2(command[i])) != 0)
+			ft_pipe(command[i], env, nbpipe);
 		else
-			ft_commande(commande[i], env);
+			ft_command(command[i], env);
 		i++;
 	}
-	ft_splitdel(&commande);
+	//free(command[i]);
+	ft_splitdel(&command);
 	return (1);
 }
