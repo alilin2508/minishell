@@ -128,7 +128,7 @@ char 	**ft_unset(char **cmd, char **env)
 				j++;
 				while (j < tab_len(env))
 				{
-					if (!(tmp[j-1] = (char *)malloc(sizeof(char) * ft_strlen(env[j]) + 1)))
+					if (!(tmp[j-1] = (char *)malloc(sizeof(char) * (ft_strlen(env[j]) + 1))))
 						return (NULL);
 					ft_strcpy(tmp[j-1], env[j]);
 					j++;
@@ -286,9 +286,11 @@ char 								*ft_variables(char *str, int idx, char **env)
 	char *tenv;
 
 	tenv = NULL;
+	i = 0;
 	str_tmp = NULL;
 	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + PATH_MAX + 1))))
 		return (NULL);
+	//ft_bzero(tmp, ft_strlen(str) + PATH_MAX + 1);
 	if (idx != 0)
 		ft_strlcpy(tmp, str, idx + 1);
 	idx++;
@@ -296,7 +298,7 @@ char 								*ft_variables(char *str, int idx, char **env)
 	{
 		if (!(str_tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1))))
 			return (NULL);
-		i = 0;
+		//ft_bzero(str_tmp, ft_strlen(str) + 1);
 		while(str[idx] && str[idx] != '$' && str[idx] != ' ' && str[idx] != '"')
 		{
 			str_tmp[i] = str[idx];
@@ -309,6 +311,7 @@ char 								*ft_variables(char *str, int idx, char **env)
 			ft_strcat(tmp, tenv);
 		tenv = NULL;
 		free(str_tmp);
+		str_tmp = NULL;
 	}
 	else
 	{
@@ -324,6 +327,7 @@ char 								*ft_variables(char *str, int idx, char **env)
 		return (NULL);
 	ft_strcpy(str, tmp);
 	free(tmp);
+	tmp = NULL;
 	return (str);
 }
 
@@ -349,7 +353,8 @@ char 								*ft_backslash(char *str, int bsl)
 	}
 	tmp[i] = '\0';
 	free(str);
-	if (!(str = (char *)malloc(sizeof(char*) + (ft_strlen(tmp) + 1))))
+	str = NULL;
+	if (!(str = (char *)malloc(sizeof(char*) * (ft_strlen(tmp) + 1))))
 		return (NULL);
 	ft_strcpy(str, tmp);
 	free(tmp);
@@ -373,8 +378,8 @@ char 								*variables1(char *str, char **env)
 		{
 			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
 			{
-				str = ft_variables(str, i, env);
-				i	= -1;
+				if ((str = ft_variables(str, i, env)) == NULL)
+					return (NULL);
 			}
 		}
 		if (str[i] == '"')
@@ -385,7 +390,10 @@ char 								*variables1(char *str, char **env)
 				if (str[i] == '$')
 				{
 					if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
-						str = ft_variables(str, i, env);
+					{
+						if ((str = ft_variables(str, i, env)) == NULL)
+							return (NULL);
+					}
 				}
 				if (str[i] == '\\' && str[i + 1] == '\\')
 					str = ft_backslash(str, i);
@@ -534,7 +542,7 @@ char 		**my_redir_right(char **cmd, int idx, int f_open[2])
 		else
 			f_open[0] = 1;
 	}
-	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - 2 + 1))))
+	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - 1))))
 		return (NULL);
 	i = 0;
 	j = 0;
@@ -586,7 +594,7 @@ char 		**my_redir_left(char **cmd, int idx, int f_open[2])
 		return NULL;
 	}
 	f_open[1] = 1;
-	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - 2 + 1))))
+	if (!(tmp = (char **)malloc(sizeof(char *) * (tab_len(cmd) - 1))))
 		return (NULL);
 	i = 0;
 	j = 0;

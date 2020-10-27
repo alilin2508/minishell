@@ -20,7 +20,7 @@ SRC = main.c \
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 
 CC		= gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 
 FTDIR = ./libft
 FT_LIB = $(addprefix $(FTDIR)/,libft.a)

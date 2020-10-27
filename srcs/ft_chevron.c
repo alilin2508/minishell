@@ -62,7 +62,24 @@ char 	*ft_chevronspace(char *str)
 			while (str[i] != c && str[i])
 				i++;
 		}
-		if (((str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>')
+		if (i == 0)
+		{
+			if (str[i] == '>' && str[i + 1] != '>' && str[i + 1] != ' ')
+			{
+				tmp[j] = '>';
+				tmp[j+1] = ' ';
+				j += 2;
+				i++;
+			}
+			else if (str[i] == '<' && str[i + 1] != ' ')
+			{
+				tmp[j] = '<';
+				tmp[j + 1] = ' ';
+				j += 2;
+				i++;
+			}
+		}
+		else if (((str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>')
 		|| (str[i] == '<' && str[i - 1] != ' ')) && i != 0)
 		{
 			tmp[j] = ' ';
@@ -81,7 +98,7 @@ char 	*ft_chevronspace(char *str)
 	tmp[j] = '\0';
 	free(str);
 	if (!(str = (char *)malloc(sizeof(char) * (ft_strlen(tmp) + 1))))
-		return NULL;
+		return (NULL);
 	ft_strcpy(str, tmp);
 	free(tmp);
 	return (str);
@@ -102,14 +119,25 @@ char	*ft_checkredir(char *str)
 			while (str[i] != c && str[i])
 				i++;
 		}
-		if ((str[i - 1] != '>' && str[i] == '>' && str[i + 1] != '>'
-		&& (str[i + 1] != ' ' || str[i - 1] != ' '))
-		|| (str[i] == '>' && str[i + 1] == '>'
-		&& (str[i + 2] != ' ' || str[i - 1] != ' '))
-		|| (str[i] == '<' && (str[i - 1] != ' ' || str[i + 1] != ' ')))
+		if (i != 0)
 		{
-			str = ft_chevronspace(str);
-			break ;
+			if ((str[i - 1] != '>' && str[i] == '>' && str[i + 1] != '>'
+			&& (str[i + 1] != ' ' || str[i - 1] != ' '))
+			|| (str[i] == '>' && str[i + 1] == '>'
+			&& (str[i + 2] != ' ' || str[i - 1] != ' '))
+			|| (str[i] == '<' && (str[i - 1] != ' ' || str[i + 1] != ' ')))
+			{
+				str = ft_chevronspace(str);
+				break ;
+			}
+		}
+		else
+		{
+			if ((str[i] == '>' && ((str[i + 1] != '>' && str[i + 1] != ' ') || (str[i + 1] == '>' && str[i + 2] != ' '))) || (str[i] == '<' && str[i + 1] != ' '))
+			{
+				str = ft_chevronspace(str);
+				break ;
+			}
 		}
 		i++;
 	}

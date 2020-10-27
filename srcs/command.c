@@ -12,6 +12,20 @@
 
 #include "minishell.h"
 
+/*static void	free_array(char **array)
+{
+	for (int i = 0; array[i]; i++) {
+		printf("last = %s\n", array[i]);
+	}
+	for (int i = 0; array[i]; i++) {
+		printf("%d\n", i);
+		free(array[i]);
+		array[i] = NULL;
+	}
+	free(array);
+	array = NULL;
+}*/
+
 void	ft_closefile(void)
 {
 	if (g_fd[0] != 0 && g_cvr[0])
@@ -47,7 +61,7 @@ void	exect_command(char **commande, char ***env)
 	tenv = NULL;
 }
 
-int		ft_command(char *line, char ***env)
+char		*ft_command(char *line, char ***env)
 {
 	char	**command;
 	char	**tenv;
@@ -61,8 +75,6 @@ int		ft_command(char *line, char ***env)
 	}
 	if ((command = creat_list_arg(line)) == NULL)
 		return (0);
-	//if (line != NULL)
-	//free(line);
 	command = detectcmd(command);
 	if (command == NULL)
 		write(1, "", 0);
@@ -75,7 +87,7 @@ int		ft_command(char *line, char ***env)
 	if (command)
 		ft_splitdel(&command);
 	ft_closefile();
-	return (1);
+	return (line);
 }
 
 int		ft_precommande(char *line, char ***env)
@@ -98,10 +110,9 @@ int		ft_precommande(char *line, char ***env)
 		if ((nbpipe = ft_nbpipe2(command[i])) != 0)
 			ft_pipe(command[i], env, nbpipe);
 		else
-			ft_command(command[i], env);
+			command[i] = ft_command(command[i], env);
 		i++;
 	}
-	//free(command[i]);
 	ft_splitdel(&command);
 	return (1);
 }

@@ -39,7 +39,7 @@ int           my_cd(char *path, char **env);
 int           ft_access(char *bin);
 void          exect_built_commande(char **cmd, char ***env);
 int 				  built_command(char *cmd);
-int           ft_command(char *line, char ***env);
+char          *ft_command(char *line, char ***env);
 void 				  end(int sig);
 void 				  recovery(int sig);
 char 					*variables1(char *str, char **env);
@@ -53,5 +53,6 @@ int           parse_error(int t_e, char *err);
 void          ft_puterror(char *errorstart, char *arg, char *errorend, int err);
 int           ft_checkex2(char *cmd, char **env);
 int           ft_checkunset(char *cmd, char **env);
+int           tab_len(char **env);
 
 #endif

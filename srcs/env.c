@@ -17,15 +17,12 @@ char	**ft_getenv(char **env)
 	char	**envi;
 	int		i;
 
-	i = 0;
-	while (env[i])
-		i++;
-	if (!(envi = (char**)malloc(sizeof(char *) * i + 1)))
+	if (!(envi = (char**)malloc(sizeof(char *) * (tab_len(env) + 1))))
 		return (0);
 	i = 0;
 	while (env[i])
 	{
-		if (!(envi[i] = (char *)malloc(sizeof(char) * ft_strlen(env[i]) + 1)))
+		if (!(envi[i] = (char *)malloc(sizeof(char) * (ft_strlen(env[i]) + 1))))
 			return (0);
 		ft_strlcpy(envi[i], env[i], ft_strlen(env[i]) + 1);
 		i++;
