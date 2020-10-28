@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utilspipe.c                                        :+:      :+:    :+:   */
+/*   pipe.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 16:29:28 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/20 16:56:09 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/28 11:02:29 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,64 +36,73 @@ int			ft_nbpipe2(const char *str)
 	return (nb);
 }
 
-void   			my_pipe(char **cmd, char ***env)
+static int	execution(char *cmd, int p_in[2], int p_out[2], char ***env)
 {
-	int 		pfd[2];
-	int			ppfd[2];
-	pid_t   ppid[2];
-	int  		fd_in;
-	int 		i;
-
-	fd_in = 0;
-	i = 0;
-	while (cmd[i] != 0)
+	g_pid[1] = fork();
+	if (g_pid[1] == -1)
+		exit(EXIT_FAILURE);
+	else if (g_pid[1] == 0)
 	{
-		pipe(pfd);
-		if ((ppid[0] = fork()) == -1)
-			exit(EXIT_FAILURE);
-		else if (ppid[0] == 0)
+		if (p_in[0] != -1 && p_in[1] != -1)
 		{
-			dup2(fd_in, 0);
-			close(pfd[0]);
-			if (cmd[i + 1] != NULL)
-				dup2(pfd[1], STDOUT_FILENO);
-			close(pfd[1]);
-			ft_command(cmd[i], env);
-			exit(EXIT_FAILURE);
+			close(p_in[1]);
+			dup2(p_in[0], STDIN_FILENO);
+		}
+		if (p_out[0] != -1 && p_out[1] != -1)
+		{
+			close(p_out[0]);
+			dup2(p_out[1], STDOUT_FILENO);
+		}
+		close(p_in[0]);
+		ft_command(cmd, env);
+		exit(EXIT_FAILURE);
+	}
+	return (g_pid[1]);
+}
+
+static int	preexecution(char **cmd, int p_in[2], int p_out[2], char ***env)
+{
+	int i;
+	int nb_cmd;
+
+	nb_cmd = tab_len(cmd);
+	i = 0;
+	while (cmd[i])
+	{
+		if (i < nb_cmd - 1)
+			pipe(p_out);
+		execution(cmd[i], p_in, p_out, env);
+		close(p_in[1]);
+		close(p_in[0]);
+		if (i < nb_cmd - 1)
+		{
+			p_in[0] = p_out[0];
+			p_in[1] = p_out[1];
 		}
 		else
 		{
-			if (cmd[i + 1] != NULL)
-			{
-				pipe(ppfd);
-				if ((ppid[1] = fork()) == -1)
-					exit(EXIT_FAILURE);
-				else if (ppid[1] == 0)
-				{
-					close(pfd[1]);
-					dup2(pfd[0], STDIN_FILENO);
-					close(pfd[0]);
-					close(ppfd[0]);
-					if (cmd[i + 2] != NULL)
-						dup2(ppfd[1], STDOUT_FILENO);
-					close(ppfd[1]);
-					ft_command(cmd[i + 1], env);
-					exit(EXIT_FAILURE);
-				}
-				else
-				{
-					close(pfd[0]);
-					close(pfd[1]);
-					close(ppfd[1]);
-					fd_in = dup(ppfd[0]);
-					close(ppfd[0]);
-					i++;
-				}
-			}
-			wait(NULL);
-			wait(NULL);
+			p_out[0] = -1;
+			p_out[1] = -1;
 		}
 		i++;
+	}
+	return (g_pid[1]);
+}
+
+void		my_pipe(char **cmd, char ***env)
+{
+	int		p_in[2];
+	int		p_out[2];
+
+	p_in[0] = -1;
+	p_in[1] = -1;
+	p_out[0] = -1;
+	p_out[1] = -1;
+	preexecution(cmd, p_in, p_out, env);
+	close(p_out[0]);
+	close(p_out[1]);
+	while (wait(NULL) > 0)
+	{
 	}
 }
 
@@ -103,7 +112,7 @@ void		ft_pipe(char *str, char ***env, int nb)
 	int		i;
 	int		j;
 	int		first;
-	int 	c;
+	int		c;
 
 	if (!(command = (char **)malloc(sizeof(char *) * (nb + 2))))
 		return ;

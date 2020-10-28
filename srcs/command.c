@@ -6,25 +6,11 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:23:14 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/20 14:45:29 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/28 11:09:26 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/*static void	free_array(char **array)
-{
-	for (int i = 0; array[i]; i++) {
-		printf("last = %s\n", array[i]);
-	}
-	for (int i = 0; array[i]; i++) {
-		printf("%d\n", i);
-		free(array[i]);
-		array[i] = NULL;
-	}
-	free(array);
-	array = NULL;
-}*/
 
 void	ft_closefile(void)
 {
@@ -61,14 +47,14 @@ void	exect_command(char **commande, char ***env)
 	tenv = NULL;
 }
 
-char		*ft_command(char *line, char ***env)
+char	*ft_command(char *line, char ***env)
 {
 	char	**command;
 	char	**tenv;
 
 	command = NULL;
 	tenv = NULL;
-	if (ft_strchr(line, '$')|| ft_strchr(line, '\\'))
+	if (ft_strchr(line, '$') || ft_strchr(line, '\\'))
 	{
 		if ((line = variables1(line, *env)) == NULL)
 			return (0);

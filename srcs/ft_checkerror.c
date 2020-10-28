@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 14:26:27 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/22 14:51:15 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/28 11:10:33 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ int			ft_parse_error(const char *str, int i)
 		while (str[i] && str[i] != c)
 			i++;
 		if (str[i] == '\0')
-			return(parse_error(2, NULL));
+			return (parse_error(2, NULL));
 	}
 	else if (str[i] == ';')
 	{

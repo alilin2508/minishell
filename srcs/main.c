@@ -248,8 +248,9 @@ int 		ft_echo(char **cmd)
 {
 	int i;
 	int j;
-	int n = 0;
+	int n;
 
+	n = 0;
 	if (cmd[1] == NULL)
 	{
 		write(1, "\n", 1);
@@ -276,135 +277,6 @@ int 		ft_echo(char **cmd)
 	if (n == 0)
 		write(1, "\n",  1);
 	return (0);
-}
-
-char 								*ft_variables(char *str, int idx, char **env)
-{
-	int i;
-	char *tmp;
-	char *str_tmp;
-	char *tenv;
-
-	tenv = NULL;
-	i = 0;
-	str_tmp = NULL;
-	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + PATH_MAX + 1))))
-		return (NULL);
-	//ft_bzero(tmp, ft_strlen(str) + PATH_MAX + 1);
-	if (idx != 0)
-		ft_strlcpy(tmp, str, idx + 1);
-	idx++;
-	if (str[idx] != '?')
-	{
-		if (!(str_tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1))))
-			return (NULL);
-		//ft_bzero(str_tmp, ft_strlen(str) + 1);
-		while(str[idx] && str[idx] != '$' && str[idx] != ' ' && str[idx] != '"')
-		{
-			str_tmp[i] = str[idx];
-			idx++;
-			i++;
-		}
-		str_tmp[i] = '=';
-		str_tmp[i + 1] = '\0';
-		if ((tenv = my_getenv(env, str_tmp)) != NULL)
-			ft_strcat(tmp, tenv);
-		tenv = NULL;
-		free(str_tmp);
-		str_tmp = NULL;
-	}
-	else
-	{
-		tenv = ft_itoa(errno);
-		ft_strcat(tmp, tenv);
-		free(tenv);
-		idx++;
-	}
-	if (str[idx] != '\0')
-		ft_strcat(tmp, &str[idx]);
-	free(str);
-	if (!(str = (char *)malloc(sizeof(char) * (ft_strlen(tmp) + 1))))
-		return (NULL);
-	ft_strcpy(str, tmp);
-	free(tmp);
-	tmp = NULL;
-	return (str);
-}
-
-char 								*ft_backslash(char *str, int bsl)
-{
-	char 	*tmp;
-	int 	i;
-
-	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str)))))
-		return (NULL);
-	i = 0;
-	while (i != bsl)
-	{
-		tmp[i] = str[i];
-		i++;
-	}
-	bsl++;
-	while (str[bsl])
-	{
-		tmp[i] = str[bsl];
-		i++;
-		bsl++;
-	}
-	tmp[i] = '\0';
-	free(str);
-	str = NULL;
-	if (!(str = (char *)malloc(sizeof(char*) * (ft_strlen(tmp) + 1))))
-		return (NULL);
-	ft_strcpy(str, tmp);
-	free(tmp);
-	return (str);
-}
-
-char 								*variables1(char *str, char **env)
-{
-	int 	i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '\'')
-		{
-			i++;
-			while (str[i] != '\'')
-				i++;
-		}
-		if (str[i] == '$')
-		{
-			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
-			{
-				if ((str = ft_variables(str, i, env)) == NULL)
-					return (NULL);
-			}
-		}
-		if (str[i] == '"')
-		{
-			i++;
-			while (str[i] != '"' && str[i])
-			{
-				if (str[i] == '$')
-				{
-					if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
-					{
-						if ((str = ft_variables(str, i, env)) == NULL)
-							return (NULL);
-					}
-				}
-				if (str[i] == '\\' && str[i + 1] == '\\')
-					str = ft_backslash(str, i);
-				i++;
-			}
-		}
-		if (str[i] == '\\')
-			str = ft_backslash(str, i);
-		i++;
-	}
-	return (str);
 }
 
 int 								ft_cword(char *line)

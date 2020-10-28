@@ -15,7 +15,8 @@ SRC = main.c \
 				env.c \
 				utilsexport.c \
 				ft_checkerror.c \
-				ft_chevron.c
+				ft_chevron.c \
+				variable.c
 
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 

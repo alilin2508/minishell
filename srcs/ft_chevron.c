@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/23 10:53:12 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/23 13:52:02 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/28 11:15:41 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,25 +24,26 @@ int		ft_nbchevron(const char *str)
 	{
 		if (str[i] == '"' || str[i] == '\'')
 		{
-			c = str[i];
-			i++;
+			c = str[i++];
 			while (str[i] != c && str[i])
 				i++;
 		}
-		if ((str[i] == '>' && str[i-1] != '>' && str[i-1] != ' ' && str[i + 1] != ' ' && str[i + 1] != '>') ||
-				(str[i] == '>' && str[i + 1] == '>' && str[i - 1] != ' ' && str[i + 2] != ' ') ||
+		if ((str[i] == '>' && str[i - 1] != '>' && str[i - 1] != ' ' &&
+			str[i + 1] != ' ' && str[i + 1] != '>') || (str[i] == '>' &&
+			str[i + 1] == '>' && str[i - 1] != ' ' && str[i + 2] != ' ') ||
 				(str[i] == '<' && str[i - 1] != ' ' && str[i + 1] != ' '))
 			nb += 2;
-		else if ((str[i] == '>' && str[i + 1] != '>' && str[i-1] != '>' && (str[i-1] != ' ' || str[i+1] != ' ')) ||
-				(str[i] == '>' && str[i + 1] == '>' && (str[i - 1] != ' ' || str[i + 2] != ' ')) ||
-				(str[i] == '<' && (str[i - 1] != ' ' || str[i + 1] != ' ')))
+		else if ((str[i] == '>' && str[i + 1] != '>' && str[i - 1] != '>' &&
+			(str[i - 1] != ' ' || str[i + 1] != ' ')) || (str[i] == '>' &&
+			str[i + 1] == '>' && (str[i - 1] != ' ' || str[i + 2] != ' ')) ||
+			(str[i] == '<' && (str[i - 1] != ' ' || str[i + 1] != ' ')))
 			nb++;
 		i++;
 	}
 	return (nb);
 }
 
-char 	*ft_chevronspace(char *str)
+char	*ft_chevronspace(char *str)
 {
 	char	*tmp;
 	int		i;
@@ -51,7 +52,7 @@ char 	*ft_chevronspace(char *str)
 
 	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) +
 			ft_nbchevron((const char *)str) + 1))))
-		return NULL;
+		return (NULL);
 	i = 0;
 	j = 0;
 	while (str[i])
@@ -67,7 +68,7 @@ char 	*ft_chevronspace(char *str)
 			if (str[i] == '>' && str[i + 1] != '>' && str[i + 1] != ' ')
 			{
 				tmp[j] = '>';
-				tmp[j+1] = ' ';
+				tmp[j + 1] = ' ';
 				j += 2;
 				i++;
 			}
@@ -133,7 +134,9 @@ char	*ft_checkredir(char *str)
 		}
 		else
 		{
-			if ((str[i] == '>' && ((str[i + 1] != '>' && str[i + 1] != ' ') || (str[i + 1] == '>' && str[i + 2] != ' '))) || (str[i] == '<' && str[i + 1] != ' '))
+			if ((str[i] == '>' && ((str[i + 1] != '>' && str[i + 1] != ' ') ||
+				(str[i + 1] == '>' && str[i + 2] != ' '))) ||
+				(str[i] == '<' && str[i + 1] != ' '))
 			{
 				str = ft_chevronspace(str);
 				break ;

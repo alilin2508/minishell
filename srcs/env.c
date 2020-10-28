@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 17:27:34 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/20 17:31:44 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/28 11:09:52 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,5 +80,5 @@ int		position(void)
 	ft_putstr(path);
 	write(1, "\n", 1);
 	free(path);
-	return(0);
+	return (0);
 }

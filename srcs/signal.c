@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:08:39 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/20 13:13:43 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/28 12:08:56 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,9 @@ void	recovery(int sig)
 	}
 }
 
-int 	ft_exit(char **commande)
+int		ft_exit(char **commande)
 {
-	int ex;
+	int		ex;
 
 	ex = 0;
 	if (commande != NULL)
