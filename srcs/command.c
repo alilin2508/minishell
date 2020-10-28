@@ -22,6 +22,7 @@ void	ft_closefile(void)
 		close(g_file[0]);
 		close(g_fd[0]);
 		g_fd[0] = 0;
+		g_pid[0] = 0;
 	}
 	if (g_fd[1] != 0 && g_cvr[1])
 	{
@@ -31,6 +32,7 @@ void	ft_closefile(void)
 		close(g_file[1]);
 		close(g_fd[1]);
 		g_fd[1] = 0;
+		g_pid[0] = 0;
 	}
 }
 

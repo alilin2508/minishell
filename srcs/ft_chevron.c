@@ -28,7 +28,14 @@ int		ft_nbchevron(const char *str)
 			while (str[i] != c && str[i])
 				i++;
 		}
-		if ((str[i] == '>' && str[i - 1] != '>' && str[i - 1] != ' ' &&
+		if (i == 0)
+		{
+			if ((str[i] == '>' && ((str[i + 1] != '>' && str[i + 1] != ' ') ||
+				(str[i + 1] == '>' && str[i + 2] != ' '))) ||
+				(str[i] == '<' && str[i + 1] != ' '))
+				nb++;
+		}
+		else if ((str[i] == '>' && str[i - 1] != '>' && str[i - 1] != ' ' &&
 			str[i + 1] != ' ' && str[i + 1] != '>') || (str[i] == '>' &&
 			str[i + 1] == '>' && str[i - 1] != ' ' && str[i + 2] != ' ') ||
 				(str[i] == '<' && str[i - 1] != ' ' && str[i + 1] != ' '))

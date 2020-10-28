@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 14:47:41 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/20 15:45:34 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/28 16:55:17 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,27 +85,19 @@ int		ft_strnext(char *str, int j)
 	return (j);
 }
 
-char	**ft_splitcmd(char *str)
+char	**creat_tab(char **tab, int i, int j, char *str)
 {
-	char	**tab;
-	int		first;
-	int		i;
-	int		j;
+	int first;
 
-	if (!(tab = (char **)malloc(sizeof(char *) * (ft_nb_cmd(str) + 1))))
-		return (NULL);
-	i = 0;
-	j = 0;
 	first = 0;
 	while (str[j])
 	{
 		if (str[j] == '"' || str[j] == '\'')
-			j += ft_strnext(str, j);
+			j = ft_strnext(str, j);
 		if (str[j] == ';')
 		{
-			if ((tab[i] = ft_takecmd(str, first, j)) == NULL)
+			if ((tab[i++] = ft_takecmd(str, first, j)) == NULL)
 				return (NULL);
-			i++;
 			j++;
 			while (str[j] == ' ' && str[j] == ';')
 				j++;
@@ -117,5 +109,15 @@ char	**ft_splitcmd(char *str)
 	}
 	tab[i] = ft_takecmd(str, first, j);
 	tab[i + 1] = NULL;
+	return (tab);
+}
+
+char	**ft_splitcmd(char *str)
+{
+	char	**tab;
+
+	if (!(tab = (char **)malloc(sizeof(char *) * (ft_nb_cmd(str) + 1))))
+		return (NULL);
+	tab = creat_tab(tab, 0, 0, str);
 	return (tab);
 }

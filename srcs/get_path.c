@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 16:09:43 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/20 16:27:07 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/28 16:40:25 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,28 +51,36 @@ char	*creatbin(char **split_path, char **cmd)
 	return (bin);
 }
 
+char	*get_firstpath(char **env)
+{
+	int		i;
+	char	*path;
+
+	path = NULL;
+	i = 0;
+	while (env[i])
+	{
+		if (!ft_strncmp(env[i], "PATH=", 5))
+		{
+			path = ft_strdup(&env[i][5]);
+			break ;
+		}
+		i++;
+	}
+	return (path);
+}
+
 bool	get_path(char **cmd, char **env)
 {
 	char	*path;
 	char	*bin;
 	char	**split_path;
-	int		i;
 
 	path = NULL;
 	split_path = NULL;
 	if (cmd[0][0] != '/' && ft_strncmp(cmd[0], "./", 2) != 0)
 	{
-		i = 0;
-		while (env[i])
-		{
-			if (!ft_strncmp(env[i], "PATH=", 5))
-			{
-				path = ft_strdup(&env[i][5]);
-				break ;
-			}
-			i++;
-		}
-		if (path == NULL)
+		if ((path = get_firstpath(env)) == NULL)
 			return (false);
 		split_path = ft_split(path, ':');
 		free(path);

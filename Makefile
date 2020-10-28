@@ -16,7 +16,14 @@ SRC = main.c \
 				utilsexport.c \
 				ft_checkerror.c \
 				ft_chevron.c \
-				variable.c
+				variable.c \
+				builtin.c \
+				utils.c \
+				ft_detectcmd.c \
+				ft_redir.c \
+				ft_creat_list_arg.c \
+				ft_unset.c \
+				ft_export.c
 
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 

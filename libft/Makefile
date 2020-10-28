@@ -41,7 +41,6 @@ SRC = ft_bzero.c \
 			ft_strtrim.c \
 			ft_putendl.c \
 			get_next_line.c \
-			ft_lerpi.c \
 			ft_memdel.c \
 			ft_strnew.c \
 			ft_lstnew.c \
