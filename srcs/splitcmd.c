@@ -31,8 +31,6 @@ int		ft_nb_cmd(const char *line)
 		}
 		if (line[i] == ';')
 			nb++;
-		if (line[i] == '\\')
-			i++;
 		i++;
 	}
 	return (nb);
@@ -103,8 +101,6 @@ char	**creat_tab(char **tab, int i, int j, char *str)
 				j++;
 			first = j;
 		}
-		if (str[j] == '\\')
-			j++;
 		j++;
 	}
 	tab[i] = ft_takecmd(str, first, j);

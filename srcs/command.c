@@ -56,7 +56,7 @@ char	*ft_command(char *line, char ***env)
 
 	command = NULL;
 	tenv = NULL;
-	if (ft_strchr(line, '$') || ft_strchr(line, '\\'))
+	if (ft_strchr(line, '$'))
 	{
 		if ((line = variables1(line, *env)) == NULL)
 			return (0);

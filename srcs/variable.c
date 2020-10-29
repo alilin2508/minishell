@@ -106,8 +106,6 @@ char	*variables1(char *str, char **env)
 			while (str[i] != '\'')
 				i++;
 		}
-		if (str[i] == '\\')
-			str = ft_backslash(str, i);
 		if (str[i] == '$')
 		{
 			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')

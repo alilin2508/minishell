@@ -84,7 +84,8 @@ int		main(int ac, char **av, char **env)
 	while (1)
 	{
 		g_pid[0] = 0;
-		write(1, "\033[1;34m$alilin> \033[0;37m", 23);
+		g_pid[1] = 0;
+		write(0, "\033[1;34m$alilin> \033[0;37m", 23);
 		if (get_next_line(0, &line) == 0)
 			ft_exit(NULL);
 		ft_precommande(line, &envi);

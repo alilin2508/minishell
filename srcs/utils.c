@@ -25,19 +25,13 @@ int		ft_cword(char *line)
 {
 	int		i;
 	int		nb;
-	char	sep;
 
 	i = 0;
 	nb = 1;
 	while (line[i])
 	{
 		if (line[i] == '\'' || line[i] == '"')
-		{
-			sep = line[i];
-			i++;
-			while (line[i] != sep && line[i])
-				i++;
-		}
+			i = passquotes(line, i, line[i]);
 		if (line[i] == ' ')
 		{
 			while (line[i + 1] == ' ')
