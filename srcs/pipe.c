@@ -6,35 +6,11 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 16:29:28 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 11:02:29 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/29 10:54:10 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int			ft_nbpipe2(const char *str)
-{
-	int		i;
-	int		nb;
-	char	c;
-
-	i = 0;
-	nb = 0;
-	while (str[i])
-	{
-		if (str[i] == '\'' || str[i] == '"')
-		{
-			c = str[i];
-			i++;
-			while (str[i] != c && str[i])
-				i++;
-		}
-		if (str[i] == '|')
-			nb++;
-		i++;
-	}
-	return (nb);
-}
 
 static int	execution(char *cmd, int p_in[2], int p_out[2], char ***env)
 {
@@ -106,48 +82,47 @@ void		my_pipe(char **cmd, char ***env)
 	}
 }
 
-void		ft_pipe(char *str, char ***env, int nb)
+char		**takecmd_pipe(char **command, int i, int j, char *str)
 {
-	char	**command;
-	int		i;
-	int		j;
-	int		first;
-	int		c;
+	int c;
+	int first;
 
-	if (!(command = (char **)malloc(sizeof(char *) * (nb + 2))))
-		return ;
-	i = 0;
-	j = 0;
 	first = 0;
-	while (str[i])
+	while (str[i++])
 	{
 		if (str[i] == '\'' || str[i] == '"')
-		{
-			c = str[i];
-			i++;
-			while (str[i] != c && str[i])
-				i++;
-		}
+			i = passquotes(str, i + 1, str[i]);
 		if (str[i] == '|')
 		{
 			c = i;
 			while (str[c - 1] == ' ')
 				c--;
 			if (!(command[j] = (char *)malloc(sizeof(char) * (c - first) + 1)))
-				return ;
-			ft_strlcpy(command[j], &str[first], c - first + 1);
-			while (str[i + 1] == ' ')
-				i++;
+				return (NULL);
+			ft_strlcpy(command[j++], &str[first], c - first + 1);
+			i = ft_pass_space(str, i);
 			first = i + 1;
-			j++;
 		}
-		i++;
 	}
 	if (!(command[j] = (char *)malloc(sizeof(char) * (i - first) + 1)))
-		return ;
+		return (NULL);
 	ft_strlcpy(command[j], &str[first], i - first + 1);
-	j++;
-	command[j] = NULL;
+	command[j + 1] = NULL;
+	return (command);
+}
+
+void		ft_pipe(char *str, char ***env, int nb)
+{
+	char	**command;
+
+	if (!(command = (char **)malloc(sizeof(char *) * (nb + 2))))
+		return ;
+	if ((command = takecmd_pipe(command, 0, 0, str)) == NULL)
+	{
+		write(2, "error: malloc failed\n", 21);
+		ft_splitdel(&command);
+		return ;
+	}
 	my_pipe(command, env);
 	ft_splitdel(&command);
 }

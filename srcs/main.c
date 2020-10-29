@@ -83,6 +83,7 @@ int		main(int ac, char **av, char **env)
 	signal(SIGQUIT, end);
 	while (1)
 	{
+		g_pid[0] = 0;
 		write(1, "\033[1;34m$alilin> \033[0;37m", 23);
 		if (get_next_line(0, &line) == 0)
 			ft_exit(NULL);

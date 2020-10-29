@@ -6,11 +6,20 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 12:44:50 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 12:49:45 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/29 10:55:09 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int		passquotes(char *str, int i, int c)
+{
+	while (str[i] != c && str[i])
+		i++;
+	if (str[i] == '\0')
+		return (-1);
+	return (i);
+}
 
 int		ft_cword(char *line)
 {

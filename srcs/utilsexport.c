@@ -6,11 +6,18 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 17:37:29 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/20 17:48:11 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/29 10:55:40 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int		ft_pass_space(char *str, int i)
+{
+	while (str[i + 1] == ' ')
+		i++;
+	return (i);
+}
 
 int		ft_checkex2(char *cmd, char **env)
 {
@@ -42,4 +49,28 @@ int		ft_checkunset(char *cmd, char **env)
 		i++;
 	}
 	return (0);
+}
+
+int		ft_nbpipe2(const char *str)
+{
+	int		i;
+	int		nb;
+	char	c;
+
+	i = 0;
+	nb = 0;
+	while (str[i])
+	{
+		if (str[i] == '\'' || str[i] == '"')
+		{
+			c = str[i];
+			i++;
+			while (str[i] != c && str[i])
+				i++;
+		}
+		if (str[i] == '|')
+			nb++;
+		i++;
+	}
+	return (nb);
 }

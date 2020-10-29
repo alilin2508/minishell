@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:13:00 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 16:15:58 by grigo            ###   ########.fr       */
+/*   Updated: 2020/10/29 10:57:13 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ char	**detectcmd(char **cmd);
 char	**my_redir_left(char **cmd, int idx, int f_open[2]);
 char	**delet_chevron(char **cmd, int idx);
 char	**ft_export(char **cmd, char **env);
-char  **ft_unset(char **cmd, char **env);
+char	**ft_unset(char **cmd, char **env);
+int		passquotes(char *str, int i, int c);
+int		ft_pass_space(char *str, int i);
 
 #endif

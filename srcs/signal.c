@@ -21,9 +21,7 @@ void	end(int sig)
 		kill(g_pid[0], SIGQUIT);
 	}
 	else if (g_pid[1] != 0)
-	{
 		kill(g_pid[1], SIGINT);
-	}
 	else
 		ft_putstr("\b \b\b \b");
 }
