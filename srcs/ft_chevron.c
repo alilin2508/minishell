@@ -64,11 +64,14 @@ char	*ft_checkredir2(char *str, char *tmp, int i, int j)
 			i = passquotes(str, i + 1, str[i]);
 		if (i != 0)
 		{
-			if (((str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>')
-			|| (str[i] == '<' && str[i - 1] != ' ')) && i != 0)
+			if (((str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>' && str[i - 1] != '\\')
+			|| (str[i] == '<' && str[i - 1] != ' ' && str[i - 1] != '\\')))
 				tmp[j++] = ' ';
-			else if ((str[i - 1] == '>' && str[i] != ' ' && str[i] != '>')
-			|| (str[i - 1] == '<' && str[i] != ' '))
+			else if ((str[i - 1] == '>' && str[i] != ' ' && str[i] != '>' &&
+			str[i - 2] != '>' && str[i - 2] != '\\')
+			|| (str[i - 1] == '<' && str[i] != ' ' && str[i - 2] != '\\') ||
+				(str[i - 1] == '>' && str[i] != ' ' && str[i] != '>' &&
+				str[i - 2] == '>' && str[i - 3] != '\\'))
 				tmp[j++] = ' ';
 		}
 		tmp[j++] = str[i];

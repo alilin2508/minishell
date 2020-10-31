@@ -16,21 +16,17 @@ int		ft_nb_cmd(const char *line)
 {
 	int		i;
 	int		nb;
-	char	c;
 
 	i = 0;
 	nb = 1;
 	while (line[i])
 	{
 		if (line[i] == '"' || line[i] == '\'')
-		{
-			c = line[i];
-			i++;
-			while (line[i] && line[i] != c)
-				i++;
-		}
+			i = passquotes(line, i, line[i]);
 		if (line[i] == ';')
 			nb++;
+		if (line[i] == '\\')
+			i++;
 		i++;
 	}
 	return (nb);
@@ -78,6 +74,8 @@ int		ft_strnext(char *str, int j)
 			str[j + 1] = 1;
 			str[j] = 1;
 		}
+		else if (str[j] == '\\')
+			str[j] = 3;
 		j++;
 	}
 	return (j);
@@ -101,6 +99,8 @@ char	**creat_tab(char **tab, int i, int j, char *str)
 				j++;
 			first = j;
 		}
+		if (str[j] == '\\')
+			j++;
 		j++;
 	}
 	tab[i] = ft_takecmd(str, first, j);

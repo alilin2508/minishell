@@ -51,6 +51,8 @@ char	**creat_list_arg2(char *line, char **commande, int i, int j)
 						(ft_strlen(line) + 1))))
 					return (NULL);
 		}
+		if (line[i] == '\\')
+			i++;
 		i++;
 	}
 	if (first != i)

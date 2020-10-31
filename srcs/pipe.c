@@ -94,15 +94,15 @@ char		**takecmd_pipe(char **command, int i, int j, char *str)
 			i = passquotes(str, i + 1, str[i]);
 		if (str[i] == '|')
 		{
-			c = i;
-			while (str[c - 1] == ' ')
-				c--;
+			c = delspace(str, i);
 			if (!(command[j] = (char *)malloc(sizeof(char) * (c - first) + 1)))
 				return (NULL);
 			ft_strlcpy(command[j++], &str[first], c - first + 1);
 			i = ft_pass_space(str, i);
 			first = i + 1;
 		}
+		if (str[i] == '\\')
+			i++;
 	}
 	if (!(command[j] = (char *)malloc(sizeof(char) * (i - first) + 1)))
 		return (NULL);

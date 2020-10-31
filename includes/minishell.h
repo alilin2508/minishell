@@ -74,7 +74,9 @@ char	**my_redir_left(char **cmd, int idx, int f_open[2]);
 char	**delet_chevron(char **cmd, int idx);
 char	**ft_export(char **cmd, char **env);
 char	**ft_unset(char **cmd, char **env);
-int		passquotes(char *str, int i, int c);
+int		passquotes(const char *str, int i, int c);
 int		ft_pass_space(char *str, int i);
+char  **ft_backslash(char **cmd, int i);
+int 	delspace(char *str, int c);
 
 #endif

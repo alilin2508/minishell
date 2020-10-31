@@ -67,7 +67,7 @@ char	*ft_variables(char *str, int idx, char **env)
 	return (str);
 }
 
-char	*ft_backslash(char *str, int bsl)
+/*char	*ft_backslash(char *str, int bsl)
 {
 	char	*tmp;
 	int		i;
@@ -91,7 +91,7 @@ char	*ft_backslash(char *str, int bsl)
 	ft_strcpy(str, tmp);
 	free(tmp);
 	return (str);
-}
+}*/
 
 char	*variables1(char *str, char **env)
 {
@@ -100,6 +100,8 @@ char	*variables1(char *str, char **env)
 	i = 0;
 	while (str[i])
 	{
+		if (str[i] == '\\')
+			i += 2;
 		if (str[i] == '\'')
 		{
 			i++;

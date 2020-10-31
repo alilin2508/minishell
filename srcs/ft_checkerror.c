@@ -84,15 +84,10 @@ int			ft_pipe_error(const char *str, int i)
 int			ft_parse_error(const char *str, int i)
 {
 	int		err;
-	int		c;
 
 	if (str[i] == '\'' || str[i] == '"')
 	{
-		c = str[i];
-		i++;
-		while (str[i] && str[i] != c)
-			i++;
-		if (str[i] == '\0')
+		if ((i = passquotes(str, i + 1, str[i])) == -1)
 			return (parse_error(2, NULL));
 	}
 	else if (str[i] == ';')

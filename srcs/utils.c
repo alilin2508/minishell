@@ -12,10 +12,14 @@
 
 #include "minishell.h"
 
-int		passquotes(char *str, int i, int c)
+int		passquotes(const char *str, int i, int c)
 {
 	while (str[i] != c && str[i])
+	{
+		if (str[i] == '\\' && c != '\'')
+			i++;
 		i++;
+	}
 	if (str[i] == '\0')
 		return (-1);
 	return (i);

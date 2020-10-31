@@ -19,6 +19,13 @@ int		ft_pass_space(char *str, int i)
 	return (i);
 }
 
+int 	delspace(char *str, int c)
+{
+	while (str[c - 1] == ' ')
+		c--;
+	return (c);
+}
+
 int		ft_checkex2(char *cmd, char **env)
 {
 	int		i;
@@ -55,21 +62,17 @@ int		ft_nbpipe2(const char *str)
 {
 	int		i;
 	int		nb;
-	char	c;
 
 	i = 0;
 	nb = 0;
 	while (str[i])
 	{
 		if (str[i] == '\'' || str[i] == '"')
-		{
-			c = str[i];
-			i++;
-			while (str[i] != c && str[i])
-				i++;
-		}
+			i = passquotes(str, i + 1, str[i]);
 		if (str[i] == '|')
 			nb++;
+		if (str[i] == '\\')
+			i++;
 		i++;
 	}
 	return (nb);

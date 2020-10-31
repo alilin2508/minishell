@@ -108,11 +108,9 @@ char	**ft_oldpwd(char **env, char *oldpwd)
 
 int		my_cd(char *path, char ***env)
 {
-	char	*tmp;
 	char	*oldpwd;
 
 	oldpwd = NULL;
-	tmp = NULL;
 	if (path == NULL)
 		path = my_getenv(*env, "HOME=");
 	if (!(oldpwd = (char *)malloc(sizeof(char) * (PATH_MAX + 1))))

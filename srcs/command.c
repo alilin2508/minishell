@@ -52,10 +52,8 @@ void	exect_command(char **commande, char ***env)
 char	*ft_command(char *line, char ***env)
 {
 	char	**command;
-	char	**tenv;
 
 	command = NULL;
-	tenv = NULL;
 	if (ft_strchr(line, '$'))
 	{
 		if ((line = variables1(line, *env)) == NULL)
@@ -64,6 +62,7 @@ char	*ft_command(char *line, char ***env)
 	if ((command = creat_list_arg(line)) == NULL)
 		return (0);
 	command = detectcmd(command);
+	command = ft_backslash(command, 0);
 	if (command == NULL)
 		write(1, "", 0);
 	else if (ft_strcmp(command[0], "exit") == 0)
