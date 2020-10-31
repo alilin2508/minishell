@@ -53,34 +53,6 @@ char	*ft_takecmd(char *str, int first, int last)
 	return (s);
 }
 
-int		ft_strnext(char *str, int j)
-{
-	char	c;
-
-	c = str[j];
-	j++;
-	while (str[j] && str[j] != c)
-	{
-		if (str[j] == '>' && str[j - 1] == c && str[j + 1] == c &&
-				str[j - 2] == ' ')
-			str[j] = 1;
-		else if (str[j] == '<' && str[j - 1] == c &&
-				str[j + 1] == c && str[j - 2] == ' ')
-			str[j] = 2;
-		else if (str[j] == '>' && str[j + 1] == '>' &&
-				str[j - 1] == c && str[j + 2] == c &&
-				str[j - 2] == ' ')
-		{
-			str[j + 1] = 1;
-			str[j] = 1;
-		}
-		else if (str[j] == '\\')
-			str[j] = 3;
-		j++;
-	}
-	return (j);
-}
-
 char	**creat_tab(char **tab, int i, int j, char *str)
 {
 	int first;
@@ -89,7 +61,7 @@ char	**creat_tab(char **tab, int i, int j, char *str)
 	while (str[j])
 	{
 		if (str[j] == '"' || str[j] == '\'')
-			j = ft_strnext(str, j);
+			j = passquotes(str, j + 1, str[j]);
 		if (str[j] == ';')
 		{
 			if ((tab[i++] = ft_takecmd(str, first, j)) == NULL)

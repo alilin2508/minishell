@@ -38,6 +38,60 @@ int		takepath(char *str, int idx, char *tmp, char **env)
 	return (idx);
 }
 
+char	*ft_spaceredir(char *str, char *tmp, int idx, int i)
+{
+	int		j;
+
+	j = 0;
+	while (str[i])
+	{
+		if (i == idx || i == idx + 1)
+		{
+			tmp[j] = ' ';
+			j++;
+		}
+		tmp[j] = str[i];
+		i++;
+		j++;
+	}
+	tmp[j] = '\0';
+	free(str);
+	str = ft_strdup(tmp);
+	free(tmp);
+	tmp = NULL;
+	return (str);
+}
+
+char	*ft_checkbackredir(char *str, int i)
+{
+	int 	nb;
+	char 	*tmp;
+
+	nb = 0;
+	tmp = NULL;
+	while (str[i])
+	{
+		if (str[i] == '\'' || str[i] == '"')
+			i = passquotes(str, i + 1, str[i]);
+		while (str[i] == '\\')
+		{
+			nb++;
+			i++;
+		}
+		if ((str[i] == '>' || str[i] == '<') && nb != 0 && nb % 2 == 0)
+		{
+			if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 3))))
+				return (NULL);
+			str = ft_spaceredir(str, tmp, i, 0);
+			i += 1;
+		}
+		else
+			nb = 0;
+		i++;
+	}
+	return (str);
+}
+
 char	*ft_variables(char *str, int idx, char **env)
 {
 	char	*tmp;
@@ -66,32 +120,6 @@ char	*ft_variables(char *str, int idx, char **env)
 	free(tmp);
 	return (str);
 }
-
-/*char	*ft_backslash(char *str, int bsl)
-{
-	char	*tmp;
-	int		i;
-
-	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str)))))
-		return (NULL);
-	i = 0;
-	while (i != bsl)
-	{
-		tmp[i] = str[i];
-		i++;
-	}
-	bsl++;
-	while (str[bsl])
-		tmp[i++] = str[bsl++];
-	tmp[i] = '\0';
-	free(str);
-	str = NULL;
-	if (!(str = (char *)malloc(sizeof(char*) * (ft_strlen(tmp) + 1))))
-		return (NULL);
-	ft_strcpy(str, tmp);
-	free(tmp);
-	return (str);
-}*/
 
 char	*variables1(char *str, char **env)
 {

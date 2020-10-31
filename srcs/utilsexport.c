@@ -65,10 +65,14 @@ int		ft_nbpipe2(const char *str)
 
 	i = 0;
 	nb = 0;
+	printf("%d\n", i);
 	while (str[i])
 	{
 		if (str[i] == '\'' || str[i] == '"')
-			i = passquotes(str, i + 1, str[i]);
+		{
+			if ((i = passquotes(str, i + 1, str[i])) == -1)
+				break ;
+		}
 		if (str[i] == '|')
 			nb++;
 		if (str[i] == '\\')

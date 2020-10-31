@@ -22,19 +22,6 @@ void		ft_initf(int f_open[2])
 	f_open[1] = 0;
 }
 
-void		ft_nextchevron(char **cmd, int i)
-{
-	if (cmd[i][0] == 1 && cmd[i][1] == '\0')
-		cmd[i][0] = '>';
-	if (cmd[i][0] == 1 && cmd[i][1] == 1 && cmd[i][2] == '\0')
-	{
-		cmd[i][0] = '>';
-		cmd[i][1] = '>';
-	}
-	if (cmd[i][0] == 2 && cmd[i][1] == '\0')
-		cmd[i][0] = '<';
-}
-
 char		**ft_selec_redir(char **cmd, int f_open[2])
 {
 	int		i;
@@ -58,7 +45,6 @@ char		**ft_selec_redir(char **cmd, int f_open[2])
 			f_open[1] = 1;
 			i--;
 		}
-		ft_nextchevron(cmd, i);
 		i++;
 	}
 	return (cmd);

@@ -19,7 +19,7 @@ int		ft_echo(char **cmd)
 	i = 1;
 	if (cmd[1] == NULL)
 	{
-		write(0, "\n", 1);
+		write(1, "\n", 1);
 		return (0);
 	}
 	if (!ft_strcmp(cmd[1], "-n"))

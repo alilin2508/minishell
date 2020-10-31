@@ -71,5 +71,7 @@ char	*my_redirection(char *str)
 {
 	if (ft_strchr(str, '>') || ft_strchr(str, '<'))
 		str = ft_checkredir(str);
+	if (ft_strchr(str, '\\'))
+		str = ft_checkbackredir(str, 0);
 	return (str);
 }

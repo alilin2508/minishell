@@ -21,44 +21,53 @@ int 	ft_passpace(char *line, int idx)
 	return (1);
 }
 
-char	**creat_list_arg2(char *line, char **commande, int i, int j)
+char	**creat_list_arg2(char *line, char **cmd, int i, int j)
 {
-	int		first;
+	int 	k;
+	int		c;
 
-	first = 0;
+	k = 0;
 	while (line[i])
 	{
-		if (line[i] == '\'' || line[i] == '"')
-		{
-			commande[j] = ft_strncat(commande[j], &line[first], i - first);
-			first = i + 1;
-			commande[j] = ft_strncat(commande[j], &line[first],
-				ft_sepcount(&line[first], line[i]) - 1);
-			i += ft_sepcount(&line[first], line[i]);
-			first = i + 1;
-		}
 		if (line[i] == ' ')
 		{
-			if (!ft_passpace(line, i))
-				break ;
-			commande[j] = ft_strncat(commande[j], &line[first], i - first);
-			j++;
-			while (line[i + 1] == ' ')
+			cmd[j][k] = '\0';
+			j += 1;
+			cmd[j] = NULL;
+			k = 0;
+			while(line[i] == ' ')
 				i++;
-			first = i + 1;
-			if (line[i + 1] != '\0')
-				if (!(commande[j] = (char *)ft_calloc(sizeof(char),
-						(ft_strlen(line) + 1))))
-					return (NULL);
+			if (line[i] == '\0')
+				break ;
+			if (!(cmd[j] = (char *)ft_calloc(sizeof(char), (ft_strlen(&line[i]) + 1))))
+				return (NULL);
 		}
-		if (line[i] == '\\')
+		if (line[i] == '\'' || line[i] == '"')
+		{
+			c = line[i];
 			i++;
+			while (line[i] != c && line[i])
+			{
+				if (line[i] == '\\' && c == '"' && line[i + 1] == '\\')
+					i++;
+				cmd[j][k] = line[i];
+				i++;
+				k++;
+			}
+			i++;
+		}
+		if (line[i] == '\\' && line[i + 1] != '>' && line[i + 1] != '<')
+			i++;
+		cmd[j][k] = line[i];
 		i++;
+		k++;
 	}
-	if (first != i)
-		commande[j] = ft_strncat(commande[j], &line[first], i - first);
-	commande[j + 1] = NULL;
-	return (commande);
+	if (cmd[j] != NULL)
+	{
+		cmd[j][k] = '\0';
+		cmd[j + 1] = NULL;
+	}
+	return (cmd);
 }
 
 char	**creat_list_arg(char *line)

@@ -54,6 +54,7 @@ char	*ft_command(char *line, char ***env)
 	char	**command;
 
 	command = NULL;
+	printf("OK1\n");
 	if (ft_strchr(line, '$'))
 	{
 		if ((line = variables1(line, *env)) == NULL)
@@ -62,7 +63,6 @@ char	*ft_command(char *line, char ***env)
 	if ((command = creat_list_arg(line)) == NULL)
 		return (0);
 	command = detectcmd(command);
-	command = ft_backslash(command, 0);
 	if (command == NULL)
 		write(1, "", 0);
 	else if (ft_strcmp(command[0], "exit") == 0)
@@ -94,6 +94,7 @@ int		ft_precommande(char *line, char ***env)
 	while (command[i])
 	{
 		command[i] = my_redirection(command[i]);
+		printf("OK\n");
 		if ((nbpipe = ft_nbpipe2(command[i])) != 0)
 			ft_pipe(command[i], env, nbpipe);
 		else
