@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-char    *ft_deletbackslash(char *cmd, char *tmp, int i, int j)
+char	*ft_deletbackslash(char *cmd, char *tmp, int i, int j)
 {
   while (cmd[i])
   {
@@ -18,14 +18,14 @@ char    *ft_deletbackslash(char *cmd, char *tmp, int i, int j)
   return (cmd);
 }
 
-char    **ft_backslash(char **cmd, int i)
+char	**ft_backslash(char **cmd, int i)
 {
-  char  *tmp;
+  char	*tmp;
 
   tmp = NULL;
   while (cmd[i])
   {
-    if(ft_strchr(cmd[i], '\\'))
+    if (ft_strchr(cmd[i], '\\'))
     {
       if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
         return (NULL);
