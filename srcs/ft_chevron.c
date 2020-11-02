@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/23 10:53:12 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/29 11:52:25 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/02 18:25:10 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ char	*ft_checkredir2(char *str, char *tmp, int i, int j)
 {
 	int 	c;
 
-	c = '\0';
 	while (str[i])
 	{
 		if (str[i] == '"' || str[i] == '\'')

@@ -24,7 +24,8 @@ SRC = main.c \
 				ft_creat_list_arg.c \
 				ft_unset.c \
 				ft_export.c \
-				ft_backslash.c
+				ft_backslash.c \
+				utils2.c
 
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 

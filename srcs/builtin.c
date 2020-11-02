@@ -15,15 +15,19 @@
 int		ft_echo(char **cmd)
 {
 	int		i;
+	int		arg;
 
+	arg = 0;
 	i = 1;
 	if (cmd[1] == NULL)
 	{
 		write(1, "\n", 1);
 		return (0);
 	}
-	if (!ft_strcmp(cmd[1], "-n"))
-		i = 2;
+	while (ft_strcmparg(cmd[i]))
+		i++;
+	if (i != 1)
+		arg = 1;
 	while (cmd[i])
 	{
 		ft_putstr(cmd[i]);
@@ -31,7 +35,7 @@ int		ft_echo(char **cmd)
 			write(1, " ", 1);
 		i++;
 	}
-	if (ft_strcmp(cmd[1], "-n"))
+	if (arg != 1)
 		write(1, "\n", 1);
 	return (0);
 }

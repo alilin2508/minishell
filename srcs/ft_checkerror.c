@@ -66,18 +66,15 @@ int			ft_pipe_error(const char *str, int i)
 {
 	int		err;
 
-	if (str[i + 1] == '|' || i == 0)
+	err = i + 1;
+	while (str[err] && str[err] == ' ')
+		err++;
+	if (str[err] == '\0')
+		return (parse_error(1, "newline"));
+	if (str[err] == '|')
 		return (parse_error(1, "|"));
-	if (str[i + 1] == ' ' || str[i + 1] == '\0')
-	{
-		err = i + 1;
-		while (str[err] && str[err] == ' ')
-			err++;
-		if (str[err] == '\0')
-			return (parse_error(1, "newline"));
-		if (str[err] == '|')
-			return (parse_error(1, "|"));
-	}
+	if (str[err] == ';')
+		return (parse_error(1, ";"));
 	return (0);
 }
 

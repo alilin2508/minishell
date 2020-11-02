@@ -79,5 +79,6 @@ int		ft_pass_space(char *str, int i);
 char  **ft_backslash(char **cmd, int i);
 int 	delspace(char *str, int c);
 char  *ft_checkbackredir(char *str, int i);
+int   ft_strcmparg(char *str);
 
 #endif
