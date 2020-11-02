@@ -51,18 +51,14 @@ char	**creat_list_arg2(char *line, char **cmd, int i, int j)
 				if ((line[i] == '\\' && c == '"') && (line[i + 1] == '\\' ||
 							line[i + 1] == '"' || line[i + 1] == '$'))
 					i++;
-				cmd[j][k] = line[i];
-				i++;
-				k++;
+				cmd[j][k++] = line[i++];
 			}
-			//i++;
 		}
 		if (line[i] == '\\' && line[i + 1] != '>' && line[i + 1] != '<')
 			i++;
 		if (line[i] != c)
-			cmd[j][k] = line[i];
+			cmd[j][k++] = line[i];
 		i++;
-		k++;
 	}
 	if (cmd[j] != NULL)
 	{
