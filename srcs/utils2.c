@@ -13,3 +13,9 @@ int   ft_strcmparg(char *str)
     return (0);
   return (1);
 }
+
+char  **ft_free(char **freed)
+{
+  ft_splitdel(&freed);
+  return (NULL);
+}

@@ -61,7 +61,8 @@ char	*ft_command(char *line, char ***env)
 	}
 	if ((command = creat_list_arg(line)) == NULL)
 		return (0);
-	command = detectcmd(command);
+	if ((command = detectcmd(command)) == NULL)
+		return (NULL);
 	command = ft_backslash(command, 0);
 	if (command == NULL)
 		write(1, "", 0);
