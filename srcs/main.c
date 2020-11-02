@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-void	cmd_execution(char **cmd)
+void	cmd_execution(char **cmd, char **env)
 {
 	int		status;
 
@@ -26,7 +26,7 @@ void	cmd_execution(char **cmd)
 	}
 	else
 	{
-		if (execve(cmd[0], cmd, NULL) == -1)
+		if (execve(cmd[0], cmd, env) == -1)
 			ft_puterror("bash: ", cmd[0], ": command not found\n", 127);
 		exit(EXIT_FAILURE);
 	}

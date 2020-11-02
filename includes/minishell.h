@@ -43,7 +43,7 @@ char	**detectcmd(char **cmd);
 bool	get_path(char **cmd, char **env);
 char	**ft_getenv(char **env);
 char	*my_getenv(char **env, char *path);
-void	cmd_execution(char **cmd);
+void	cmd_execution(char **cmd, char **env);
 int		environment(char **cmd, char **env);
 size_t	path_max(char **env);
 int		position(void);

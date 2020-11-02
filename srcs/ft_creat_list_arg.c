@@ -48,7 +48,8 @@ char	**creat_list_arg2(char *line, char **cmd, int i, int j)
 			i++;
 			while (line[i] != c && line[i])
 			{
-				if (line[i] == '\\' && c == '"' && line[i + 1] == '\\')
+				if ((line[i] == '\\' && c == '"') && (line[i + 1] == '\\' ||
+							line[i + 1] == '"' || line[i + 1] == '$'))
 					i++;
 				cmd[j][k] = line[i];
 				i++;

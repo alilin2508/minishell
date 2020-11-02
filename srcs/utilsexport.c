@@ -65,7 +65,6 @@ int		ft_nbpipe2(const char *str)
 
 	i = 0;
 	nb = 0;
-	printf("%d\n", i);
 	while (str[i])
 	{
 		if (str[i] == '\'' || str[i] == '"')

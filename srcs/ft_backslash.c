@@ -4,20 +4,11 @@ char    *ft_deletbackslash(char *cmd, char *tmp, int i, int j)
 {
   while (cmd[i])
   {
-    if (cmd[i] == '\\')
+    if (cmd[i] == '\\' && (cmd[i + 1] == '>' || cmd[i + 1] == '<'))
       i++;
-    if (cmd[i] == 3 && cmd[i + 1] == 3)
-    {
-      i++;
-      cmd[i] = '\\';
-    }
-    else if (cmd[i] == 3)
-      cmd[i] = '\\';
-    if (cmd[i] != '\0')
-      tmp[j] = cmd[i];
-    j++;
-    i++;
+    tmp[j++] = cmd[i++];
   }
+  tmp[j] = '\0';
   free(cmd);
   if (!(cmd = (char *)malloc(sizeof(char) * (ft_strlen(tmp) + 1))))
     return (NULL);
@@ -34,7 +25,7 @@ char    **ft_backslash(char **cmd, int i)
   tmp = NULL;
   while (cmd[i])
   {
-    if(ft_strchr(cmd[i], '\\') || ft_strchr(cmd[i], 3))
+    if(ft_strchr(cmd[i], '\\'))
     {
       if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
         return (NULL);

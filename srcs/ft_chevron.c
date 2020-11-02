@@ -48,7 +48,11 @@ int		ft_nbchevron(const char *str)
 		{
 			c = str[i++];
 			while (str[i] != c && str[i])
+			{
+				if (str[i] == '>' || str[i] == '<')
+					nb += 2;
 				i++;
+			}
 		}
 		nb += ft_nbchevron2(str, i);
 		i++;
@@ -58,11 +62,29 @@ int		ft_nbchevron(const char *str)
 
 char	*ft_checkredir2(char *str, char *tmp, int i, int j)
 {
+	int 	c;
+
+	c = '\0';
 	while (str[i])
 	{
 		if (str[i] == '"' || str[i] == '\'')
-			i = passquotes(str, i + 1, str[i]);
-		if (i != 0)
+		{
+			if (str[i - 1] == '>' || str[i - 1] == '<')
+				tmp[j++] = ' ';
+			c = str[i];
+			tmp[j++] = str[i++];
+			while (str[i] != c)
+			{
+				if ((str[i] == '>' || str[i] == '<'))
+				{
+					if (c == '"')
+						tmp[j++] = '\\';
+					tmp[j++] = '\\';
+				}
+				tmp[j++] = str[i++];
+			}
+		}
+		if (i != 0 && str[i] != '"' && str[i] != '\'')
 		{
 			if (((str[i] == '>' && str[i - 1] != ' ' && str[i - 1] != '>' && str[i - 1] != '\\')
 			|| (str[i] == '<' && str[i - 1] != ' ' && str[i - 1] != '\\')))
@@ -74,8 +96,7 @@ char	*ft_checkredir2(char *str, char *tmp, int i, int j)
 				str[i - 2] == '>' && str[i - 3] != '\\'))
 				tmp[j++] = ' ';
 		}
-		tmp[j++] = str[i];
-		i++;
+		tmp[j++] = str[i++];
 	}
 	tmp[j] = '\0';
 	return (tmp);
