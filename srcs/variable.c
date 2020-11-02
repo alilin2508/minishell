@@ -135,7 +135,7 @@ char	*variables1(char *str, char **env)
 			while (str[i] != '\'')
 				i++;
 		}
-		if (str[i] == '$' && str[i + 1] != '$')
+		if (str[i] == '$' && str[i + 1] != '$' && str[i + 1] != '"')
 		{
 			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
 			{
