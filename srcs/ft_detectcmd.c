@@ -32,7 +32,7 @@ char		**ft_selec_redir(char **cmd, int f_open[2])
 		if (!ft_strcmp(cmd[i], ">") || !ft_strcmp(cmd[i], ">>"))
 		{
 			if (!(cmd = my_redir_right(cmd, i, f_open)))
-				return (ft_free(cmd));
+				return (NULL);
 			g_cvr[0] = 1;
 			f_open[0] = 1;
 			i--;
@@ -40,7 +40,7 @@ char		**ft_selec_redir(char **cmd, int f_open[2])
 		if (!ft_strcmp(cmd[i], "<"))
 		{
 			if (!(cmd = my_redir_left(cmd, i, f_open)))
-				return (ft_free(cmd));
+				return (NULL);
 			g_cvr[1] = 1;
 			f_open[1] = 1;
 			i--;

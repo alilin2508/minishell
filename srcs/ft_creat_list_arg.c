@@ -27,6 +27,7 @@ char	**creat_list_arg2(char *line, char **cmd, int i, int j)
 	int		c;
 
 	k = 0;
+	c = '\0';
 	while (line[i])
 	{
 		if (line[i] == ' ')

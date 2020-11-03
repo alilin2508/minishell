@@ -14,8 +14,11 @@ int   ft_strcmparg(char *str)
   return (1);
 }
 
-char  **ft_free(char **freed)
+char    **ft_strerror(char *str, char **cmd)
 {
-  ft_splitdel(&freed);
+  ft_puterror("bash: ", str, ": ", errno);
+  write(2, strerror(errno), ft_strlen(strerror(errno)));
+  write(2, "\n", 1);
+  ft_splitdel(&cmd);
   return (NULL);
 }

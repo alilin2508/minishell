@@ -66,6 +66,15 @@ int			ft_pipe_error(const char *str, int i)
 {
 	int		err;
 
+	if (str[i + 1] == '|' && str[i + 2] == '|')
+		return (parse_error(1, "||"));
+	if (i == 0)
+		return (parse_error(1, "|"));
+	err = i - 1;
+	while (str[err] == ' ' && err > 0)
+		err--;
+	if (err == 0)
+	 	return (parse_error(1, "|"));
 	err = i + 1;
 	while (str[err] && str[err] == ' ')
 		err++;
@@ -78,26 +87,25 @@ int			ft_pipe_error(const char *str, int i)
 	return (0);
 }
 
-int			ft_parse_error(const char *str, int i)
+int 	ft_semicolon_error(const char *str, int i)
 {
-	int		err;
+	int err;
 
-	if (str[i] == '\'' || str[i] == '"')
-	{
-		if ((i = passquotes(str, i + 1, str[i])) == -1)
-			return (parse_error(2, NULL));
-	}
-	else if (str[i] == ';')
-	{
-		if (i == 0)
-			return (parse_error(1, ";"));
-		err = i + 1;
-		while (str[err] == ' ')
-			err++;
-		if (str[err] == ';')
-			return (parse_error(1, ";"));
-	}
-	return (i);
+	if (i == 0)
+		return (parse_error(1, ";"));
+	err = i - 1;
+	while (str[err] == ' ' && err > 0)
+		err--;
+	if (err == 0)
+		return (parse_error(1, ";"));
+	err = i + 1;
+	while (str[err] == ' ')
+		err++;
+	if (str[err] == ';')
+		return (parse_error(1, ";"));
+	else if (str[err] == '|')
+		return (parse_error(1, "|"));
+	return (0);
 }
 
 int			ft_checkerror(const char *str)
@@ -108,9 +116,12 @@ int			ft_checkerror(const char *str)
 	i = 0;
 	while (str[i])
 	{
-		if (str[i] == '\'' || str[i] == '"' || str[i] == ';')
-			if ((i = ft_parse_error(str, i)) == -1)
-				return (1);
+		if (str[i] == '\'' || str[i] == '"')
+			if ((i = passquotes(str, i + 1, str[i])) == -1)
+				return (parse_error(2, NULL));
+		if (str[i] == ';')
+			if ((err = ft_semicolon_error(str, i)) != 0)
+				return (err);
 		if (str[i] == '>')
 			if ((err = ft_redir_right_error(str, i)) != 0)
 				return (err);

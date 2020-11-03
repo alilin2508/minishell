@@ -80,6 +80,6 @@ char  **ft_backslash(char **cmd, int i);
 int 	delspace(char *str, int c);
 char  *ft_checkbackredir(char *str, int i);
 int   ft_strcmparg(char *str);
-char  **ft_free(char **freed);
+char  **ft_strerror(char *str, char **cmd);
 
 #endif

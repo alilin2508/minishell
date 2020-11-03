@@ -89,7 +89,7 @@ char		**my_redir_right(char **cmd, int idx, int f_open[2])
 			close(g_file[0]);
 		if ((g_file[0] = open(cmd[idx + 1], O_CREAT | O_WRONLY | O_TRUNC,
 			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
-			return (NULL);
+			return (ft_strerror(cmd[idx + 1], cmd));
 		else
 			f_open[0] = 1;
 	}
@@ -99,7 +99,7 @@ char		**my_redir_right(char **cmd, int idx, int f_open[2])
 			close(g_file[0]);
 		if ((g_file[0] = open(cmd[idx + 1], O_CREAT | O_WRONLY | O_APPEND,
 			S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1)
-			return (NULL);
+			return (ft_strerror(cmd[idx + 1], cmd));
 		else
 			f_open[0] = 1;
 	}

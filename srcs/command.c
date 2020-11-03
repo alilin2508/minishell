@@ -57,12 +57,12 @@ char	*ft_command(char *line, char ***env)
 	if (ft_strchr(line, '$'))
 	{
 		if ((line = variables1(line, *env)) == NULL)
-			return (0);
+			return (line);
 	}
 	if ((command = creat_list_arg(line)) == NULL)
-		return (0);
+		return (line);
 	if ((command = detectcmd(command)) == NULL)
-		return (NULL);
+		return (line);
 	command = ft_backslash(command, 0);
 	if (command == NULL)
 		write(1, "", 0);

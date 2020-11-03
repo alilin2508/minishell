@@ -31,7 +31,5 @@ int		parse_error(int t_e, char *err)
 		errno = 258;
 		return (-1);
 	}
-	if (!ft_strcmp(err, ";"))
-		return (-1);
 	return (t_e);
 }
