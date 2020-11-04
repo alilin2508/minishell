@@ -35,15 +35,15 @@ char		**ft_selec_redir(char **cmd, int f_open[2])
 				return (NULL);
 			g_cvr[0] = 1;
 			f_open[0] = 1;
-			i--;
+			i = -1;
 		}
-		if (!ft_strcmp(cmd[i], "<"))
+		else if (!ft_strcmp(cmd[i], "<"))
 		{
 			if (!(cmd = my_redir_left(cmd, i, f_open)))
 				return (NULL);
 			g_cvr[1] = 1;
 			f_open[1] = 1;
-			i--;
+			i = -1;
 		}
 		i++;
 	}

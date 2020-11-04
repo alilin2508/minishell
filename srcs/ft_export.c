@@ -17,12 +17,14 @@ int		ft_check_ex_err(char **cmd, int i, int j)
 	while (cmd[i][j])
 	{
 		if ((!ft_isalnum(cmd[i][j]) && cmd[i][j] != '=' && cmd[i][j] != '_')
-		|| cmd[i][0] == '=')
+		|| cmd[i][0] == '=' || (ft_isdigit(cmd[i][j]) && j == 0))
 		{
 			ft_puterror("bash: export: `", cmd[i],
 				"': not a valid identifier\n", 1);
 			return (-1);
 		}
+		if (cmd[i][j] == '+' && cmd[i][j + 1] == '=')
+			return (0);
 		if (cmd[i][j] == '=')
 			return (0);
 		j++;

@@ -16,7 +16,8 @@ int		ft_check_unset_err(char **cmd, int i, int j)
 {
 	while (cmd[i][j])
 	{
-		if (!ft_isalnum(cmd[i][j]) && cmd[i][j] != '_')
+		if ((!ft_isalnum(cmd[i][j]) && cmd[i][j] != '_') ||
+			(ft_isdigit(cmd[i][j]) && j == 0))
 		{
 			ft_puterror("bash: unset: `", cmd[i],
 				"': not a valid identifier\n", 1);

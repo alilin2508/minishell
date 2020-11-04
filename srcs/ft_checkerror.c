@@ -16,6 +16,8 @@ int			ft_redir_right_error(const char *str, int i)
 {
 	int		err;
 
+	if (str[i + 1] == '>' && str[i + 2] == '>' && str[i + 3] == '>')
+		return (parse_error(1, ">>"));
 	if (str[i + 1] == '>' && str[i + 2] == '>')
 		return (parse_error(1, ">"));
 	if (str[i + 1] == ' ' || str[i + 1] == '\0' || (str[i + 1] == '>' &&
@@ -93,6 +95,8 @@ int 	ft_semicolon_error(const char *str, int i)
 
 	if (i == 0)
 		return (parse_error(1, ";"));
+	if (str[i + 1] == ';')
+		return (parse_error(1, ";;"));
 	err = i - 1;
 	while (str[err] == ' ' && err > 0)
 		err--;

@@ -33,6 +33,7 @@ void	recovery(int sig)
 	{
 		ft_putstr("\b \b\b \b\n");
 		write(0, "\033[1;34m$alilin> \033[0;37m", 23);
+		errno = 1;
 	}
 	else
 	{
@@ -41,23 +42,24 @@ void	recovery(int sig)
 		else
 			kill(g_pid[0], SIGINT);
 		write(1, "\n", 1);
+		errno = 130;
 	}
 }
 
-int		ft_exit(char **commande)
+int		ft_exit(char **cmd)
 {
-	int		ex;
-
-	ex = 0;
-	if (commande != NULL)
+	if (cmd != NULL)
 	{
-		if (commande[1] != NULL && ft_isdigit(commande[1][0]))
-			ex = ft_atoi(commande[1]);
-		ft_splitdel(&commande);
-		system("leaks minishell");
-		exit(ex);
+		write(0, "exit\n", 5);
+		if (cmd[1] != NULL && ft_isdigit(cmd[1][0]))
+			errno = ft_atoi(cmd[1]);
+		else if (cmd[1] != NULL)
+			ft_puterror("bash: exit: ", cmd[1], ": numeric argument required\n", 255);
+		ft_splitdel(&cmd);
+		//system("leaks minishell");
+		exit(errno);
 	}
 	ft_putstr("  \b\b \b");
 	write(0, "\n", 1);
-	exit(ex);
+	exit(errno);
 }

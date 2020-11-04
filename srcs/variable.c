@@ -21,8 +21,8 @@ int		takepath(char *str, int idx, char *tmp, char **env)
 	i = 0;
 	if (!(str_tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1))))
 		return (-1);
-	while (str[idx] && str[idx] != '$' && str[idx] != ' ' && str[idx] != '"' &&
-		str[idx] != '/')
+	while (str[idx] && str[idx] != '$' && str[idx] != ' ' &&
+	(ft_isalnum(str[idx]) || str[idx] == '_'))
 	{
 		str_tmp[i] = str[idx];
 		idx++;
@@ -136,7 +136,8 @@ char	*variables1(char *str, char **env)
 			while (str[i] != '\'')
 				i++;
 		}
-		if (str[i] == '$' && str[i + 1] != '$' && str[i + 1] != '"')
+		if (str[i] == '$' && str[i + 1] != '$' && str[i + 1] != '"' &&
+				!ft_isdigit(str[i + 1]))
 		{
 			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
 			{

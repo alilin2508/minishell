@@ -1,0 +1,4 @@
+export.
+> $test (don't exist).
+export TEST=LOL ; export TEST+=LOL.
+errno with execve.

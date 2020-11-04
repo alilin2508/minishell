@@ -69,14 +69,17 @@ char		**my_redir_left(char **cmd, int idx, int f_open[2])
 {
 	if (f_open[1])
 		close(g_file[1]);
-	if ((g_file[1] = open(cmd[idx + 1], O_RDONLY)) == -1)
+	if (cmd[idx + 1] != NULL)
 	{
-		ft_puterror("bash: ", cmd[idx + 1],
-			": No such file or directory\n", errno);
-		ft_splitdel(&cmd);
-		return (NULL);
+		if ((g_file[1] = open(cmd[idx + 1], O_RDONLY)) == -1)
+		{
+			ft_puterror("bash: ", cmd[idx + 1],
+				": No such file or directory\n", errno);
+			ft_splitdel(&cmd);
+			return (NULL);
+		}
+		f_open[1] = 1;
 	}
-	f_open[1] = 1;
 	cmd = delet_chevron(cmd, idx);
 	return (cmd);
 }
