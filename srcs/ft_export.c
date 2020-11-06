@@ -16,6 +16,8 @@ int		ft_check_ex_err(char **cmd, int i, int j)
 {
 	while (cmd[i][j])
 	{
+		if (cmd[i][j] == '+' && cmd[i][j + 1] == '=' && j != 0)
+			return (0);
 		if ((!ft_isalnum(cmd[i][j]) && cmd[i][j] != '=' && cmd[i][j] != '_')
 		|| cmd[i][0] == '=' || (ft_isdigit(cmd[i][j]) && j == 0))
 		{
@@ -23,8 +25,6 @@ int		ft_check_ex_err(char **cmd, int i, int j)
 				"': not a valid identifier\n", 1);
 			return (-1);
 		}
-		if (cmd[i][j] == '+' && cmd[i][j + 1] == '=')
-			return (0);
 		if (cmd[i][j] == '=')
 			return (0);
 		j++;
@@ -56,7 +56,7 @@ char	**ft_modif_env_export(char **cmd, char **env, int i, int j)
 	return (env);
 }
 
-char	**ft_get_ex_tmp(char **cmd, char **env, int i, int j)
+char	**ft_get_ex_tmp(char *cmd, char **env, int j)
 {
 	char	**tmp;
 
@@ -69,9 +69,9 @@ char	**ft_get_ex_tmp(char **cmd, char **env, int i, int j)
 		ft_strcpy(tmp[j], env[j]);
 		j++;
 	}
-	if (!(tmp[j] = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
+	if (!(tmp[j] = (char *)malloc(sizeof(char) * (ft_strlen(cmd) + 1))))
 		return (NULL);
-	ft_strcpy(tmp[j], cmd[i]);
+	ft_strcpy(tmp[j], cmd);
 	if (!(tmp[j + 1] = (char *)malloc(sizeof(char) * (ft_strlen(env[j]) + 1))))
 		return (NULL);
 	ft_strcpy(tmp[j + 1], env[j]);
@@ -109,12 +109,15 @@ char	**ft_export(char **cmd, char **env)
 	{
 		if (ft_check_ex_err(cmd, i, 0) != -1)
 		{
-			if (strchr(cmd[i], '=') != 0 && ft_checkex2(cmd[i], env))
+			if (ft_strchr(cmd[i], '=') != 0 && ft_checkex2(cmd[i], env) &&
+					!ft_strchr(cmd[i], '+'))
 			{
-				tmp = ft_get_ex_tmp(cmd, env, i, 0);
+				tmp = ft_get_ex_tmp(cmd[i], env, 0);
 				env = ft_get_ex_env(env, tmp, 0);
 			}
-			else
+			else if (ft_strchr(cmd[i], '=') && ft_strchr(cmd[i], '+'))
+				env = ft_add_env_export(cmd[i], env, NULL, 0);
+			if (!ft_checkex2(cmd[i], env))
 				env = ft_modif_env_export(cmd, env, i, 0);
 		}
 		i++;

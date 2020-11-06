@@ -58,6 +58,8 @@ char	*ft_command(char *line, char ***env)
 	{
 		if ((line = variables1(line, *env)) == NULL)
 			return (line);
+		if (!ft_strcmp(line, "\0"))
+			return (line);
 	}
 	if ((command = creat_list_arg(line)) == NULL)
 		return (line);

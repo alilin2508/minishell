@@ -22,3 +22,11 @@ char    **ft_strerror(char *str, char **cmd)
   ft_splitdel(&cmd);
   return (NULL);
 }
+
+char   **ft_returncmd(char **cmd, char *mess, int err)
+{
+  errno = err;
+  write(2, mess, ft_strlen(mess));
+  ft_splitdel(&cmd);
+  return (NULL);
+}
