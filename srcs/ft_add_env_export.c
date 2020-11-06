@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_add_env_export.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/11/06 18:58:01 by grigo             #+#    #+#             */
+/*   Updated: 2020/11/06 18:58:10 by grigo            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int   ft_strlenidx(char *cmd, int i)
@@ -11,7 +23,7 @@ int   ft_strlenidx(char *cmd, int i)
 
 char  *take_tenv(char *cmd, int i)
 {
-  char *t_env;
+  char  *t_env;
 
   if (!(t_env = (char *)malloc(sizeof(char) * i)))
     return (NULL);

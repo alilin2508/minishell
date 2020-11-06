@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:13:00 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/29 10:57:13 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/06 19:10:30 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,12 +78,13 @@ int		passquotes(const char *str, int i, int c);
 int		ft_pass_space(char *str, int i);
 char  **ft_backslash(char **cmd, int i);
 int 	delspace(char *str, int c);
-char  *ft_checkbackredir(char *str, int i);
+char  *ft_checkbackredir(char *str, int i, int nb);
 int   ft_strcmparg(char *str);
 char  **ft_strerror(char *str, char **cmd);
 char  **ft_returncmd(char **cmd, char *mess, int err);
 char  **ft_add_env_export(char *cmd, char **env, char **tmp, int j);
 char	**ft_get_ex_tmp(char *cmd, char **env, int j);
 char	**ft_get_ex_env(char **env, char **tmp, int j);
+char 	**sort_export(char **env);
 
 #endif

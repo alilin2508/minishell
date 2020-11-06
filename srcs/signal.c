@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:08:39 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 12:08:56 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/06 19:14:19 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int		ft_exit(char **cmd)
 		else if (cmd[1] != NULL)
 			ft_puterror("bash: exit: ", cmd[1], ": numeric argument required\n", 255);
 		ft_splitdel(&cmd);
-		//system("leaks minishell");
+		system("leaks minishell");
 		exit(errno);
 	}
 	ft_putstr("  \b\b \b");

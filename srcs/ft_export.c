@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 17:10:07 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/29 13:29:44 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/06 19:11:34 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,8 @@ char	**ft_export(char **cmd, char **env)
 	tmp = NULL;
 	i = 0;
 	errno = 0;
+	if (cmd[0] == NULL)
+		return(sort_export(env));
 	while (cmd[i])
 	{
 		if (ft_check_ex_err(cmd, i, 0) != -1)

@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:28:40 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 12:05:45 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/06 19:04:08 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,10 @@ char	*ft_spaceredir(char *str, char *tmp, int idx, int i)
 	return (str);
 }
 
-char	*ft_checkbackredir(char *str, int i)
+char	*ft_checkbackredir(char *str, int i, int nb)
 {
-	int 	nb;
-	char 	*tmp;
+	char	*tmp;
 
-	nb = 0;
 	tmp = NULL;
 	while (str[i])
 	{

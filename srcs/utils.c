@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 12:44:50 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/29 10:55:09 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/06 19:04:41 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,6 @@ char	*my_redirection(char *str)
 	if (ft_strchr(str, '>') || ft_strchr(str, '<'))
 		str = ft_checkredir(str);
 	if (ft_strchr(str, '\\'))
-		str = ft_checkbackredir(str, 0);
+		str = ft_checkbackredir(str, 0, 0);
 	return (str);
 }
