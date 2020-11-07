@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:13:00 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/06 19:10:30 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/07 17:42:36 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,7 @@ char  **ft_add_env_export(char *cmd, char **env, char **tmp, int j);
 char	**ft_get_ex_tmp(char *cmd, char **env, int j);
 char	**ft_get_ex_env(char **env, char **tmp, int j);
 char 	**sort_export(char **env);
+int		ft_checkex2_1(char **env, char *cmd, int len, int i);
+int		ft_checkex2_2(char **env, char *cmd, int len, int i);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 17:37:29 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/29 10:55:40 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/07 17:41:55 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,27 +32,36 @@ int		ft_checkex2(char *cmd, char **env)
 	int		len;
 
 	i = 0;
-	while (cmd[i] != '=')
+	while (cmd[i] != '=' && cmd[i])
 		i++;
 	len = i;
-	while (env[i])
+	if (cmd[len] == '=')
 	{
-		if (ft_strncmp(cmd, env[i], len) == 0)
+		if (ft_checkex2_1(env, cmd, len, 0))
 			return (0);
-		i++;
 	}
+	else
+		if (ft_checkex2_2(env, cmd, len, i))
+			return (2);
 	return (1);
 }
 
 int		ft_checkunset(char *cmd, char **env)
 {
 	int		i;
+	int 	j;
 
 	i = 0;
 	while (env[i])
 	{
 		if (!ft_strncmp(env[i], cmd, ft_strlen(cmd)))
-			return (i + 1);
+		{
+			j = 0;
+			while (cmd[j] == env[i][j] && env[i][j] && cmd[j])
+				j++;
+			if (env[i][j] == '=' || env[i][j] == '\0')
+				return (i + 1);
+		}
 		i++;
 	}
 	return (0);

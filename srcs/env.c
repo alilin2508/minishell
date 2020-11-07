@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 17:27:34 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 11:09:52 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/07 17:06:06 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,11 @@ int		environment(char **cmd, char **env)
 	}
 	while (env[i])
 	{
-		ft_putstr(env[i]);
-		write(1, "\n", 1);
+		if (ft_strchr(env[i], '='))
+		{
+			ft_putstr(env[i]);
+			write(1, "\n", 1);
+		}
 		i++;
 	}
 	return (0);

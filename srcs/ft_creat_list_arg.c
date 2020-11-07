@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:56:47 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/29 13:30:35 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/07 15:41:20 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,16 @@ char	**creat_list_arg2(char *line, char **cmd, int i, int j)
 			if (!(cmd[j] = (char *)ft_calloc(sizeof(char), (ft_strlen(&line[i]) + 1))))
 				return (NULL);
 		}
+		if (line[i] == '$' && ft_isdigit(line[i + 1]))
+			i += 2;
 		if (line[i] == '\'' || line[i] == '"')
 		{
 			c = line[i];
 			i++;
 			while (line[i] != c && line[i])
 			{
+				if (line[i] == '$' && ft_isdigit(line[i + 1]))
+					i += 2;
 				if ((line[i] == '\\' && c == '"') && (line[i + 1] == '\\' ||
 							line[i + 1] == '"' || line[i + 1] == '$'))
 					i++;

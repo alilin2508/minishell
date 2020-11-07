@@ -6,11 +6,41 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/06 18:58:01 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/06 18:58:10 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/07 17:41:18 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int		ft_checkex2_1(char **env, char *cmd, int len, int i)
+{
+  while (env[i])
+  {
+    if (ft_strncmp(cmd, env[i], len) == 0)
+      return (1);
+    i++;
+  }
+  return (0);
+}
+
+int		ft_checkex2_2(char **env, char *cmd, int len, int i)
+{
+  int   j;
+
+  while (env[i])
+  {
+    if (ft_strncmp(cmd, env[i], len) == 0)
+    {
+      j = 0;
+      while (env[i][j] == cmd[j] && cmd[j] && env[i][j])
+        j++;
+      if (env[i][j] == '=' || env[i][j] == '\0')
+        return (1);
+    }
+    i++;
+  }
+  return (0);
+}
 
 int   ft_strlenidx(char *cmd, int i)
 {

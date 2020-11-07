@@ -6,7 +6,7 @@
 /*   By: alilin <alilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/06 18:57:34 by alilin            #+#    #+#             */
-/*   Updated: 2020/11/06 19:20:17 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/07 17:08:08 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,20 @@ void	print_export(char **tmp)
 	{
 		write(1, "export ", 7);
 		j = 0;
-		while(tmp[i][j] != '=')
+		while(tmp[i][j] != '=' && tmp[i][j])
 		{
 			write(1, &tmp[i][j], 1);
 			j++;
 		}
-		write(1, &tmp[i][j], 1);
-		j++;
-		write(1, "\"", 1);
-		write(1, &tmp[i][j], ft_strlen(&tmp[i][j]));
-		write(1, "\"\n", 2);
+		if (tmp[i][j] != '\0')
+		{
+			write(1, &tmp[i][j], 1);
+			j++;
+			write(1, "\"", 1);
+			write(1, &tmp[i][j], ft_strlen(&tmp[i][j]));
+			write(1, "\"", 1);
+		}
+		write(1, "\n", 1);
 		i++;
 	}
 }

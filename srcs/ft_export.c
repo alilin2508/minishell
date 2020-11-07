@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 17:10:07 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/06 19:11:34 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/07 17:23:53 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int		ft_check_ex_err(char **cmd, int i, int j)
 			return (0);
 		j++;
 	}
-	return (-1);
+	return (0);
 }
 
 char	**ft_modif_env_export(char **cmd, char **env, int i, int j)
@@ -111,8 +111,8 @@ char	**ft_export(char **cmd, char **env)
 	{
 		if (ft_check_ex_err(cmd, i, 0) != -1)
 		{
-			if (ft_strchr(cmd[i], '=') != 0 && ft_checkex2(cmd[i], env) &&
-					!ft_strchr(cmd[i], '+'))
+			if (((ft_strchr(cmd[i], '=') != 0 && !ft_strchr(cmd[i], '+')) ||
+					!ft_strchr(cmd[i], '=')) && ft_checkex2(cmd[i], env) == 1)
 			{
 				tmp = ft_get_ex_tmp(cmd[i], env, 0);
 				env = ft_get_ex_env(env, tmp, 0);

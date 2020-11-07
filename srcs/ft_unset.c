@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 17:04:24 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/29 13:50:01 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/07 17:02:52 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char	*ft_creat_unset_tcmd(char **cmd, int i, int j)
 {
 	char	*tcmd;
 
-	if (!(tcmd = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 2))))
+	if (!(tcmd = (char *)malloc(sizeof(char) * (ft_strlen(cmd[i]) + 1))))
 		return (NULL);
 	j = 0;
 	while (cmd[i][j])
@@ -40,8 +40,7 @@ char	*ft_creat_unset_tcmd(char **cmd, int i, int j)
 		tcmd[j] = cmd[i][j];
 		j++;
 	}
-	tcmd[j] = '=';
-	tcmd[j + 1] = '\0';
+	tcmd[j] = '\0';
 	return (tcmd);
 }
 
