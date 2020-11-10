@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:28:40 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/06 19:04:08 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/10 11:50:45 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int		takepath(char *str, int idx, char *tmp, char **env)
 	char	*tenv;
 
 	i = 0;
-	if (!(str_tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1))))
+	if (!(str_tmp = (char *)ft_calloc(sizeof(char), (ft_strlen(str) + 1))))
 		return (-1);
 	while (str[idx] && str[idx] != '$' && str[idx] != ' ' &&
 	(ft_isalnum(str[idx]) || str[idx] == '_'))
@@ -90,12 +90,12 @@ char	*ft_checkbackredir(char *str, int i, int nb)
 	return (str);
 }
 
-char	*ft_variables(char *str, int idx, char **env)
+char	*ft_variables(char *str, int idx, char **env, int sp)
 {
 	char	*tmp;
 	char	*tenv;
 
-	if (!(tmp = (char *)malloc(sizeof(char) * (ft_strlen(str) + PATH_MAX + 1))))
+	if (!(tmp = (char *)ft_calloc(sizeof(char), (ft_strlen(str) + PATH_MAX + 1))))
 		return (NULL);
 	if (idx != 0)
 		ft_strlcpy(tmp, str, idx + 1);
@@ -109,10 +109,13 @@ char	*ft_variables(char *str, int idx, char **env)
 		free(tenv);
 		idx++;
 	}
-	if (str[idx] != '\0')
+	sp = idx;
+	while (str[sp] == ' ' && str[sp])
+		sp++;
+	if (str[sp] != '\0')
 		ft_strcat(tmp, &str[idx]);
 	free(str);
-	if (!(str = (char *)malloc(sizeof(char) * (ft_strlen(tmp) + 1))))
+	if (!(str = (char *)ft_calloc(sizeof(char), (ft_strlen(tmp) + 1))))
 		return (NULL);
 	ft_strcpy(str, tmp);
 	free(tmp);
@@ -139,7 +142,7 @@ char	*variables1(char *str, char **env)
 		{
 			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
 			{
-				if ((str = ft_variables(str, i, env)) == NULL)
+				if ((str = ft_variables(str, i, env, 0)) == NULL)
 					return (NULL);
 				i--;
 			}

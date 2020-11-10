@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:23:14 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 11:09:26 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/10 11:45:58 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ char	*ft_command(char *line, char ***env)
 	if (command == NULL)
 		write(1, "", 0);
 	else if (ft_strcmp(command[0], "exit") == 0)
-		ft_exit(command);
+		errno = ft_exit(command);
 	else if (built_command(command[0]))
 		exect_built_commande(command, env);
 	else

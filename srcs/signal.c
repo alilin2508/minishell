@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:08:39 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/07 17:25:33 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/10 11:26:46 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,15 @@ int		ft_exit(char **cmd)
 	if (cmd != NULL)
 	{
 		write(0, "exit\n", 5);
-		if (cmd[1] != NULL && ft_isdigit(cmd[1][0]))
+		if (cmd[1] != NULL && ft_strisdigit(cmd[1]))
+		{
+			if (cmd[2] != NULL)
+			{
+				write(2, "bash: exit: too many arguments\n", 31);
+				return (1);
+			}
 			errno = ft_atoi(cmd[1]);
+		}
 		else if (cmd[1] != NULL)
 			ft_puterror("bash: exit: ", cmd[1], ": numeric argument required\n", 255);
 		ft_splitdel(&cmd);

@@ -1,3 +1,2 @@
 > $test (don't exist).
 errno with execve.
-export TEST="ls       -l     - a" ; echo $TEST ; $LS ;  env | sort | grep -v SHLVL | grep -v _=
