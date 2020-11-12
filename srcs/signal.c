@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:08:39 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/10 11:26:46 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/10 16:34:56 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,9 @@ int		ft_exit(char **cmd)
 				return (1);
 			}
 			errno = ft_atoi(cmd[1]);
+			if (errno == -1 && ft_strcmp(cmd[1], "-1"))
+				ft_puterror("bash: exit: ", cmd[1],
+					": numeric argument required\n", 255);
 		}
 		else if (cmd[1] != NULL)
 			ft_puterror("bash: exit: ", cmd[1], ": numeric argument required\n", 255);

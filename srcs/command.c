@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:23:14 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/10 11:45:58 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 13:39:27 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,8 @@ void	exect_command(char **commande, char ***env)
 	tenv = NULL;
 }
 
-char	*ft_command(char *line, char ***env)
+char	*ft_command(char *line, char ***env, char **command)
 {
-	char	**command;
-
-	command = NULL;
 	if (ft_strchr(line, '$'))
 	{
 		if ((line = variables1(line, *env)) == NULL)
@@ -100,7 +97,7 @@ int		ft_precommande(char *line, char ***env)
 		if ((nbpipe = ft_nbpipe2(command[i])) != 0)
 			ft_pipe(command[i], env, nbpipe);
 		else
-			command[i] = ft_command(command[i], env);
+			command[i] = ft_command(command[i], env, NULL);
 		i++;
 	}
 	ft_splitdel(&command);

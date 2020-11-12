@@ -6,13 +6,13 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:56:47 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/07 15:41:20 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 14:03:22 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int 	ft_passpace(char *line, int idx)
+int		ft_passpace(char *line, int idx)
 {
 	while (line[idx] == ' ')
 		idx++;
@@ -23,7 +23,7 @@ int 	ft_passpace(char *line, int idx)
 
 char	**creat_list_arg2(char *line, char **cmd, int i, int j)
 {
-	int 	k;
+	int		k;
 	int		c;
 
 	k = 0;
@@ -36,7 +36,7 @@ char	**creat_list_arg2(char *line, char **cmd, int i, int j)
 			j += 1;
 			cmd[j] = NULL;
 			k = 0;
-			while(line[i] == ' ')
+			while (line[i] == ' ')
 				i++;
 			if (line[i] == '\0')
 				break ;

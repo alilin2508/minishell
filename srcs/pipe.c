@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 16:29:28 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/29 10:54:10 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 13:41:03 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static int	execution(char *cmd, int p_in[2], int p_out[2], char ***env)
 			dup2(p_out[1], STDOUT_FILENO);
 		}
 		close(p_in[0]);
-		ft_command(cmd, env);
+		ft_command(cmd, env, NULL);
 		exit(EXIT_FAILURE);
 	}
 	return (g_pid[1]);

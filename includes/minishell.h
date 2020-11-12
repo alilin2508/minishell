@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:13:00 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/07 17:42:36 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 13:40:34 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ int		my_cd(char *path, char ***env);
 int		ft_access(char *bin);
 void	exect_built_commande(char **cmd, char ***env);
 int		built_command(char *cmd);
-char	*ft_command(char *line, char ***env);
+char	*ft_command(char *line, char ***env, char **command);
 void	end(int sig);
 void	recovery(int sig);
 char	*variables1(char *str, char **env);

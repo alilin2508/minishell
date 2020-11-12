@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/10 14:11:23 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/10 11:30:48 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 13:36:43 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,6 @@ int				ft_countwords(char *str, char sep);
 void			ft_lstrev(t_list **alst);
 int				ft_splitdel(char ***split);
 size_t			ft_lstcount(t_list *lst);
-int   		ft_strisdigit(char *str);
+int				ft_strisdigit(char *str);
 
 #endif

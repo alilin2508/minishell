@@ -6,13 +6,13 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 14:26:27 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 11:10:33 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 13:50:07 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int			ft_redir_right_error(const char *str, int i)
+int		ft_redir_right_error(const char *str, int i)
 {
 	int		err;
 
@@ -41,9 +41,9 @@ int			ft_redir_right_error(const char *str, int i)
 	return (0);
 }
 
-int			ft_redir_left_error(const char *str, int i)
+int		ft_redir_left_error(const char *str, int i)
 {
-	int err;
+	int		err;
 
 	if (str[i + 1] == '<' || str[i + 1] == '>' || str[i + 1] == '\0')
 		return (parse_error(1, "newline"));
@@ -64,7 +64,7 @@ int			ft_redir_left_error(const char *str, int i)
 	return (0);
 }
 
-int			ft_pipe_error(const char *str, int i)
+int		ft_pipe_error(const char *str, int i)
 {
 	int		err;
 
@@ -76,7 +76,7 @@ int			ft_pipe_error(const char *str, int i)
 	while (str[err] == ' ' && err > 0)
 		err--;
 	if (err == 0)
-	 	return (parse_error(1, "|"));
+		return (parse_error(1, "|"));
 	err = i + 1;
 	while (str[err] && str[err] == ' ')
 		err++;
@@ -89,9 +89,9 @@ int			ft_pipe_error(const char *str, int i)
 	return (0);
 }
 
-int 	ft_semicolon_error(const char *str, int i)
+int		ft_semicolon_error(const char *str, int i)
 {
-	int err;
+	int		err;
 
 	if (i == 0)
 		return (parse_error(1, ";"));
@@ -112,7 +112,7 @@ int 	ft_semicolon_error(const char *str, int i)
 	return (0);
 }
 
-int			ft_checkerror(const char *str)
+int		ft_checkerror(const char *str)
 {
 	int		i;
 	int		err;

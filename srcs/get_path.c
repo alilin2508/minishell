@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 16:09:43 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 16:40:25 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/10 15:55:26 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,13 @@ int		ft_access(char *bin)
 	int		fd;
 
 	if ((fd = open(bin, O_RDONLY)) > 0)
+	{
+		errno = 0;
+		close(fd);
 		return (0);
-	else
-		return (-1);
+	}
+	errno = 0;
+	return (-1);
 }
 
 char	*creatbin(char **split_path, char **cmd)
@@ -36,7 +40,7 @@ char	*creatbin(char **split_path, char **cmd)
 		ft_strcat(bin, split_path[i]);
 		ft_strcat(bin, "/");
 		ft_strcat(bin, cmd[0]);
-		if (ft_access(bin) == 0)
+		if (!ft_access(bin))
 			break ;
 		free(bin);
 		bin = NULL;

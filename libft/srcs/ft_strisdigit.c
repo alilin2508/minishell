@@ -6,22 +6,24 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/10 11:28:17 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/10 11:32:04 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 13:36:01 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int   ft_strisdigit(char *str)
+int		ft_strisdigit(char *str)
 {
-  int   i;
+	int	i;
 
-  i = 0;
-  while (str[i])
-  {
-    if (!ft_isdigit(str[i]))
-      return (0);
-    i++;
-  }
-  return (1);
+	i = 0;
+	if (str[0] == '-')
+		i = 1;
+	while (str[i])
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
 }

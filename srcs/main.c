@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/26 10:30:45 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/10 11:17:23 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/10 15:55:15 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void	cmd_execution(char **cmd, char **env)
 	else if (g_pid[0] > 0)
 	{
 		waitpid(g_pid[0], &status, 0);
-		kill(g_pid[0], SIGTERM);
+		if (status == 256)
+			errno = 1;
 	}
 	else
 	{
