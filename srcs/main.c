@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/26 10:30:45 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/10 15:55:15 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 14:24:12 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	exect_built_commande(char **cmd, char ***env)
 	else if (!ft_strcmp(cmd[0], "pwd"))
 		errno = position();
 	else if (!ft_strcmp(cmd[0], "export"))
-		*env = ft_export(&cmd[1], *env);
+		*env = ft_export(&cmd[1], *env, 0);
 	else if (!ft_strcmp(cmd[0], "unset"))
 		*env = ft_unset(cmd, *env);
 	else if (!ft_strcmp(cmd[0], "echo"))

@@ -6,7 +6,7 @@
 /*   By: alilin <alilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/06 18:57:34 by alilin            #+#    #+#             */
-/*   Updated: 2020/11/07 17:08:08 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 14:29:57 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,11 @@ void	print_export(char **tmp)
 	int j;
 
 	i = 0;
-	while(tmp[i])
+	while (tmp[i])
 	{
 		write(1, "export ", 7);
 		j = 0;
-		while(tmp[i][j] != '=' && tmp[i][j])
+		while (tmp[i][j] != '=' && tmp[i][j])
 		{
 			write(1, &tmp[i][j], 1);
 			j++;
@@ -47,12 +47,12 @@ void	alph_sort(char **tmp, int i, int j, int k)
 	char	*temp;
 
 	flag = 0;
-	while(tmp[i])
+	while (tmp[i])
 	{
 		comp = NULL;
 		comp = ft_strdup(tmp[i]);
 		k = i + 1;
-		while(tmp[k])
+		while (tmp[k])
 		{
 			j = 0;
 			if (comp[j] > tmp[k][j])
@@ -84,15 +84,15 @@ void	alph_sort(char **tmp, int i, int j, int k)
 			tmp[flag] = ft_strdup(temp);
 			free(temp);
 		}
-    free(comp);
+		free(comp);
 		i++;
 	}
 	print_export(tmp);
 }
 
-char 	**sort_export(char **env)
+char	**sort_export(char **env)
 {
-	int 	i;
+	int		i;
 	int		j;
 	char	**tmp;
 
@@ -100,11 +100,12 @@ char 	**sort_export(char **env)
 	j = 0;
 	if (!(tmp = (char **)malloc(sizeof(char *) * tab_len(env))))
 		return (env);
-	while(env[i])
+	while (env[i])
 	{
 		if (ft_strncmp(env[i], "_=", 2) != 0)
 		{
-			if (!(tmp[j] = (char *)malloc(sizeof(char) * ft_strlen(env[i]) + 1)))
+			if (!(tmp[j] = (char *)malloc(sizeof(char) *
+					ft_strlen(env[i]) + 1)))
 				return (env);
 			ft_strcpy(tmp[j], env[i]);
 			j++;
@@ -114,5 +115,5 @@ char 	**sort_export(char **env)
 	tmp[j] = NULL;
 	alph_sort(tmp, 0, 0, 0);
 	ft_splitdel(&tmp);
-	return(env);
+	return (env);
 }

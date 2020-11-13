@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 17:37:29 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/07 17:41:55 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 14:35:00 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int		ft_pass_space(char *str, int i)
 	return (i);
 }
 
-int 	delspace(char *str, int c)
+int		delspace(char *str, int c)
 {
 	while (str[c - 1] == ' ')
 		c--;
@@ -41,15 +41,17 @@ int		ft_checkex2(char *cmd, char **env)
 			return (0);
 	}
 	else
+	{
 		if (ft_checkex2_2(env, cmd, len, i))
 			return (2);
+	}
 	return (1);
 }
 
 int		ft_checkunset(char *cmd, char **env)
 {
 	int		i;
-	int 	j;
+	int		j;
 
 	i = 0;
 	while (env[i])

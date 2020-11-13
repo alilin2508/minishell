@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 14:26:27 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 13:50:07 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/11/12 15:27:51 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,10 +93,10 @@ int		ft_semicolon_error(const char *str, int i)
 {
 	int		err;
 
-	if (i == 0)
-		return (parse_error(1, ";"));
 	if (str[i + 1] == ';')
 		return (parse_error(1, ";;"));
+	if (i == 0)
+		return (parse_error(1, ";"));
 	err = i - 1;
 	while (str[err] == ' ' && err > 0)
 		err--;

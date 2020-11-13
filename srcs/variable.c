@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:28:40 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/10 11:50:45 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/13 16:37:02 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,11 @@ char	*ft_variables(char *str, int idx, char **env, int sp)
 	if (idx != 0)
 		ft_strlcpy(tmp, str, idx + 1);
 	idx++;
+	//sp = idx - 1;
+	//while(str[sp] == ' ')
+		//sp--;
+	//if (str[sp] == '>' || str[sp] == '<')
+		//ok
 	if (str[idx] != '?')
 		idx = takepath(str, idx, tmp, env);
 	else
@@ -137,8 +142,7 @@ char	*variables1(char *str, char **env)
 			while (str[i] != '\'')
 				i++;
 		}
-		if (str[i] == '$' && str[i + 1] != '$' && str[i + 1] != '"' &&
-				!ft_isdigit(str[i + 1]) && str[i + 1] != '=')
+		if (str[i] == '$' && ft_isalpha(str[i + 1]) && !ft_isdigit(str[i + 1]))
 		{
 			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
 			{

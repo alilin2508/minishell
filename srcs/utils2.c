@@ -5,40 +5,40 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/06 18:57:40 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/06 18:58:11 by grigo            ###   ########.fr       */
+/*   Created: 2020/11/12 14:34:00 by grigo             #+#    #+#             */
+/*   Updated: 2020/11/12 14:34:03 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int   ft_strcmparg(char *str)
+int		ft_strcmparg(char *str)
 {
-  int   i;
+	int		i;
 
-  i = 1;
-  if (str[0] != '-')
-    return (0);
-  while (str[i] && str[i] == 'n')
-    i++;
-  if (str[i] != '\0')
-    return (0);
-  return (1);
+	i = 1;
+	if (str[0] != '-')
+		return (0);
+	while (str[i] && str[i] == 'n')
+		i++;
+	if (str[i] != '\0')
+		return (0);
+	return (1);
 }
 
-char    **ft_strerror(char *str, char **cmd)
+char	**ft_strerror(char *str, char **cmd)
 {
-  ft_puterror("bash: ", str, ": ", errno);
-  write(2, strerror(errno), ft_strlen(strerror(errno)));
-  write(2, "\n", 1);
-  ft_splitdel(&cmd);
-  return (NULL);
+	ft_puterror("bash: ", str, ": ", errno);
+	write(2, strerror(errno), ft_strlen(strerror(errno)));
+	write(2, "\n", 1);
+	ft_splitdel(&cmd);
+	return (NULL);
 }
 
-char   **ft_returncmd(char **cmd, char *mess, int err)
+char	**ft_returncmd(char **cmd, char *mess, int err)
 {
-  errno = err;
-  write(2, mess, ft_strlen(mess));
-  ft_splitdel(&cmd);
-  return (NULL);
+	errno = err;
+	write(2, mess, ft_strlen(mess));
+	ft_splitdel(&cmd);
+	return (NULL);
 }

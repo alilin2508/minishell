@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 12:27:24 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 16:02:52 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/12 14:24:41 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ char	**ft_creatpwd(char **env, char *pwd, char *start)
 	ft_strcpy(newpwd[0], start);
 	ft_strcat(newpwd[0], pwd);
 	newpwd[1] = NULL;
-	env = ft_export(newpwd, env);
+	env = ft_export(newpwd, env, 0);
 	ft_splitdel(&newpwd);
 	return (env);
 }

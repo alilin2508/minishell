@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:13:00 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 13:40:34 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/11/12 14:39:33 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,20 +72,20 @@ int		ft_sepcount(char *line, char c);
 char	**detectcmd(char **cmd);
 char	**my_redir_left(char **cmd, int idx, int f_open[2]);
 char	**delet_chevron(char **cmd, int idx);
-char	**ft_export(char **cmd, char **env);
+char	**ft_export(char **cmd, char **env, int i);
 char	**ft_unset(char **cmd, char **env);
 int		passquotes(const char *str, int i, int c);
 int		ft_pass_space(char *str, int i);
-char  **ft_backslash(char **cmd, int i);
-int 	delspace(char *str, int c);
-char  *ft_checkbackredir(char *str, int i, int nb);
-int   ft_strcmparg(char *str);
-char  **ft_strerror(char *str, char **cmd);
-char  **ft_returncmd(char **cmd, char *mess, int err);
-char  **ft_add_env_export(char *cmd, char **env, char **tmp, int j);
+char	**ft_backslash(char **cmd, int i);
+int		delspace(char *str, int c);
+char	*ft_checkbackredir(char *str, int i, int nb);
+int		ft_strcmparg(char *str);
+char	**ft_strerror(char *str, char **cmd);
+char	**ft_returncmd(char **cmd, char *mess, int err);
+char	**ft_add_env_export(char *cmd, char **env, char **tmp, int j);
 char	**ft_get_ex_tmp(char *cmd, char **env, int j);
 char	**ft_get_ex_env(char **env, char **tmp, int j);
-char 	**sort_export(char **env);
+char	**sort_export(char **env);
 int		ft_checkex2_1(char **env, char *cmd, int len, int i);
 int		ft_checkex2_2(char **env, char *cmd, int len, int i);
 
