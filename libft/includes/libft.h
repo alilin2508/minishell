@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/10 14:11:23 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 13:36:43 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/11/14 17:36:28 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,5 +92,6 @@ void			ft_lstrev(t_list **alst);
 int				ft_splitdel(char ***split);
 size_t			ft_lstcount(t_list *lst);
 int				ft_strisdigit(char *str);
+char			*ft_strccat(char *dest, char src);
 
 #endif

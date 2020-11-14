@@ -57,7 +57,8 @@ SRC = ft_bzero.c \
 			ft_strcspn.c \
 			ft_strndup.c \
 			ft_strncat.c \
-			ft_strisdigit.c
+			ft_strisdigit.c \
+			ft_strccat.c
 
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 
