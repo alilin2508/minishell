@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 17:27:34 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 14:58:28 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/15 12:43:46 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,8 @@ int		position(void)
 		return (2);
 	if (getcwd(path, PATH_MAX) == NULL)
 	{
-		write(2, "pwd: error retrieving current directory: getcwd: cannot ", 56);
-		write(2, "access parent directories: No such file or directory\n", 53);
+		write(2, "pwd: error retrieving current directory: getcwd: cannot", 55);
+		write(2, " access parent directories: No such file or directory\n", 55);
 		return (1);
 	}
 	ft_putstr(path);

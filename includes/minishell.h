@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:13:00 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 14:39:33 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/11/17 13:19:09 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int		built_command(char *cmd);
 char	*ft_command(char *line, char ***env, char **command);
 void	end(int sig);
 void	recovery(int sig);
-char	*variables1(char *str, char **env);
+char	*variables1(char *str, char **env, int i, bool r);
 int		ft_checkerror(const char *str);
 char	**creat_list_arg(char *line);
 char	**ft_splitcmd(char *str);
@@ -88,5 +88,11 @@ char	**ft_get_ex_env(char **env, char **tmp, int j);
 char	**sort_export(char **env);
 int		ft_checkex2_1(char **env, char *cmd, int len, int i);
 int		ft_checkex2_2(char **env, char *cmd, int len, int i);
+char	*ft_variables3(char *str, int idx, char **env);
+int		takepath(char *str, int idx, char *tmp, char **env);
+char  **open_double_redir(char **cmd, int f_open[2], int idx);
+char  **open_simple_redir(char **cmd, int f_open[2], int idx);
+bool	ft_check_var_redir(char *str, int i);
+int		ft_checkvar(char *str, int i, bool r);
 
 #endif

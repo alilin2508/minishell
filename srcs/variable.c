@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:28:40 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/14 17:34:07 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/17 13:19:01 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,8 @@ char	*ft_variables(char *str, int idx, char **env, int sp)
 	char	*tmp;
 	char	*tenv;
 
-	if (!(tmp = (char *)ft_calloc(sizeof(char), (ft_strlen(str) + PATH_MAX + 1))))
+	if (!(tmp = (char *)ft_calloc(sizeof(char),
+			(ft_strlen(str) + PATH_MAX + 1))))
 		return (NULL);
 	if (idx != 0)
 		ft_strlcpy(tmp, str, idx + 1);
@@ -122,103 +123,28 @@ char	*ft_variables(char *str, int idx, char **env, int sp)
 	return (str);
 }
 
-char	*ft_variables3(char *str, int idx, char **env, int k)
+char	*variables1(char *str, char **env, int i, bool r)
 {
-	char	*tmp;
-	char	*tmp2;
-	char	*tenv;
-	int		sp;
-
-	tmp2 = NULL;
-	if (!(tmp = (char *)ft_calloc(sizeof(char), (ft_strlen(str) + PATH_MAX + 1))))
-		return (NULL);
-	k = idx;
-	while (str[k] != ' ' && str[k] != '"' && str[k])
-	{
-		if (str[k] == '$')
-		{
-			if (str[k + 1] != '?')
-				k = takepath(str, k + 1, tmp, env) - 1;
-			else
-			{
-				tenv = ft_itoa(errno);
-				ft_strcat(tmp, tenv);
-				free(tenv);
-				k++;
-			}
-		}
-		else
-			ft_strccat(tmp, str[k]);
-		k++;
-	}
-	if (tmp[0] == '\0')
-	{
-		free(tmp);
-		return (str);
-	}
-	else
-	{
-		if (!(tmp2 = (char *)ft_calloc(sizeof(char), (ft_strlen(str) + PATH_MAX))))
-			return (NULL);
-		if (idx != 0)
-			ft_strlcpy(tmp2, str, idx + 1);
-		ft_strcat(tmp2, tmp);
-		free(tmp);
-		sp = k;
-		while (str[sp] == ' ' && str[sp])
-			sp++;
-		if (str[sp] != '\0')
-			ft_strcat(tmp2, &str[k]);
-		free(str);
-		if (!(str = (char *)ft_calloc(sizeof(char), (ft_strlen(tmp2) + 1))))
-			return (NULL);
-		ft_strcpy(str, tmp2);
-		free(tmp2);
-	}
-	return (str);
-}
-
-char	*variables1(char *str, char **env)
-{
-	int		i;
-	int 	idx;
-	bool	r;
-
-	i = 0;
 	while (str[i])
 	{
 		r = true;
 		if (str[i] == '\\')
 			i += 2;
 		if (str[i] == '\'')
+			i = passquotes(str, i + 1, '\'');
+		r = ft_check_var_redir(str, i);
+		if (ft_checkvar(str, i, r))
 		{
-			i++;
-			while (str[i] != '\'')
-				i++;
-		}
-		if (str[i] == '$')
-		{
-			idx = i - 1;
-			while (str[idx] == ' ')
-				idx--;
-			if (str[idx] == '>' || str[idx] == '<')
-				r = false;
-		}
-		if (str[i] == '$' && (ft_isalpha(str[i + 1]) || str[i + 1] == '?') && !ft_isdigit(str[i + 1]) && r)
-		{
-			if (ft_strlen(str) != 1 && str[i + 1] != '\0' && str[i + 1] != ' ')
-			{
-				if ((str = ft_variables(str, i, env, 0)) == NULL)
-					return (NULL);
-				i--;
-			}
+			if ((str = ft_variables(str, i, env, 0)) == NULL)
+				return (NULL);
+			i--;
 		}
 		else if (r == false && (ft_isalpha(str[i + 1]) || str[i + 1] == '?') &&
 				str[i + 1] != '\0' && str[i + 1] != ' ' && ft_strlen(str) != 1)
 		{
-			if ((str = ft_variables3(str, i, env, 0)) == NULL)
+			if ((str = ft_variables3(str, i, env)) == NULL)
 				return (NULL);
-			while (str[i] != ' ' && str[i] && str[i] != '\\')
+			while (str[i] != ' ' && str[i] != '"' && str[i + 1])
 				i++;
 		}
 		i++;

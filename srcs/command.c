@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:23:14 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/13 12:46:43 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/17 12:14:00 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ char	*ft_command(char *line, char ***env, char **command)
 {
 	if (ft_strchr(line, '$'))
 	{
-		if ((line = variables1(line, *env)) == NULL)
+		if ((line = variables1(line, *env, 0, true)) == NULL)
 			return (line);
 		if (!ft_strcmp(line, "\0"))
 			return (line);
