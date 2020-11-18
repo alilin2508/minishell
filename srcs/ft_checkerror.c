@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 14:26:27 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 15:27:51 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/17 14:51:05 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,12 +112,10 @@ int		ft_semicolon_error(const char *str, int i)
 	return (0);
 }
 
-int		ft_checkerror(const char *str)
+int		ft_checkerror(const char *str, int i)
 {
-	int		i;
 	int		err;
 
-	i = 0;
 	while (str[i])
 	{
 		if (str[i] == '\'' || str[i] == '"')
@@ -135,6 +133,8 @@ int		ft_checkerror(const char *str)
 		if (str[i] == '|')
 			if ((err = ft_pipe_error(str, i)) != 0)
 				return (err);
+		if (str[i] == '\\')
+			i++;
 		i++;
 	}
 	return (0);

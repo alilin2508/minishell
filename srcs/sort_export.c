@@ -6,7 +6,7 @@
 /*   By: alilin <alilin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/06 18:57:34 by alilin            #+#    #+#             */
-/*   Updated: 2020/11/12 14:29:57 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/11/17 15:27:54 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,37 @@ void	print_export(char **tmp)
 	}
 }
 
-void	alph_sort(char **tmp, int i, int j, int k)
+char	*new_comp_sort(char *comp, char **tmp, int **k, int **flag)
+{
+	free(comp);
+	comp = ft_strdup(tmp[**k]);
+	**flag = **k;
+	return (comp);
+}
+
+char	*get_flag_comp(char *comp, char **tmp, int *k, int *flag)
+{
+	int		j;
+
+	while (tmp[*k])
+	{
+		j = 0;
+		if (comp[j] > tmp[*k][j])
+			comp = new_comp_sort(comp, tmp, &k, &flag);
+		else if (comp[j] == tmp[*k][j])
+		{
+			while ((comp[j] != '=' && tmp[*k][j] != '=') &&
+					(comp[j] == tmp[*k][j]))
+				j++;
+			if (comp[j] > tmp[*k][j])
+				comp = new_comp_sort(comp, tmp, &k, &flag);
+		}
+		*k += 1;
+	}
+	return (comp);
+}
+
+void	alph_sort(char **tmp, int i, int k)
 {
 	int		flag;
 	char	*comp;
@@ -52,28 +82,7 @@ void	alph_sort(char **tmp, int i, int j, int k)
 		comp = NULL;
 		comp = ft_strdup(tmp[i]);
 		k = i + 1;
-		while (tmp[k])
-		{
-			j = 0;
-			if (comp[j] > tmp[k][j])
-			{
-				free(comp);
-				comp = ft_strdup(tmp[k]);
-				flag = k;
-			}
-			else if (comp[j] == tmp[k][j])
-			{
-				while ((comp[j] != '=' && tmp[k][j] != '=') && (comp[j] == tmp[k][j]))
-					j++;
-				if (comp[j] > tmp[k][j])
-				{
-					free(comp);
-					comp = ft_strdup(tmp[k]);
-					flag = k;
-				}
-			}
-			k++;
-		}
+		comp = get_flag_comp(comp, tmp, &k, &flag);
 		if (ft_strcmp(tmp[i], comp) != 0)
 		{
 			temp = NULL;
@@ -113,7 +122,7 @@ char	**sort_export(char **env)
 		i++;
 	}
 	tmp[j] = NULL;
-	alph_sort(tmp, 0, 0, 0);
+	alph_sort(tmp, 0, 0);
 	ft_splitdel(&tmp);
 	return (env);
 }

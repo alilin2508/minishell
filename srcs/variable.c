@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:28:40 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/17 13:19:01 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/17 13:27:29 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ char	*ft_checkbackredir(char *str, int i, int nb)
 	return (str);
 }
 
-char	*ft_variables(char *str, int idx, char **env, int sp)
+char	*ft_variables(char *str, int idx, char **env)
 {
 	char	*tmp;
 	char	*tenv;
@@ -110,16 +110,8 @@ char	*ft_variables(char *str, int idx, char **env, int sp)
 		free(tenv);
 		idx++;
 	}
-	sp = idx;
-	while (str[sp] == ' ' && str[sp])
-		sp++;
-	if (str[sp] != '\0')
-		ft_strcat(tmp, &str[idx]);
-	free(str);
-	if (!(str = (char *)ft_calloc(sizeof(char), (ft_strlen(tmp) + 1))))
+	if ((str = get_str_var(str, tmp, idx, idx)) == NULL)
 		return (NULL);
-	ft_strcpy(str, tmp);
-	free(tmp);
 	return (str);
 }
 
@@ -135,7 +127,7 @@ char	*variables1(char *str, char **env, int i, bool r)
 		r = ft_check_var_redir(str, i);
 		if (ft_checkvar(str, i, r))
 		{
-			if ((str = ft_variables(str, i, env, 0)) == NULL)
+			if ((str = ft_variables(str, i, env)) == NULL)
 				return (NULL);
 			i--;
 		}

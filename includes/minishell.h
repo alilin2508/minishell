@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:13:00 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/17 13:19:09 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/17 15:20:13 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ pid_t		g_pid[2];
 # define PATH_MAX 4096
 
 char	*ft_checkredir(char *str);
-int		ft_checkerror(const char *str);
 int		ft_exit(char **commande);
 char	**my_redir_right(char **cmd, int idx, int f_open[2]);
 int		ft_precommande(char *line, char ***env);
@@ -55,7 +54,7 @@ char	*ft_command(char *line, char ***env, char **command);
 void	end(int sig);
 void	recovery(int sig);
 char	*variables1(char *str, char **env, int i, bool r);
-int		ft_checkerror(const char *str);
+int		ft_checkerror(const char *str, int i);
 char	**creat_list_arg(char *line);
 char	**ft_splitcmd(char *str);
 void	ft_pipe(char *str, char ***env, int nb);
@@ -90,9 +89,12 @@ int		ft_checkex2_1(char **env, char *cmd, int len, int i);
 int		ft_checkex2_2(char **env, char *cmd, int len, int i);
 char	*ft_variables3(char *str, int idx, char **env);
 int		takepath(char *str, int idx, char *tmp, char **env);
-char  **open_double_redir(char **cmd, int f_open[2], int idx);
-char  **open_simple_redir(char **cmd, int f_open[2], int idx);
+char	**open_double_redir(char **cmd, int f_open[2], int idx);
+char	**open_simple_redir(char **cmd, int f_open[2], int idx);
 bool	ft_check_var_redir(char *str, int i);
 int		ft_checkvar(char *str, int i, bool r);
+char	*get_str_var(char *str, char *tmp, int idx, int sp);
+char	*get_tmp_che(char *tmp, char *str, int *i, int *j);
+char	**ft_cmd_creatnull(char **cmd, int j, int k);
 
 #endif

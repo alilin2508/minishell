@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:08:39 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/15 11:58:38 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/18 17:21:07 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,26 @@ void	recovery(int sig)
 	}
 }
 
+void	ft_error_min_max(char **cmd, unsigned long long res)
+{
+	if (cmd[1][0] == '-')
+	{
+		if (res * -1 - 1 > 9223372036854775807ULL)
+			ft_puterror("bash: exit: ", cmd[1],
+				": numeric argument required\n", 255);
+	}
+	else
+	{
+		if (res > 9223372036854775807ULL)
+			ft_puterror("bash: exit: ", cmd[1],
+				": numeric argument required\n", 255);
+	}
+}
+
 int		ft_exit(char **cmd)
 {
+	unsigned long long res;
+
 	if (cmd != NULL)
 	{
 		write(0, "exit\n", 5);
@@ -58,16 +76,14 @@ int		ft_exit(char **cmd)
 				write(2, "bash: exit: too many arguments\n", 31);
 				return (1);
 			}
-			errno = ft_atoi(cmd[1]);
-			if (errno == -1 && ft_strcmp(cmd[1], "-1"))
-				ft_puterror("bash: exit: ", cmd[1],
-					": numeric argument required\n", 255);
+			res = ft_atoi(cmd[1]);
+			errno = res;
+			ft_error_min_max(cmd, res);
 		}
 		else if (cmd[1] != NULL)
 			ft_puterror("bash: exit: ", cmd[1],
 				": numeric argument required\n", 255);
 		ft_splitdel(&cmd);
-		//system("leaks minishell");
 		exit(errno);
 	}
 	ft_putstr("  \b\b \b");

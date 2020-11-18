@@ -6,13 +6,13 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 16:29:28 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 13:41:03 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/11/18 17:24:03 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	execution(char *cmd, int p_in[2], int p_out[2], char ***env)
+void		execution(char *cmd, int p_in[2], int p_out[2], char ***env)
 {
 	g_pid[1] = fork();
 	if (g_pid[1] == -1)
@@ -31,9 +31,8 @@ static int	execution(char *cmd, int p_in[2], int p_out[2], char ***env)
 		}
 		close(p_in[0]);
 		ft_command(cmd, env, NULL);
-		exit(EXIT_FAILURE);
+		exit(errno);
 	}
-	return (g_pid[1]);
 }
 
 static int	preexecution(char **cmd, int p_in[2], int p_out[2], char ***env)
@@ -69,7 +68,9 @@ void		my_pipe(char **cmd, char ***env)
 {
 	int		p_in[2];
 	int		p_out[2];
+	int		status;
 
+	status = 0;
 	p_in[0] = -1;
 	p_in[1] = -1;
 	p_out[0] = -1;
@@ -77,9 +78,11 @@ void		my_pipe(char **cmd, char ***env)
 	preexecution(cmd, p_in, p_out, env);
 	close(p_out[0]);
 	close(p_out[1]);
-	while (wait(NULL) > 0)
+	while (waitpid(0, &status, 0) > 0)
 	{
 	}
+	printf("ok\n");
+	errno = status / 256;
 }
 
 char		**takecmd_pipe(char **command, int i, int j, char *str)

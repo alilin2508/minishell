@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 12:27:24 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 14:24:41 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/11/18 15:01:10 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ int		my_cd(char *path, char ***env)
 	getcwd(oldpwd, PATH_MAX);
 	if (chdir(path) == -1)
 	{
-		ft_puterror("bash: cd: ", path, ": No such file or directory\n", 1);
+		ft_puterror("bash: cd: ", path, ": No such file or directory", 1);
 		free(oldpwd);
 		return (1);
 	}

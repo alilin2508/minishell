@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:56:47 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 14:03:22 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/11/17 14:49:40 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,55 +21,73 @@ int		ft_passpace(char *line, int idx)
 	return (1);
 }
 
+char	*get_cmd_quote(char *cmd, char *line, int **i, int **k)
+{
+	int c;
+
+	c = line[**i];
+	**i += 1;
+	while (line[**i] != c && line[**i])
+	{
+		if (line[**i] == '$' && ft_isdigit(line[**i + 1]))
+			**i += 2;
+		if ((line[**i] == '\\' && c == '"') && (line[**i + 1] == '\\' ||
+					line[**i + 1] == '"' || line[**i + 1] == '$'))
+			**i += 1;
+		cmd[**k] = line[**i];
+		**i += 1;
+		**k += 1;
+	}
+	return (cmd);
+}
+
+char	*get_cmd_creat(char *cmd, char *line, int *i, int *k)
+{
+	int		c;
+
+	c = '\0';
+	if (line[*i] == '$' && ft_isdigit(line[*i + 1]))
+		*i += 2;
+	if (line[*i] == '\'' || line[*i] == '"')
+	{
+		c = line[*i];
+		cmd = get_cmd_quote(cmd, line, &i, &k);
+	}
+	if (line[*i] == '\\' && line[*i + 1] != '>' && line[*i + 1] != '<')
+		*i += 1;
+	if (line[*i] != c)
+	{
+		cmd[*k] = line[*i];
+		*k += 1;
+	}
+	return (cmd);
+}
+
 char	**creat_list_arg2(char *line, char **cmd, int i, int j)
 {
 	int		k;
-	int		c;
 
 	k = 0;
-	c = '\0';
 	while (line[i])
 	{
 		if (line[i] == ' ')
 		{
 			cmd[j][k] = '\0';
+			k = 0;
 			j += 1;
 			cmd[j] = NULL;
-			k = 0;
 			while (line[i] == ' ')
 				i++;
 			if (line[i] == '\0')
 				break ;
-			if (!(cmd[j] = (char *)ft_calloc(sizeof(char), (ft_strlen(&line[i]) + 1))))
+			if (!(cmd[j] = (char *)ft_calloc(sizeof(char),
+					(ft_strlen(&line[i]) + 1))))
 				return (NULL);
 		}
-		if (line[i] == '$' && ft_isdigit(line[i + 1]))
-			i += 2;
-		if (line[i] == '\'' || line[i] == '"')
-		{
-			c = line[i];
-			i++;
-			while (line[i] != c && line[i])
-			{
-				if (line[i] == '$' && ft_isdigit(line[i + 1]))
-					i += 2;
-				if ((line[i] == '\\' && c == '"') && (line[i + 1] == '\\' ||
-							line[i + 1] == '"' || line[i + 1] == '$'))
-					i++;
-				cmd[j][k++] = line[i++];
-			}
-		}
-		if (line[i] == '\\' && line[i + 1] != '>' && line[i + 1] != '<')
-			i++;
-		if (line[i] != c)
-			cmd[j][k++] = line[i];
+		cmd[j] = get_cmd_creat(cmd[j], line, &i, &k);
 		i++;
 	}
-	if (cmd[j] != NULL)
-	{
-		cmd[j][k] = '\0';
-		cmd[j + 1] = NULL;
-	}
+	cmd = ft_cmd_creatnull(cmd, j, k);
 	return (cmd);
 }
 

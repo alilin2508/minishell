@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/10 14:11:23 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/14 17:36:28 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/11/18 17:23:26 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int				ft_strcmp(char *s1, char *s2);
 char			*ft_strcat(char *dest, char *src);
 void			ft_del_lst(t_env **p);
 void			ft_addback(t_env **p, char *environement);
-int				ft_atoi(const char *str);
+long long		ft_atoi(const char *str);
 int				ft_isalnum(int c);
 int				ft_isalpha(int c);
 int				ft_isascii(int c);

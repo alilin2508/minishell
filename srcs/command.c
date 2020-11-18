@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:23:14 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/17 12:14:00 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/18 12:32:30 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ int		ft_precommande(char *line, char ***env)
 	int		nbpipe;
 
 	command = NULL;
-	if (ft_checkerror(line))
+	if (ft_checkerror(line, 0))
 		return (0);
 	while (line[0] == ' ' || line[0] == ';')
 		line += 1;

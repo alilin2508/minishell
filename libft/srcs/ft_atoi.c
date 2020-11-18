@@ -6,15 +6,15 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/08 11:04:44 by grigo             #+#    #+#             */
-/*   Updated: 2019/10/08 19:16:58 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/18 17:22:54 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int	ft_atoi(const char *str)
+long long		ft_atoi(const char *str)
 {
-	int	result;
-	int	i;
-	int	value;
+	unsigned long long	result;
+	int					i;
+	int					value;
 
 	i = 0;
 	while ((str[i] > 8 && 14 > str[i]) || str[i] == 32)

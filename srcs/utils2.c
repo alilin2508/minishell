@@ -6,11 +6,36 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/12 14:34:00 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 14:34:03 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/17 14:49:36 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+char	**ft_cmd_creatnull(char **cmd, int j, int k)
+{
+	if (cmd[j] != NULL)
+	{
+		cmd[j][k] = '\0';
+		cmd[j + 1] = NULL;
+	}
+	return (cmd);
+}
+
+char	*get_str_var(char *str, char *tmp, int idx, int sp)
+{
+	sp = idx;
+	while (str[sp] == ' ' && str[sp])
+		sp++;
+	if (str[sp] != '\0')
+		ft_strcat(tmp, &str[idx]);
+	free(str);
+	if (!(str = (char *)ft_calloc(sizeof(char), (ft_strlen(tmp) + 1))))
+		return (NULL);
+	ft_strcpy(str, tmp);
+	free(tmp);
+	return (str);
+}
 
 int		ft_strcmparg(char *str)
 {

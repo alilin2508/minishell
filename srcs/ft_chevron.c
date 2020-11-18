@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/23 10:53:12 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/12 13:56:39 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/17 14:01:26 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,26 +77,14 @@ int		ft_nbchevron(const char *str)
 
 char	*ft_checkredir2(char *str, char *tmp, int i, int j)
 {
-	int		c;
-
 	while (str[i])
 	{
 		if (str[i] == '"' || str[i] == '\'')
 		{
 			if (str[i - 1] == '>' || str[i - 1] == '<')
 				tmp[j++] = ' ';
-			c = str[i];
 			tmp[j++] = str[i++];
-			while (str[i] != c)
-			{
-				if ((str[i] == '>' || str[i] == '<'))
-				{
-					if (c == '"')
-						tmp[j++] = '\\';
-					tmp[j++] = '\\';
-				}
-				tmp[j++] = str[i++];
-			}
+			tmp = get_tmp_che(tmp, str, &i, &j);
 		}
 		if (i != 0 && str[i] != '"' && str[i] != '\'')
 			if (ft_spacechevron(str, i))
