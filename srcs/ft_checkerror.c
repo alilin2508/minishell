@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 14:26:27 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/17 14:51:05 by grigo            ###   ########.fr       */
+/*   Updated: 2020/12/08 14:44:59 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ int		ft_pipe_error(const char *str, int i)
 	err = i - 1;
 	while (str[err] == ' ' && err > 0)
 		err--;
-	if (err == 0)
+	if (err == 0 && str[err] == ' ')
 		return (parse_error(1, "|"));
 	err = i + 1;
 	while (str[err] && str[err] == ' ')

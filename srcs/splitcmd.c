@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 14:47:41 by grigo             #+#    #+#             */
-/*   Updated: 2020/10/28 16:55:17 by grigo            ###   ########.fr       */
+/*   Updated: 2020/12/07 15:25:09 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ char	*ft_takecmd(char *str, int first, int last)
 	int		i;
 	char	*s;
 
-	while (str[first] == ';' || str[first] == ' ')
+	while (str[first] == ' ')
 		first++;
 	if (str[first] == '\0')
 		return (NULL);
@@ -67,7 +67,7 @@ char	**creat_tab(char **tab, int i, int j, char *str)
 			if ((tab[i++] = ft_takecmd(str, first, j)) == NULL)
 				return (NULL);
 			j++;
-			while (str[j] == ' ' && str[j] == ';')
+			while (str[j] == ' ')
 				j++;
 			first = j;
 		}

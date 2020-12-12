@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 16:29:28 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/18 17:24:03 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/12/12 14:23:46 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void		execution(char *cmd, int p_in[2], int p_out[2], char ***env)
 {
 	g_pid[1] = fork();
+	errno = 0;
 	if (g_pid[1] == -1)
 		exit(EXIT_FAILURE);
 	else if (g_pid[1] == 0)
@@ -23,33 +24,33 @@ void		execution(char *cmd, int p_in[2], int p_out[2], char ***env)
 		{
 			close(p_in[1]);
 			dup2(p_in[0], STDIN_FILENO);
+			close(p_in[0]);
 		}
-		if (p_out[0] != -1 && p_out[1] != -1)
+		if (p_out[0] != -1 && p_out[1] != -1 && g_last != 1)
 		{
 			close(p_out[0]);
 			dup2(p_out[1], STDOUT_FILENO);
+			close(p_out[1]);
 		}
-		close(p_in[0]);
 		ft_command(cmd, env, NULL);
 		exit(errno);
 	}
 }
 
-static int	preexecution(char **cmd, int p_in[2], int p_out[2], char ***env)
+void		preexecution(char **cmd, int p_in[2], int p_out[2], char ***env)
 {
-	int i;
-	int nb_cmd;
+	int		i;
 
-	nb_cmd = tab_len(cmd);
 	i = 0;
 	while (cmd[i])
 	{
-		if (i < nb_cmd - 1)
+		if (i < tab_len(cmd) - 1)
 			pipe(p_out);
 		execution(cmd[i], p_in, p_out, env);
+		if (p_in[0] != -1)
+			close(p_in[0]);
 		close(p_in[1]);
-		close(p_in[0]);
-		if (i < nb_cmd - 1)
+		if (i < tab_len(cmd) - 1)
 		{
 			p_in[0] = p_out[0];
 			p_in[1] = p_out[1];
@@ -59,9 +60,10 @@ static int	preexecution(char **cmd, int p_in[2], int p_out[2], char ***env)
 			p_out[0] = -1;
 			p_out[1] = -1;
 		}
+		if (i == tab_len(cmd) - 2)
+			g_last = 1;
 		i++;
 	}
-	return (g_pid[1]);
 }
 
 void		my_pipe(char **cmd, char ***env)
@@ -76,12 +78,9 @@ void		my_pipe(char **cmd, char ***env)
 	p_out[0] = -1;
 	p_out[1] = -1;
 	preexecution(cmd, p_in, p_out, env);
-	close(p_out[0]);
-	close(p_out[1]);
 	while (waitpid(0, &status, 0) > 0)
 	{
 	}
-	printf("ok\n");
 	errno = status / 256;
 }
 
@@ -118,6 +117,7 @@ void		ft_pipe(char *str, char ***env, int nb)
 {
 	char	**command;
 
+	g_last = 0;
 	if (!(command = (char **)malloc(sizeof(char *) * (nb + 2))))
 		return ;
 	if ((command = takecmd_pipe(command, 0, 0, str)) == NULL)

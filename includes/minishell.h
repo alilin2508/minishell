@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:13:00 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/17 15:20:13 by grigo            ###   ########.fr       */
+/*   Updated: 2020/12/12 14:18:53 by gabrielri        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,11 @@ int			g_file[3];
 int			g_fd[2];
 int			g_cvr[2];
 pid_t		g_pid[2];
+int			g_last;
 # define PATH_MAX 4096
 
 char	*ft_checkredir(char *str);
-int		ft_exit(char **commande);
+int		ft_exit(char **commande, char **env);
 char	**my_redir_right(char **cmd, int idx, int f_open[2]);
 int		ft_precommande(char *line, char ***env);
 char	*my_redirection(char *str);

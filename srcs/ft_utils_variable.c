@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/15 12:44:39 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/17 13:19:28 by grigo            ###   ########.fr       */
+/*   Updated: 2020/11/19 11:56:24 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,5 @@ char	*ft_variables3(char *str, int idx, char **env)
 		if ((str = ft_modif_str_vari(str, idx, tmp)) == NULL)
 			return (NULL);
 	}
-	printf("str = %s\n", str);
 	return (str);
 }

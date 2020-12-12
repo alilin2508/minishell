@@ -34,7 +34,8 @@ SRC = main.c \
 
 OBJ		= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))
 
-CC		= gcc
+CC		= clang -g
+##CC		= gcc
 CFLAGS = -Wall -Wextra -Werror -g
 
 FTDIR = ./libft

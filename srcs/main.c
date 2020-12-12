@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/26 10:30:45 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/18 15:04:15 by grigo            ###   ########.fr       */
+/*   Updated: 2020/12/12 14:09:07 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int		main(int ac, char **av, char **env)
 		g_pid[1] = 0;
 		write(0, "\033[1;34m$alilin> \033[0;37m", 23);
 		if (get_next_line(0, &line) == 0)
-			ft_exit(NULL);
+			ft_exit(NULL, envi);
 		ft_precommande(line, &envi);
 		free(line);
 		line = NULL;

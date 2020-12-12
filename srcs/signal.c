@@ -6,7 +6,7 @@
 /*   By: grigo <grigo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:08:39 by grigo             #+#    #+#             */
-/*   Updated: 2020/11/18 17:21:07 by gabrielri        ###   ########.fr       */
+/*   Updated: 2020/12/12 14:20:07 by grigo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,12 @@ void	ft_error_min_max(char **cmd, unsigned long long res)
 	}
 }
 
-int		ft_exit(char **cmd)
+int		ft_exit(char **cmd, char **env)
 {
 	unsigned long long res;
 
 	if (cmd != NULL)
 	{
-		write(0, "exit\n", 5);
 		if (cmd[1] != NULL && ft_strisdigit(cmd[1]))
 		{
 			if (cmd[2] != NULL)
@@ -84,6 +83,7 @@ int		ft_exit(char **cmd)
 			ft_puterror("bash: exit: ", cmd[1],
 				": numeric argument required\n", 255);
 		ft_splitdel(&cmd);
+		ft_splitdel(&env);
 		exit(errno);
 	}
 	ft_putstr("  \b\b \b");
